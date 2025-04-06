@@ -10,9 +10,10 @@ class Event extends Model
     use HasFactory;
     protected $casts = [
         'start_time' => 'datetime',  // This will automatically cast start_time to a Carbon instance
+        'end_time' => 'datetime',
     ];
 
-    protected $fillable = ['jumuiya_id', 'title', 'description', 'end_time', 'location', 'status'];
+    protected $fillable = ['jumuiya_id', 'title', 'description', 'start_time', 'end_time', 'location', 'status'];
 
     public function jumuiya()
     {

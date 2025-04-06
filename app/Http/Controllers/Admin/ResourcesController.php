@@ -7,7 +7,7 @@ use App\Models\Resource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-
+use App\Models\Jumuiya; // Or the correct namespace for your Jumuiya model
 class ResourcesController extends Controller
 {
     /**
@@ -34,7 +34,9 @@ class ResourcesController extends Controller
             'other' => 'Other'
         ];
 
-        return view('admin.resources.create', compact('resourceTypes'));
+        $jumuiyas = \App\Models\Jumuiya::all();
+
+        return view('admin.resources.create', compact('resourceTypes', 'jumuiyas'));
     }
 
     /**
@@ -46,31 +48,26 @@ class ResourcesController extends Controller
             'title' => 'required|string|max:255',
             'type' => 'required|string|in:document,video,audio,image,other',
             'description' => 'nullable|string',
-            'file' => 'required|file|mimes:pdf,jpeg,png,jpg,docx,mp4,mov,mp3,wav|max:20480', // 20MB max
+            'file' => 'required|file|mimes:pdf,jpeg,png,jpg,docx,mp4,mov,mp3,wav|max:20480',
+            'jumuiya_id' => 'required|exists:jumuiyas,id' // Add validation
         ]);
-
+    
         $file = $request->file('file');
-        $originalName = $file->getClientOriginalName();
-        $fileSize = round($file->getSize() / 1024); // Size in KB
-        $fileExtension = $file->getClientOriginalExtension();
         
-        // Store file with unique name but track original name
-        $filePath = $file->store('resources', 'public');
-
-        Resource::create([
+        $resource = Resource::create([
             'title' => $validated['title'],
             'type' => $validated['type'],
             'description' => $validated['description'],
-            'file_path' => $filePath,
-            'original_filename' => $originalName,
-            'file_size' => $fileSize,
-            'file_extension' => $fileExtension,
+            'jumuiya_id' => $validated['jumuiya_id'], // Add this line
+            'file_path' => $file->store('resources', 'public'),
+            'original_filename' => $file->getClientOriginalName(),
+            'file_size' => round($file->getSize() / 1024),
+            'file_extension' => $file->getClientOriginalExtension(),
         ]);
-
-        return redirect()->route('admin.resources.index')
-            ->with('success', 'Resource created successfully');
+    
+        return redirect()->route('admin.resources.show', $resource->id)
+                       ->with('success', 'Resource created successfully');
     }
-
     /**
      * Display the specified resource with download count
      */

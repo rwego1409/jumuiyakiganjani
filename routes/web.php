@@ -19,11 +19,6 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -49,7 +44,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             
             // Members resource
             Route::resource('members', MembersController::class)
-                // ->except(['create', 'store']) // Typically admin doesn't create members directly
                 ->names([
                     'index' => 'members.index',
                     'show' => 'members.show',
@@ -95,15 +89,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     'update' => 'resources.update',
                     'destroy' => 'resources.destroy'
                 ]);
+            
+            // Custom download route for resources
+            Route::get('resources/{resource}/download', [ResourcesController::class, 'download'])
+                ->name('resources.download');
 
             // Reports
             Route::resource('reports', ReportsController::class)
-                ->only(['index', 'show', 'store']) // Typically reports are generated, not edited
+                ->only(['index', 'show', 'store'])
                 ->names([
                     'index' => 'reports.index',
                     'show' => 'reports.show',
-                    'store' => 'reports.generate'
+                    'store' => 'reports.generate',
+                    'create' => 'reports.create',
+                    'edit' => 'reports.edit',
+                    'update' => 'reports.update',
+                    'destroy' => 'reports.destroy'
                 ]);
+
+            Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
+            Route::get('/reports/generate', [ReportsController::class, 'generate'])->name('reports.generate');
         });
 
     // Member routes
@@ -118,9 +123,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Notifications
             Route::get('/notifications', [MemberController::class, 'notifications'])
                 ->name('notifications');
-            
-            // Profile management - using standard Laravel Breeze route names but prefixed
-            
             
             // Contributions
             Route::prefix('contributions')->name('contributions.')->group(function () {
@@ -167,11 +169,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             });
         });
     
-    // Shared resource download route (accessible by both roles)
-    Route::get('/resources/download/{resource}', [ResourceController::class, 'download'])
-        ->name('resources.download')
-        ->middleware(['auth', 'verified']);
-
     // Profile management
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');
@@ -179,8 +176,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
+    
     // Fallback route for undefined paths
     Route::fallback(function () {
-        return response()->view('errors.404', [], 404);
+        return view('errors.404');
     });
 });

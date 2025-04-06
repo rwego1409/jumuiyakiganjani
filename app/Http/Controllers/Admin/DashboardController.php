@@ -40,7 +40,10 @@ class DashboardController extends Controller
         $recentResourcesCount = 5; // Replace with actual count of new resources this week
 
         // Recent Members (new members in the last month)
-        $recentMembers = Member::where('created_at', '>=', Carbon::now()->subMonth())->orderBy('created_at', 'desc')->get();
+       // DashboardController.php
+$recentMembers = Member::where('created_at', '>=', Carbon::now()->subMonth())
+->orderBy('created_at', 'desc')
+->paginate(5); // ← Change from get() to paginate()
 
         // Recent Activities (can be system logs or other activity data)
         $activities = Activity::orderBy('created_at', 'desc')->take(5)->get();

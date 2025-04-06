@@ -23,25 +23,26 @@ class MembersController extends Controller
     }
 
     public function store(StoreMemberRequest $request)
-    {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt('password'),
-            'role' => 'member'
-        ]);
+{
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => bcrypt('password'),
+        'role' => 'member'
+    ]);
 
-        Member::create([
-            'user_id' => $user->id,
-            'jumuiya_id' => $request->jumuiya_id,
-            'phone' => $request->phone,
-            'status' => $request->status,
-            'joined_date' => $request->joined_date
-        ]);
+    $member = Member::create([
+        'user_id' => $user->id,
+        'jumuiya_id' => $request->jumuiya_id,
+        'phone' => $request->phone,
+        'status' => $request->status,
+        'joined_date' => $request->joined_date
+    ]);
 
-        return redirect()->route('admin.members.index')
-            ->with('success', 'Member created successfully');
-    }
+    // Redirect to the show page of the newly created member
+    return redirect()->route('admin.members.show', $member)
+        ->with('success', 'Member created successfully');
+}
 
     public function show(Member $member)
     {

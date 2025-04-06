@@ -20,16 +20,18 @@
                                 name="title" 
                                 value="{{ old('title', $event->title) }}" 
                                 required />
+                            <x-input-error :messages="$errors->get('title')" class="mt-2" />
                         </div>
 
                         <!-- Event Status -->
                         <div>
                             <x-input-label for="status" :value="__('Event Status')" />
-                            <x-select-input id="status" name="status" class="block mt-1 w-full" required>
-                                <option value="upcoming" {{ $event->status === 'upcoming' ? 'selected' : '' }}>Upcoming</option>
-                                <option value="ongoing" {{ $event->status === 'ongoing' ? 'selected' : '' }}>Ongoing</option>
-                                <option value="completed" {{ $event->status === 'completed' ? 'selected' : '' }}>Completed</option>
-                            </x-select-input>
+                            <select id="status" name="status" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                <option value="upcoming" {{ old('status', $event->status) === 'upcoming' ? 'selected' : '' }}>Upcoming</option>
+                                <option value="ongoing" {{ old('status', $event->status) === 'ongoing' ? 'selected' : '' }}>Ongoing</option>
+                                <option value="completed" {{ old('status', $event->status) === 'completed' ? 'selected' : '' }}>Completed</option>
+                            </select>
+                            <x-input-error :messages="$errors->get('status')" class="mt-2" />
                         </div>
 
                         <!-- Start Time -->
@@ -38,8 +40,9 @@
                             <x-text-input id="start_time" class="block mt-1 w-full" 
                                 type="datetime-local" 
                                 name="start_time" 
-                                value="{{ old('start_time', $event->start_time->format('Y-m-d\TH:i')) }}" 
+                                value="{{ old('start_time', $event->start_time ? $event->start_time->format('Y-m-d\TH:i') : '') }}" 
                                 required />
+                            <x-input-error :messages="$errors->get('start_time')" class="mt-2" />
                         </div>
 
                         <!-- End Time -->
@@ -48,8 +51,9 @@
                             <x-text-input id="end_time" class="block mt-1 w-full" 
                                 type="datetime-local" 
                                 name="end_time" 
-                                value="{{ old('end_time', $event->end_time->format('Y-m-d\TH:i')) }}" 
+                                value="{{ old('end_time', $event->end_time ? $event->end_time->format('Y-m-d\TH:i') : '') }}" 
                                 required />
+                            <x-input-error :messages="$errors->get('end_time')" class="mt-2" />
                         </div>
 
                         <!-- Location -->
@@ -60,12 +64,14 @@
                                 name="location" 
                                 value="{{ old('location', $event->location) }}" 
                                 required />
+                            <x-input-error :messages="$errors->get('location')" class="mt-2" />
                         </div>
 
                         <!-- Description -->
                         <div class="md:col-span-2">
                             <x-input-label for="description" :value="__('Description')" />
-                            <x-text-area id="description" name="description" class="block mt-1 w-full" rows="4">{{ old('description', $event->description) }}</x-text-area>
+                            <textarea id="description" name="description" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows="4">{{ old('description', $event->description) }}</textarea>
+                            <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
                     </div>
 
