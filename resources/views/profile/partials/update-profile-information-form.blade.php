@@ -1,9 +1,49 @@
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+            {{ __('Profile Picture') }}
+        </h2>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            {{ __('Update your profile image') }}
+        </p>
+    </header>
+
+    <div class="flex flex-col items-center my-6">
+        <div class="h-24 w-24 rounded-full overflow-hidden bg-gray-100 mb-4">
+            @if($member && $member->profile_picture)
+                <img src="{{ Storage::url($member->profile_picture) }}" alt="{{ $user->name }}" class="h-full w-full object-cover">
+            @else
+                <div class="h-full w-full bg-primary-600 flex items-center justify-center text-white text-2xl font-semibold">
+                    {{ substr($user->name, 0, 2) }}
+                </div>
+            @endif
+        </div>
+        
+        <form action="{{ route('profile.update-picture') }}" method="post" enctype="multipart/form-data" class="w-full max-w-xs">
+            @csrf
+            @method('patch')
+            
+            <div class="relative">
+                <label for="profile_picture" class="w-full py-2 px-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none cursor-pointer inline-flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
+                    </svg>
+                    {{ __('Choose Image') }}
+                </label>
+                <input id="profile_picture" name="profile_picture" type="file" accept="image/jpeg,image/png" class="hidden" onchange="this.form.submit()">
+            </div>
+            
+            <p class="text-center text-xs text-gray-500 dark:text-gray-400 mt-2">JPG or PNG. Max 2MB.</p>
+            <x-input-error class="mt-2" :messages="$errors->get('profile_picture')" />
+        </form>
+    </div>
+</section>
+
+<section class="mt-6">
+    <header>
+        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
             {{ __('Profile Information') }}
         </h2>
-
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
             {{ __("Update your account's profile information and email address.") }}
         </p>
@@ -17,12 +57,14 @@
         @csrf
         @method('patch')
 
+        <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Name')" />
             <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
+        <!-- Email -->
         <div>
             <x-input-label for="email" :value="__('Email')" />
             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
@@ -46,6 +88,43 @@
                 </div>
             @endif
         </div>
+
+        @if(isset($member))
+        <!-- Phone -->
+        <div>
+            <x-input-label for="phone" :value="__('Phone Number')" />
+            <x-text-input id="phone" name="phone" type="tel" class="mt-1 block w-full" :value="old('phone', $member->phone)" required />
+            <x-input-error class="mt-2" :messages="$errors->get('phone')" />
+        </div>
+
+        <!-- Address -->
+        <div>
+            <x-input-label for="address" :value="__('Address')" />
+            <x-text-input id="address" name="address" type="text" class="mt-1 block w-full" :value="old('address', $member->address)" />
+            <x-input-error class="mt-2" :messages="$errors->get('address')" />
+        </div>
+
+        <!-- Birth Date -->
+        <div>
+            <x-input-label for="birth_date" :value="__('Birth Date')" />
+            <x-text-input id="birth_date" name="birth_date" type="date" class="mt-1 block w-full" :value="old('birth_date', $member->birth_date ? date('Y-m-d', strtotime($member->birth_date)) : '')" />
+            <x-input-error class="mt-2" :messages="$errors->get('birth_date')" />
+        </div>
+
+        <!-- Jumuiya Selection -->
+        <div>
+            <x-input-label for="jumuiya_id" :value="__('Community (Jumuiya)')" />
+            <select id="jumuiya_id" name="jumuiya_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                <option value="">{{ __('Select a community') }}</option>
+                @foreach($jumuiyas as $jumuiya)
+                    <option value="{{ $jumuiya->id }}" {{ old('jumuiya_id', $member->jumuiya_id) == $jumuiya->id ? 'selected' : '' }}>
+                        {{ $jumuiya->name }}
+                    </option>
+                @endforeach
+            </select>
+            <x-input-error class="mt-2" :messages="$errors->get('jumuiya_id')" />
+        </div>
+        @endif
 
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>

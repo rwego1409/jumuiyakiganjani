@@ -2,38 +2,21 @@
 
 namespace App\Exports;
 
+use Maatwebsite\Excel\Concerns\{FromCollection, WithHeadings, WithMapping};
 use App\Models\Contribution;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class ContributionsExport implements FromCollection, WithHeadings
+class ContributionsExport implements FromCollection, WithHeadings, WithMapping
 {
-    protected $startDate;
-    protected $endDate;
+    protected $query;
 
-    public function __construct($startDate = null, $endDate = null)
+    public function __construct($query)
     {
-        $this->startDate = $startDate;
-        $this->endDate = $endDate;
+        $this->query = $query;
     }
 
     public function collection()
     {
-        $query = Contribution::with('member');
-
-        if ($this->startDate && $this->endDate) {
-            $query->whereBetween('contribution_date', [$this->startDate, $this->endDate]);
-        }
-
-        return $query->get()->map(function ($contribution) {
-            return [
-                'Member' => $contribution->member->name,
-                'Amount' => $contribution->amount,
-                'Date' => $contribution->contribution_date->format('M d, Y'),
-                'Payment Method' => ucfirst($contribution->payment_method),
-                'Reference' => $contribution->reference_number
-            ];
-        });
+        return $this->query->get();
     }
 
     public function headings(): array
@@ -41,9 +24,22 @@ class ContributionsExport implements FromCollection, WithHeadings
         return [
             'Member Name',
             'Amount',
-            'Contribution Date',
             'Payment Method',
-            'Reference Number'
+            'Date',
+            'Status',
+            'Transaction ID'
+        ];
+    }
+
+    public function map($contribution): array
+    {
+        return [
+            $contribution->member->user->name,
+            number_format($contribution->amount, 2),
+            ucfirst($contribution->payment_method),
+            $contribution->created_at->format('Y-m-d H:i:s'),
+            ucfirst($contribution->status),
+            $contribution->transaction_id
         ];
     }
 }

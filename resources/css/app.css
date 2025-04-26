@@ -1,3 +1,126 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Dark mode styles */
+@layer base {
+    .dark {
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2d2d2d;
+        --text-primary: #e5e5e5;
+        --text-secondary: #a3a3a3;
+        --border-color: #404040;
+    }
+
+    /* Layout elements */
+    .dark body { @apply bg-gray-900 text-gray-100; }
+    .dark .bg-white { @apply bg-gray-800; }
+    .dark .bg-gray-50 { @apply bg-gray-900; }
+    .dark .bg-gray-100 { @apply bg-gray-800; }
+    
+    /* Text colors */
+    .dark .text-gray-600 { @apply text-gray-400; }
+    .dark .text-gray-700 { @apply text-gray-300; }
+    .dark .text-gray-900 { @apply text-gray-100; }
+    
+    /* Borders */
+    .dark .border-gray-200 { @apply border-gray-700; }
+    .dark .border-gray-300 { @apply border-gray-600; }
+    
+    /* Forms */
+    .dark input, .dark select, .dark textarea {
+        @apply bg-gray-700 border-gray-600 text-gray-100;
+    }
+    
+    /* Cards and panels */
+    .dark .card, .dark .panel {
+        @apply bg-gray-800 border-gray-700;
+    }
+    
+    /* Tables */
+    .dark table th {
+        @apply bg-gray-800 text-gray-300;
+    }
+    .dark table td {
+        @apply border-gray-700;
+    }
+    .dark tr:hover {
+        @apply bg-gray-700;
+    }
+}
+
+/* Dark mode transitions */
+.dark-transition {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+/* Dark mode utilities */
+@layer utilities {
+    .dark {
+        color-scheme: dark;
+    }
+    
+    /* Core dark mode styles */
+    .dark body {
+        @apply bg-gray-900 text-gray-100;
+    }
+    
+    /* Navigation & Header */
+    .dark nav, .dark header {
+        @apply bg-gray-800 border-gray-700;
+    }
+    
+    /* Cards & Panels */
+    .dark .card, .dark .panel {
+        @apply bg-gray-800 border-gray-700 text-gray-100;
+    }
+    
+    /* Forms & Inputs */
+    .dark input, .dark select, .dark textarea {
+        @apply bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400;
+    }
+    
+    /* Tables */
+    .dark table {
+        @apply text-gray-100;
+    }
+    .dark thead {
+        @apply bg-gray-800 border-gray-700;
+    }
+    .dark tbody tr {
+        @apply border-gray-700;
+    }
+    .dark tbody tr:hover {
+        @apply bg-gray-700;
+    }
+    
+    /* Buttons */
+    .dark .btn-secondary {
+        @apply bg-gray-700 hover:bg-gray-600 text-gray-100;
+    }
+    
+    /* Dropdowns */
+    .dark .dropdown-content {
+        @apply bg-gray-800 border-gray-700;
+    }
+    
+    /* Alerts & Notifications */
+    .dark .alert-success {
+        @apply bg-green-900 text-green-100;
+    }
+    .dark .alert-error {
+        @apply bg-red-900 text-red-100;
+    }
+    
+    /* Icons */
+    .dark .icon-primary {
+        @apply text-blue-400;
+    }
+
+    /* Card dark mode */
+    .dark .card-jumuiya {
+        @apply bg-gray-800 text-gray-100;
+    }
+}

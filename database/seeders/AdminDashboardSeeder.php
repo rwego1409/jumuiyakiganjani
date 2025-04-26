@@ -45,13 +45,13 @@ class AdminDashboardSeeder extends Seeder
         ]);
 
         // Create Contributions for members
-        Contribution::factory()->count(200)->create([
-            'member_id' => fn() => $members->random()->id,
-            'jumuiya_id' => fn() => $members->random()->jumuiya_id,
-            'amount' => rand(5000, 50000),
-            'contribution_date' => Carbon::now()->subDays(rand(0, 90))
-        ]);
-
+Contribution::factory()->count(200)->create([
+    'user_id' => fn() => $members->random()->user_id,
+    'recorded_by' => $admin->id,
+    'member_id' => fn() => $members->random()->id,
+    'jumuiya_id' => fn() => $members->random()->jumuiya_id,
+    'contribution_date' => Carbon::now()->subDays(rand(0, 90)),
+]);
         // Create Events
         $events = Event::factory()->count(15)->create([
             'jumuiya_id' => fn() => $jumuiyas->random()->id,

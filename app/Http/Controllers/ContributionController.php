@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreContributionRequest;
 use App\Http\Requests\UpdateContributionRequest;
 use App\Models\Contribution;
+use App\Notifications\ContributionReceived;
+
 
 class ContributionController extends Controller
 {
@@ -13,10 +15,16 @@ class ContributionController extends Controller
      */
     public function index()
     {
-        return view('admin.contributions.index', [
-            'contributions' => Contribution::with(['member', 'jumuiya'])->paginate(10)
-        ]);
+        $member = Auth::user()->member;  // Get the authenticated user's member record.
+    
+        $contributions = Contribution::with('jumuiya')  // Eager load jumuiya
+            ->where('member_id', $member->id)  // Filter by member_id (assuming it's in contributions table)
+            ->latest()  // Get the latest contributions first
+            ->paginate(10);  // Paginate results, 10 per page
+    
+        return view('member.contributions.index', compact('contributions'));
     }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -41,6 +49,8 @@ class ContributionController extends Controller
             'date' => $request->date,
             'status' => $request->status
         ]);
+
+        $member->user->notify(new ContributionReceived($contribution));
 
         return redirect()->route('admin.contributions.index')
             ->with('success', 'Contribution created successfully');

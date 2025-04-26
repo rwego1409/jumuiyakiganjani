@@ -84,20 +84,20 @@ class ResourcesController extends Controller
     /**
      * Download the specified resource
      */
-    public function download(string $id)
-    {
-        $resource = Resource::findOrFail($id);
-        $filePath = storage_path('app/public/' . $resource->file_path);
+    // public function download(string $id)
+    // {
+    //     $resource = Resource::findOrFail($id);
+    //     $filePath = storage_path('app/public/' . $resource->file_path);
 
-        if (!file_exists($filePath)) {
-            abort(404);
-        }
+    //     if (!file_exists($filePath)) {
+    //         abort(404);
+    //     }
 
-        // Increment download count
-        $resource->increment('download_count');
+    //     // Increment download count
+    //     $resource->increment('download_count');
 
-        return response()->download($filePath, $resource->original_filename);
-    }
+    //     return response()->download($filePath, $resource->original_filename);
+    // }
 
     /**
      * Show the form for editing the specified resource
@@ -175,4 +175,20 @@ class ResourcesController extends Controller
         return redirect()->route('admin.resources.index')
             ->with('success', 'Resource deleted successfully');
     }
+
+    public function download(Resource $resource)
+{
+    // Verify the resource exists and user has permission
+    if (!$resource->exists) {
+        abort(404);
+    }
+
+    $filePath = storage_path('app/' . $resource->file_path);
+    
+    if (!file_exists($filePath)) {
+        abort(404, 'The requested file does not exist.');
+    }
+
+    return response()->download($filePath, $resource->original_name);
+}
 }

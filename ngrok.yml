@@ -1,0 +1,12 @@
+version: "2"
+authtoken: 2vmBe8PZhQNsz9Kb2IqpA7sPeEt_7wtbw5scLhQdWe8WkHFq8
+tunnels:
+  web:
+    proto: http
+    addr: 5173
+    inspect: false
+  api:
+    proto: http
+    addr: 8000
+    inspect: false
+

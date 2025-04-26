@@ -7,12 +7,21 @@ use App\Http\Controllers\Admin\MembersController;
 use App\Http\Controllers\Admin\ResourcesController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\ActivityController;
-use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\Admin\ReportsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Members\DashboardController as MembersDashboardController;
 use App\Http\Controllers\Members\MemberController;
 use App\Http\Controllers\Members\ResourceController;
+use App\Http\Controllers\Members\BalanceController;
+use App\Http\Controllers\Members\TransactionController;
+use App\Http\Controllers\Members\ContributionController as MemberContributionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MpesaController;
+use App\Http\Controllers\ProfileSetupController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\NotificationController; // ADDED MISSING IMPORT
+use App\Http\Controllers\ClickPesaController;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,8 +30,13 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
-require __DIR__.'/auth.php';
+// Public routes
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Breeze's default authentication routes
+require __DIR__.'/auth.php'; 
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Admin routes
@@ -30,154 +44,139 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('admin.')
         ->middleware(['admin'])
         ->group(function () {
-            // Dashboard
-            Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-                ->name('dashboard');
-                
-            // Settings
-            Route::get('/settings', [SettingsController::class, 'index'])
-                ->name('settings');
-            
-            // Activities
-            Route::get('/activities', [ActivityController::class, 'index'])
-                ->name('activities');
-            
-            // Members resource
-            Route::resource('members', MembersController::class)
-                ->names([
-                    'index' => 'members.index',
-                    'show' => 'members.show',
-                    'edit' => 'members.edit',
-                    'update' => 'members.update',
-                    'destroy' => 'members.destroy',
-                    'create' => 'members.create',
-                    'store' => 'members.store',
-                ]);
-            
-            // Contributions resource
-            Route::resource('contributions', ContributionsController::class)
-                ->names([
-                    'index' => 'contributions.index',
-                    'create' => 'contributions.create',
-                    'store' => 'contributions.store',
-                    'show' => 'contributions.show',
-                    'edit' => 'contributions.edit',
-                    'update' => 'contributions.update',
-                    'destroy' => 'contributions.destroy'
-                ]);
-            
-            // Events resource
-            Route::resource('events', EventsController::class)
-                ->names([
-                    'index' => 'events.index',
-                    'create' => 'events.create',
-                    'store' => 'events.store',
-                    'show' => 'events.show',
-                    'edit' => 'events.edit',
-                    'update' => 'events.update',
-                    'destroy' => 'events.destroy'
-                ]);
-            
-            // Resources resource
-            Route::resource('resources', ResourcesController::class)
-                ->names([
-                    'index' => 'resources.index',
-                    'create' => 'resources.create',
-                    'store' => 'resources.store',
-                    'show' => 'resources.show',
-                    'edit' => 'resources.edit',
-                    'update' => 'resources.update',
-                    'destroy' => 'resources.destroy'
-                ]);
-            
-            // Custom download route for resources
-            Route::get('resources/{resource}/download', [ResourcesController::class, 'download'])
-                ->name('resources.download');
+            Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-            // Reports
-            Route::resource('reports', ReportsController::class)
-                ->only(['index', 'show', 'store'])
-                ->names([
-                    'index' => 'reports.index',
-                    'show' => 'reports.show',
-                    'store' => 'reports.generate',
-                    'create' => 'reports.create',
-                    'edit' => 'reports.edit',
-                    'update' => 'reports.update',
-                    'destroy' => 'reports.destroy'
-                ]);
+            // Admin Settings
+            Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 
-            Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
-            Route::get('/reports/generate', [ReportsController::class, 'generate'])->name('reports.generate');
+            // Admin Courses
+            Route::resource('courses', CourseController::class);
+
+            // Admin Activities
+            Route::get('/activities', [ActivityController::class, 'index'])->name('activities');
+
+            // Admin Members
+            Route::resource('members', MembersController::class);
+
+            // Admin Contributions
+            Route::resource('contributions', ContributionsController::class);
+
+            // Admin Events
+            Route::resource('events', EventsController::class);
+
+            // Admin Resources
+            Route::resource('resources', ResourcesController::class);
+
+            // Admin Reports
+            Route::prefix('reports')->name('reports.')->group(function () {
+                Route::get('/', [ReportsController::class, 'index'])->name('index');
+                Route::get('/generate/{type}/{format?}', [ReportsController::class, 'generate'])
+                    ->name('generate')
+                    ->where([
+                        'type' => 'contributions|members',
+                        'format' => 'pdf|excel|csv'
+                    ]);
+                Route::post('/download', [ReportsController::class, 'download'])->name('download');
+            });
+
+            // Export Route for Reports
+            Route::get('/reports/export/{id}/{format}', [ReportsController::class, 'export'])->name('reports.export');
+
+            // Schedule reminder route
+            Route::post('/contributions/{contribution}/schedule-reminder', [ContributionsController::class, 'scheduleReminder'])
+                ->name('contributions.scheduleReminder');
         });
-
+    
     // Member routes
     Route::prefix('member')
         ->name('member.')
         ->middleware(['member'])
         ->group(function () {
-            // Dashboard
-            Route::get('/dashboard', [MembersDashboardController::class, 'index'])
-                ->name('dashboard');
+            // Member Dashboard
+            Route::get('/dashboard', [MembersDashboardController::class, 'index'])->name('dashboard');
 
-            // Notifications
-            Route::get('/notifications', [MemberController::class, 'notifications'])
-                ->name('notifications');
-            
-            // Contributions
+            // Member Contributions
             Route::prefix('contributions')->name('contributions.')->group(function () {
-                Route::get('/', [MemberController::class, 'indexContributions'])
-                    ->name('index');
-                Route::get('/create', [MemberController::class, 'createContribution'])
-                    ->name('create');
-                Route::post('/', [MemberController::class, 'storeContribution'])
-                    ->name('store');
-                Route::get('/{contribution}', [MemberController::class, 'showContribution'])
-                    ->name('show');
-                Route::get('/{contribution}/receipt', [MemberController::class, 'downloadReceipt'])
-                    ->name('receipt');
+                Route::get('/', [MemberContributionController::class, 'index'])->name('index');
+                Route::get('/create', [MemberContributionController::class, 'create'])->name('create');
+                Route::post('/', [MemberContributionController::class, 'store'])->name('store');
+                Route::get('/{contribution}', [MemberContributionController::class, 'show'])->name('show');
+                Route::get('/{contribution}/receipt', [MemberContributionController::class, 'downloadReceipt'])->name('receipt');
             });
 
-            // Resources
+            // Member Resources
             Route::prefix('resources')->name('resources.')->group(function () {
-                Route::get('/', [MemberController::class, 'indexResources'])
-                    ->name('index');
-                Route::get('/{resource}', [MemberController::class, 'showResource'])
-                    ->name('show');
-                Route::get('/{resource}/download', [MemberController::class, 'downloadResource'])
-                    ->name('download');
+                Route::get('/', [ResourceController::class, 'index'])->name('index');
+                Route::get('/{resource}', [ResourceController::class, 'show'])->name('show');
+                Route::get('/{resource}/download', [ResourceController::class, 'download'])->name('download');
             });
 
-            // Events
+            // Member Payments
+            Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+            Route::get('/payments/success/{payment}', [PaymentController::class, 'success'])->name('payments.success');
+
+            // Member Events
             Route::prefix('events')->name('events.')->group(function () {
-                Route::get('/', [MemberController::class, 'indexEvents'])
-                    ->name('index');
-                Route::get('/{event}', [MemberController::class, 'showEvent'])
-                    ->name('show');
-                Route::post('/{event}/attend', [MemberController::class, 'attendEvent'])
-                    ->name('attend');
-                Route::get('/{event}/confirmation', [MemberController::class, 'eventConfirmation'])
-                    ->name('confirmation');
+                Route::get('/', [MemberController::class, 'indexEvents'])->name('index');
+                Route::get('/{event}', [MemberController::class, 'showEvent'])->name('show');
+                Route::post('/{event}/attend', [MemberController::class, 'attendEvent'])->name('attend');
+                Route::get('/{event}/confirmation', [MemberController::class, 'eventConfirmation'])->name('confirmation');
             });
 
-            // Activities
+            // Member Activities
             Route::prefix('activities')->name('activities.')->group(function () {
-                Route::get('/', [MemberController::class, 'indexActivities'])
-                    ->name('index');
-                Route::get('/{activity}', [MemberController::class, 'showActivity'])
-                    ->name('show');
+                Route::get('/', [MemberController::class, 'indexActivities'])->name('index');
+                Route::get('/{activity}', [MemberController::class, 'showActivity'])->name('show');
             });
         });
+
+    // Profile Management routes
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::patch('/profile/picture', [ProfileController::class, 'updatePicture'])->name('profile.update-picture');
+    });
+
+    // Notifications routes
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('/{notification}', [NotificationController::class, 'show'])->name('show');
+        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+    });
+
+    // M-Pesa payment routes
+    Route::prefix('mpesa')->name('mpesa.')->group(function () {
+        Route::post('/payment', [PaymentController::class, 'initiatePayment'])->name('payment');
+        Route::post('/callback', [MpesaController::class, 'callback'])->name('callback');
+    });
+
+    // ClickPesa payment routes
+    Route::prefix('clickpesa')->name('clickpesa.')->group(function () {
+        Route::post('/payment', [ClickPesaController::class, 'initiate'])->name('payment');
+        Route::post('/callback', [ClickPesaController::class, 'callback'])->name('callback');
+    });
+
+    // Test M-Pesa token route (for testing only)
+    Route::post('/test-mpesa-token', function () {
+        $mpesaService = app(App\Services\MpesaService::class);
+        $result = $mpesaService->testWithDirectToken();
+        
+        return response()->json($result);
+    });
+
+Route::put('/admin/settings', [SettingsController::class, 'update'])->name('admin.settings.update');
+
+
+Route::get('/send-test-email', function () {
+    Mail::raw('This is a test email sent via Mailtrap.', function ($message) {
+        $message->to('ludovickpancras@gmail.com')->subject('Test Email');
+    });
     
-    // Profile management
-    Route::get('/profile', [ProfileController::class, 'edit'])
-        ->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])
-        ->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])
-        ->name('profile.destroy');
-    
-    // Fallback route for undefined paths
+    return 'Test email sent!';
+});
+
+    // Fallback route
     Route::fallback(function () {
         return view('errors.404');
     });

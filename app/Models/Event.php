@@ -38,4 +38,11 @@ class Event extends Model
         ->where('start_time', '<=', now())
         ->where('end_time', '>=', now());
 }
+// In app/Models/Event.php
+public function attendees()
+{
+    return $this->belongsToMany(User::class, 'event_attendees')
+        ->withPivot('created_at')
+        ->withTimestamps();
+}
 }

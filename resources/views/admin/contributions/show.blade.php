@@ -50,6 +50,28 @@
                         </dl>
                     </div>
                 </div>
+
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">Scheduled Reminders</h3>
+                @if($contribution->notifications && $contribution->notifications->isNotEmpty())
+    <ul class="mt-4 space-y-2">
+        @foreach($contribution->notifications as $notification)
+            <li class="flex justify-between items-center bg-gray-50 p-4 rounded-lg shadow">
+                <span class="text-sm text-gray-700">
+                    Reminder scheduled for {{ $notification->reminder_date->format('M d, Y h:i A') }}
+                </span>
+                <span class="text-xs font-medium {{ $notification->status === 'sent' ? 'text-green-600' : 'text-yellow-600' }}">
+                    {{ ucfirst($notification->status) }}
+                </span>
+            </li>
+        @endforeach
+    </ul>
+@else
+    <p class="text-sm text-gray-500">No reminders scheduled for this contribution.</p>
+@endif
+         <a href="{{ route('admin.contributions.scheduleReminder', $contribution) }}" 
+                   class="mt-4 inline-block text-sm text-indigo-600 hover:text-indigo-800">
+                    Schedule a new reminder →
+                </a>
             </div>
         </div>
     </div>

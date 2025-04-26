@@ -12,16 +12,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Models\Member;
+use App\Models\Jumuiya;
+use App\Models\Notification;
+use App\Models\Contribution;
+use App\Models\Payment;
+use App\Models\Event;
+use App\Models\Resource;
 
 class RegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
      */
-    public function create(): View
-    {
-        return view('auth.register');
-    }
 
     /**
      * Handle an incoming registration request.
@@ -32,7 +35,7 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -40,12 +43,26 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => 'member'
+        ]);
+
+        // Create associated member record
+        $member = Member::create([
+            'user_id' => $user->id,
+            'joined_date' => now(),
+            'status' => 'active'
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
+        return redirect()->route('verification.notice');
 
-        return redirect(RouteServiceProvider::HOME);
+    }
+
+    public function create()
+    {
+        $jumuiyas = Jumuiya::all(); // Or any query to get your jumuiyas
+        return view('auth.register', compact('jumuiyas'));
     }
 }

@@ -35,6 +35,44 @@
                         <x-input-error :messages="$errors->get('email')" class="mt-2 text-sm text-red-600" />
                     </div>
 
+                    <!-- Phone Number -->
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <input id="phone" name="phone" type="tel" required pattern="[0-9]{10}"
+                            class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                            placeholder="1234567890" value="{{ old('phone') }}">
+                        <x-input-error :messages="$errors->get('phone')" class="mt-2 text-sm text-red-600" />
+                    </div>
+
+                    <!-- Physical Address -->
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-gray-700">Physical Address</label>
+                        <input id="address" name="address" type="text" required
+                            class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                            placeholder="123 Main St" value="{{ old('address') }}">
+                        <x-input-error :messages="$errors->get('address')" class="mt-2 text-sm text-red-600" />
+                    </div>
+
+                    <!-- Date of Birth -->
+                    <div>
+                        <label for="birth_date" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                        <input id="birth_date" name="birth_date" type="date" required
+                            class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                            value="{{ old('birth_date') }}">
+                        <x-input-error :messages="$errors->get('birth_date')" class="mt-2 text-sm text-red-600" />
+                    </div>
+
+                    <!-- Jumuiya -->
+                    <div>
+                        <label for="jumuiya" class="block text-sm font-medium text-gray-700">Jumuiya</label>
+                        <select id="jumuiya" name="jumuiya_id" class="w-full border-gray-300 rounded-md shadow-sm">
+                            @foreach($jumuiyas as $jumuiya)
+                                <option value="{{ $jumuiya->id }}">{{ $jumuiya->name }}</option>
+                            @endforeach
+                        </select>
+                        <x-input-error :messages="$errors->get('jumuiya_id')" class="mt-2 text-sm text-red-600" />
+                    </div>
+
                     <!-- Password -->
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700">Password</label>

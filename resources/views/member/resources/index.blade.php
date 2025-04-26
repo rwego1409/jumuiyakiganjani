@@ -15,13 +15,25 @@
             </div>
             <div class="mt-4 sm:mt-0">
                 <div class="relative">
-                    <select class="appearance-none bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                        <option>All Types</option>
-                        <option>Document</option>
-                        <option>PDF</option>
-                        <option>Image</option>
-                        <option>Video</option>
-                    </select>
+                <form method="GET" action="{{ route('member.resources.index') }}" class="mt-4 sm:mt-0">
+    <div class="relative">
+        <select name="type"
+                onchange="this.form.submit()"
+                class="appearance-none bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="all" {{ request('type') == 'all' ? 'selected' : '' }}>All Types</option>
+            <option value="document" {{ request('type') == 'document' ? 'selected' : '' }}>Document</option>
+            <option value="pdf" {{ request('type') == 'pdf' ? 'selected' : '' }}>PDF</option>
+            <option value="image" {{ request('type') == 'image' ? 'selected' : '' }}>Image</option>
+            <option value="video" {{ request('type') == 'video' ? 'selected' : '' }}>Video</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+            </svg>
+        </div>
+    </div>
+</form>
+
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                             <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>

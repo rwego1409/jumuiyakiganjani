@@ -31,4 +31,34 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+'mpesa' => [
+    'consumer_key' => env('MPESA_CONSUMER_KEY'),
+    'consumer_secret' => env('MPESA_CONSUMER_SECRET'),
+    'short_code' => env('MPESA_SHORTCODE'),
+    'passkey' => env('MPESA_PASSKEY'),
+    'env' => env('MPESA_ENV', 'sandbox'),
+    'callback_url' => env('MPESA_CALLBACK_URL'),
+],
+'daraja' => [
+        'sandbox' => env('MPESA_ENV', 'sandbox') === 'sandbox',
+        'shortcode' => env('MPESA_SHORTCODE'),
+        'key' => env('MPESA_CONSUMER_KEY'),
+        'secret' => env('MPESA_CONSUMER_SECRET'),
+        'passkey' => env('MPESA_PASSKEY'),
+        'callback_url' => env('MPESA_CALLBACK_URL'),
+    ],
+
+    'clickpesa' => [
+        'vendor_id' => env('CLICKPESA_VENDOR_ID'),
+        'api_key' => env('CLICKPESA_API_KEY'),
+        'api_secret' => env('CLICKPESA_API_SECRET'),
+        'base_url' => env('CLICKPESA_BASE_URL', 'https://api.selcommobile.com'),
+    ],
+
+    'vodacom' => [
+        'api_key' => env('VODACOM_API_KEY'),
+        'api_secret' => env('VODACOM_API_SECRET'),
+        'base_url' => env('VODACOM_BASE_URL', 'https://api.vodacom.co.tz'),
+    ]
+
 ];

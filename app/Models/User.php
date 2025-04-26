@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -17,7 +17,11 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'avatar',
         'phone',
+        'address',
+        'birth_date',
+        'status'
     ];
 
     protected $hidden = [
@@ -30,13 +34,15 @@ class User extends Authenticatable
     ];
 
     public function member()
-{
-    return $this->hasOne(Member::class)->withDefault();
-}
+    {
+        return $this->hasOne(Member::class)->withDefault();
+    }
+
     public function jumuiyas()
     {
         return $this->hasMany(Jumuiya::class, 'chairperson_id');
     }
+
     public function contributions()
     {
         return $this->hasMany(Contribution::class);
@@ -46,6 +52,7 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Jumuiya::class);
     }
+
     public function isAdmin()
     {
         return $this->role === 'admin';
@@ -59,5 +66,28 @@ class User extends Authenticatable
     public function isMember()
     {
         return $this->role === 'member';
+    }
+
+    public function unreadNotifications()
+    {
+        return $this->notifications()->whereNull('read_at');
+    }
+
+    public function activities()
+    {
+        return $this->hasManyThrough(MemberActivity::class, Member::class);
+    }
+
+    public function logActivity($type, $description, $metadata = [])
+    {
+        if ($this->member) {
+            return $this->member->activities()->create([
+                'activity_type' => $type,
+                'description' => $description,
+                'metadata' => $metadata,
+                'ip_address' => request()->ip()
+            ]);
+        }
+        return null;
     }
 }

@@ -2,39 +2,48 @@
 
 namespace App\Exports;
 
-use App\Models\Member;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use App\Models\Member;
 
-class MembersExport implements FromCollection, WithHeadings, WithMapping
+class MembersExport implements FromCollection, WithHeadings
 {
+    private $dateRange;
+
+    public function __construct($dateRange)
+    {
+        $this->dateRange = $dateRange;
+    }
+
     public function collection()
     {
-        return Member::with('contributions')->get();
+        return Member::with(['user', 'jumuiya'])
+            ->whereBetween('created_at', [
+                $this->dateRange['start_date'],
+                $this->dateRange['end_date']
+            ])
+            ->get()
+            ->map(function ($member) {
+                return [
+                    'Name' => $member->user->name,
+                    'Email' => $member->user->email,
+                    'Phone' => $member->phone,
+                    'Jumuiya' => $member->jumuiya->name,
+                    'Joined Date' => $member->created_at->format('Y-m-d'),
+                    'Status' => $member->status,
+                ];
+            });
     }
 
     public function headings(): array
     {
         return [
-            'ID',
-            'Full Name',
+            'Name',
             'Email',
             'Phone',
-            'Total Contributions',
-            'Registration Date'
-        ];
-    }
-
-    public function map($member): array
-    {
-        return [
-            $member->id,
-            $member->name,
-            $member->email,
-            $member->phone,
-            $member->contributions->sum('amount'),
-            $member->created_at->format('Y-m-d')
+            'Jumuiya',
+            'Joined Date',
+            'Status'
         ];
     }
 }

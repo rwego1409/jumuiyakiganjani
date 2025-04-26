@@ -52,10 +52,10 @@ class EventsController extends Controller
      * Display the specified resource.
      */
     public function show(string $id)
-    {
-        $event = Event::with('jumuiya')->findOrFail($id);
-        return view('admin.events.show', compact('event'));
-    }
+{
+    $event = Event::with(['jumuiya', 'attendees'])->findOrFail($id);
+    return view('admin.events.show', compact('event'));
+}
 
     /**
      * Show the form for editing the specified resource.

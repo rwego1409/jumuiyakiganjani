@@ -4,8 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Contribution;
 use App\Models\Member;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreContributionRequest;
+use App\Models\Jumuiya;
+use App\Models\Course;
+use App\Models\MemberContribution;
+use App\Models\MemberJumuiya;
+use App\Models\MemberCourse;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
 
 class ContributionsController extends Controller
 {
@@ -15,7 +24,7 @@ class ContributionsController extends Controller
     public function index()
     {
         // Paginate the contributions (adjust the number to your preference, e.g., 10)
-        $contributions = Contribution::with('member')->paginate(10);
+        $contributions = Contribution::with('member')->get();
     
         return view('admin.contributions.index', compact('contributions'));
     }
@@ -28,7 +37,7 @@ class ContributionsController extends Controller
     {
         // Fetch all members from the database
         $members = Member::with('user')->get();
-
+        $jumuiyas = Jumuiya::all();
         // Define options for select dropdown
         $options = [
             'option1' => 'Option 1',
@@ -37,30 +46,36 @@ class ContributionsController extends Controller
         ];
 
         // Return the create view with members and options
-        return view('admin.contributions.create', compact('members', 'options'));
+        return view('admin.contributions.create', compact('members', 'options','jumuiyas'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
+    // In your Controller
     public function store(Request $request)
-    {
-        // Validate the incoming request
-        $request->validate([
-            'member_id' => 'required|integer',
-            'jumuiya_id' => 'required|integer',
-            'amount' => 'required|numeric',
-            'date' => 'required|date',
-            'status' => 'required|boolean',
-        ]);
+{
+    $validated = $request->validate(Contribution::validationRules());
+    
+    // Get the member's user_id
+    $member = Member::findOrFail($validated['member_id']);
+    $validated['user_id'] = $member->user_id;
 
-        // Store the new contribution in the database
-        Contribution::create($request->all());
-
-        // Redirect to the contributions index with success message
-        return redirect()->route('admin.contributions.index')
-            ->with('success', 'Contribution created successfully');
+    // For admin submissions
+    if(auth()->user()->isAdmin()) {
+        $validated['recorded_by'] = auth()->id();
     }
+    // For member self-submissions
+    else {
+        $validated['recorded_by'] = User::where('role', 'admin')->first()->id;
+    }
+
+    Contribution::create($validated);
+    
+    return redirect()->route('admin.contributions.index')
+        ->with('success', 'Contribution recorded successfully');
+}
+
 
     /**
      * Display the specified resource.
@@ -69,6 +84,8 @@ class ContributionsController extends Controller
     {
         // Fetch the contribution by ID
         $contribution = Contribution::findOrFail($id);
+
+        $contribution->contribution_date = Carbon::parse($contribution->contribution_date);
 
         // Return the show view with the contribution data
         return view('admin.contributions.show', compact('contribution'));
@@ -131,5 +148,51 @@ class ContributionsController extends Controller
         // Redirect to the contributions index with success message
         return redirect()->route('admin.contributions.index')
             ->with('success', 'Contribution deleted successfully');
+    }
+
+    public function assignToMember(Request $request, Member $member)
+    {
+        $validated = $request->validate([
+            'course_id' => 'required|exists:courses,id',
+            'amount' => 'required|numeric|min:0',
+            'due_date' => 'required|date|after:today'
+        ]);
+
+        $member->contributions()->create($validated);
+
+        return back()->with('success', 'Contribution assigned successfully!');
+    }
+
+    public function scheduleReminder(Request $request, Contribution $contribution)
+    {
+        $request->validate([
+            'reminder_date' => 'required|date|after:now',
+        ]);
+
+        // Schedule a reminder
+        Notification::create([
+            'member_id' => $contribution->member_id,
+            'contribution_id' => $contribution->id,
+            'reminder_date' => $request->reminder_date,
+            'status' => 'pending',
+        ]);
+
+        return back()->with('success', 'Reminder scheduled successfully!');
+    }
+
+    public function sendReminders()
+    {
+        $notifications = Notification::where('status', 'pending')
+            ->where('reminder_date', '<=', now())
+            ->get();
+
+        foreach ($notifications as $notification) {
+            NotificationFacade::send(
+                $notification->member->user,
+                new \App\Notifications\ContributionReminder($notification->contribution)
+            );
+
+            $notification->update(['status' => 'sent']);
+        }
     }
 }

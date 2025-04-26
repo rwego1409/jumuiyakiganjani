@@ -3,39 +3,46 @@
 <head>
     <title>Members Report</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
+        /* Add your PDF styling here */
+        .report-header { text-align: center; margin-bottom: 30px; }
+        .report-table { width: 100%; border-collapse: collapse; }
+        .report-table th, .report-table td { border: 1px solid #ddd; padding: 8px; }
+        .report-table th { background-color: #f4f4f4; }
     </style>
 </head>
 <body>
-    <h1>Members Report</h1>
-    <p>Generated: {{ now()->format('Y-m-d H:i') }}</p>
-    
-    <table>
+    <div class="report-header">
+        <h1>Members Report</h1>
+        <p>Generated on: {{ now()->format('Y-m-d H:i:s') }}</p>
+    </div>
+
+    <table class="report-table">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
-                <th>Total Contributions</th>
-                <th>Registered At</th>
+                <th>Jumuiya</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
             @foreach($members as $member)
-            <tr>
-                <td>{{ $member->id }}</td>
-                <td>{{ $member->name }}</td>
-                <td>{{ $member->email }}</td>
-                <td>{{ $member->phone }}</td>
-                <td>{{ number_format($member->contributions->sum('amount')) }}</td>
-                <td>{{ $member->created_at->format('Y-m-d') }}</td>
-            </tr>
+                <tr>
+                    <td>{{ $member->user->name }}</td>
+                    <td>{{ $member->user->email }}</td>
+                    <td>{{ $member->phone }}</td>
+                    <td>{{ $member->jumuiya->name }}</td>
+                    <td>{{ $member->status }}</td>
+                </tr>
             @endforeach
         </tbody>
     </table>
+
+    <div class="report-summary">
+        <h3>Summary</h3>
+        <p>Total Members: {{ $members->count() }}</p>
+        <p>Active Members: {{ $members->where('status', 'active')->count() }}</p>
+    </div>
 </body>
 </html>

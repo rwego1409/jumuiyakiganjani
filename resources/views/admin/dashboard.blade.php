@@ -1,6 +1,8 @@
 @extends('layouts.admin')
 
 @section('content')
+
+
 <div class="py-12 bg-gray-50">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8 px-4">
         @if(session('success'))
@@ -94,8 +96,8 @@
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <h3 class="text-sm font-medium text-gray-500">Upcoming Events</h3>
-                            <p class="text-2xl font-bold text-gray-900">{{ $upcomingEventsCount ?? 0 }}</p>
+                            <h3 class="text-sm font-medium text-gray-500">Events</h3>
+                            <p class="text-2xl font-bold text-gray-900">{{ $totalEvents ?? 0 }}</p>
                             <div class="flex items-center text-sm text-gray-600 mt-1">
                                 <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -150,7 +152,7 @@
                         <div class="flex items-start gap-4 group">
                             <div class="flex-shrink-0">
                                 <div class="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white font-medium shadow-lg">
-                                    {{ strtoupper(substr($member->name, 0, 1)) }}
+                                    {{ strtoupper(substr($member->user->name ?? '', 0, 1)) }}
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -191,11 +193,7 @@
                         </div>
                         @endforelse
                     </div>
-                    @if($recentMembers->hasPages())
-                    <div class="mt-6 border-t border-gray-100 pt-6 flex justify-center">
-                        {{ $recentMembers->onEachSide(1)->links('vendor.pagination.tailwind') }}
-                    </div>
-                    @endif
+                    {{ $recentMembers->links() }}
                 </div>
             </div>
 
@@ -278,6 +276,167 @@
             </div>
         </div>
 
+        <!-- Analytics Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Sessions Over Time -->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <div class="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-sky-50 px-6 py-4">
+                    <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                        <svg class="h-6 w-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                        Sessions
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="text-right mb-2">
+                        <span class="text-2xl font-bold text-gray-900">741</span>
+                    </div>
+                    <div id="sessions-chart" class="h-64"></div>
+                </div>
+            </div>
+
+            <!-- Traffic Sources -->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <div class="border-b border-gray-200 bg-gradient-to-r from-purple-50 to-fuchsia-50 px-6 py-4">
+                    <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                        <svg class="h-6 w-6 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                        </svg>
+                        Sessions by Source
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="flex justify-center mb-6">
+                        <div class="relative" style="height: 200px; width: 200px;">
+                            <div id="traffic-sources-chart"></div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center">
+                                    <span class="block text-3xl font-bold text-gray-900">249</span>
+                                    <span class="text-sm text-gray-500">Total Sessions</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-blue-400 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">Email</span>
+                            <span class="ml-auto font-medium">40</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-yellow-400 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">Referral</span>
+                            <span class="ml-auto font-medium">42</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-amber-300 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">Paid Search</span>
+                            <span class="ml-auto font-medium">32</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">(Other)</span>
+                            <span class="ml-auto font-medium">38</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-cyan-300 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">Direct</span>
+                            <span class="ml-auto font-medium">32</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-gray-300 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">Social</span>
+                            <span class="ml-auto font-medium">28</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-gray-400 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">Display</span>
+                            <span class="ml-auto font-medium">27</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">Organic Search</span>
+                            <span class="ml-auto font-medium">10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modified Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Main Sessions Chart -->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <div class="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-sky-50 px-6 py-4">
+                    <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                        <svg class="h-6 w-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                        Activity Trends
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div id="sessions-chart" class="h-96"></div>
+                </div>
+            </div>
+
+            <!-- Traffic Sources Chart -->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <div class="border-b border-gray-200 bg-gradient-to-r from-purple-50 to-fuchsia-50 px-6 py-4">
+                    <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                        <svg class="h-6 w-6 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                        </svg>
+                        Traffic Sources Trend
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div id="traffic-sources-chart" class="h-96"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mini Charts Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-700">Members Growth</h3>
+                    <span class="text-sm text-indigo-600">+24%</span>
+                </div>
+                <div id="members-trend"></div>
+                <div class="text-2xl font-bold text-gray-900 mt-2">{{ $totalMembers ?? 0 }}</div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-700">Contributions</h3>
+                    <span class="text-sm text-emerald-600">+38%</span>
+                </div>
+                <div id="contributions-trend"></div>
+                <div class="text-2xl font-bold text-gray-900 mt-2">TZS {{ number_format($totalContributions ?? 0) }}</div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-700">Events</h3>
+                    <span class="text-sm text-amber-600">+12%</span>
+                </div>
+                <div id="events-trend"></div>
+                <div class="text-2xl font-bold text-gray-900 mt-2">{{ $totalEvents ?? 0 }}</div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-700">Resources</h3>
+                    <span class="text-sm text-red-600">+8%</span>
+                </div>
+                <div id="resources-trend"></div>
+                <div class="text-2xl font-bold text-gray-900 mt-2">{{ $totalResources ?? 0 }}</div>
+            </div>
+        </div>
+
         <!-- Reports Center -->
         <div class="bg-white shadow-md rounded-lg overflow-hidden mb-8">
             <div class="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-sky-50 px-6 py-4">
@@ -337,30 +496,30 @@
                                 <h3 class="text-lg font-semibold text-gray-900 truncate">Contributions Report</h3>
                             </div>
                             <p class="text-sm text-gray-600 mb-4 truncate">Detailed report of all contributions with filtering options by date range.</p>
-                            <form action="{{ route('admin.reports.generate') }}" method="GET" class="space-y-4">
-                                <input type="hidden" name="type" value="contributions">
+                            <form action="{{ route('admin.reports.generate', ['type' => 'contributions']) }}" method="GET" class="space-y-4">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1 truncate">From Date</label>
-                                        <input type="date" name="start_date" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 text-sm">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
+                                        <input type="date" name="start_date" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1 truncate">To Date</label>
-                                        <input type="date" name="end_date" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 text-sm">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
+                                        <input type="date" name="end_date" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200">
                                     </div>
                                 </div>
+
                                 <div class="flex flex-wrap gap-2 pt-2">
-                                    <button type="submit" name="format" value="pdf" class="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-green-700 transition-colors truncate">
-                                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                        </svg>
+                                    <button type="submit" name="format" value="pdf" class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M7 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V7.414A2 2 0 0014.414 6L11 2.586A2 2 0 009.586 2H7z"/></svg>
                                         PDF
                                     </button>
-                                    <button type="submit" name="format" value="excel" class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-blue-700 transition-colors truncate">
-                                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
+                                    <button type="submit" name="format" value="excel" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"/></svg>
                                         Excel
+                                    </button>
+                                    <button type="submit" name="format" value="csv" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"/></svg>
+                                        CSV
                                     </button>
                                 </div>
                             </form>
@@ -401,3 +560,129 @@
     </div>
 </div>
 @endsection
+@push('scripts')
+<!-- Load ApexCharts from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.41.0/apexcharts.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Main Sessions Chart with Multiple Lines
+        if (document.getElementById('sessions-chart')) {
+            const sessionsOptions = {
+                series: [{
+                    name: 'Website Sessions',
+                    data: [40, 70, 20, 90, 36, 80, 30, 91, 60, 28, 52, 70, 60, 110, 36, 50, 22, 70, 60, 54, 60, 40, 14, 40, 60]
+                }, {
+                    name: 'Member Logins',
+                    data: [20, 45, 15, 60, 25, 50, 20, 65, 40, 18, 35, 45, 40, 80, 25, 35, 15, 45, 40, 35, 40, 25, 10, 25, 40]
+                }, {
+                    name: 'Resource Views',
+                    data: [15, 30, 10, 40, 18, 35, 15, 45, 30, 12, 25, 30, 25, 60, 18, 25, 10, 30, 25, 22, 25, 15, 5, 15, 25]
+                }],
+                chart: {
+                    height: 350,
+                    type: 'line',
+                    zoom: { enabled: false },
+                    toolbar: { show: true },
+                    animations: { enabled: true }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 3,
+                },
+                colors: ['#3b82f6', '#10b981', '#f59e0b'],
+                grid: {
+                    borderColor: '#f1f1f1',
+                    row: { colors: ['#f8fafc', 'transparent'], opacity: 0.2 }
+                },
+                markers: { size: 5 },
+                xaxis: {
+                    categories: ['Jan 1', '', '', '', 'Jan 7', '', '', '', '', 'Jan 14', '', '', '', '', 'Jan 21', '', '', '', '', 'Jan 28'],
+                    labels: { style: { colors: '#6b7280', fontSize: '12px' } }
+                },
+                yaxis: {
+                    min: 0,
+                    max: 120,
+                    tickAmount: 6,
+                    labels: { 
+                        style: { colors: '#6b7280', fontSize: '12px' },
+                        formatter: function(val) { return val.toFixed(0); }
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    markers: { radius: 12 }
+                },
+                tooltip: {
+                    theme: 'light',
+                    y: { formatter: function(val) { return val + " sessions" } }
+                }
+            };
+
+            new ApexCharts(document.querySelector("#sessions-chart"), sessionsOptions).render();
+        }
+
+        // Feature-Specific Mini Charts
+        const createMiniChart = (elementId, data, color) => {
+            const options = {
+                series: [{ data: data }],
+                chart: {
+                    type: 'line',
+                    height: 80,
+                    sparkline: { enabled: true }
+                },
+                stroke: { curve: 'smooth', width: 2, colors: [color] },
+                markers: { size: 0 },
+                tooltip: { enabled: false },
+                grid: { show: false },
+                yaxis: { show: false },
+                xaxis: { labels: { show: false } }
+            };
+            new ApexCharts(document.querySelector(elementId), options).render();
+        };
+
+        // Initialize mini charts
+        if (document.getElementById('members-trend')) {
+            createMiniChart('#members-trend', [5, 10, 8, 12, 15, 18, 20], '#6366f1');
+            createMiniChart('#contributions-trend', [200, 300, 250, 400, 350, 450, 500], '#10b981');
+            createMiniChart('#events-trend', [2, 3, 1, 4, 5, 3, 6], '#f59e0b');
+            createMiniChart('#resources-trend', [10, 15, 12, 18, 20, 25, 22], '#ef4444');
+        }
+
+        // Traffic Sources Line Chart
+        if (document.getElementById('traffic-sources-chart')) {
+            const trafficOptions = {
+                series: [
+                    { name: 'Email', data: [10, 15, 12, 18, 20, 25, 22] },
+                    { name: 'Referral', data: [8, 12, 10, 15, 18, 20, 17] },
+                    { name: 'Direct', data: [5, 7, 6, 9, 11, 13, 10] }
+                ],
+                chart: {
+                    height: 350,
+                    type: 'line',
+                    toolbar: { show: true }
+                },
+                colors: ['#3b82f6', '#10b981', '#f59e0b'],
+                stroke: { curve: 'smooth', width: 3 },
+                markers: { size: 5 },
+                xaxis: {
+                    categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                },
+                yaxis: {
+                    min: 0,
+                    max: 30,
+                    tickAmount: 6
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'right'
+                }
+            };
+            new ApexCharts(document.querySelector("#traffic-sources-chart"), trafficOptions).render();
+        }
+
+    
+    });
+</script>
+@endpush
+

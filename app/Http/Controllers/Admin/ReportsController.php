@@ -3,118 +3,60 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Member;
 use App\Models\Contribution;
-use App\Models\Event;
-use App\Exports\MembersExport;
-use App\Exports\ContributionsExport;
-use App\Exports\EventsExport;
+use App\Exports\ReportsExport;
+use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
-use PDF;
 
 class ReportsController extends Controller
 {
-    /**
-     * Display the reports dashboard
-     */
     public function index()
     {
-        $stats = [
-            'members_count' => Member::count(),
-            'total_contributions' => Contribution::sum('amount'),
-            'upcoming_events' => Event::upcoming()->count(),
-            'latest_members' => Member::latest()->take(5)->get(),
-            'recent_contributions' => Contribution::with('member')->latest()->take(5)->get()
-        ];
-
-        return view('admin.reports.index', compact('stats'));
+        return view('admin.reports.index');
     }
 
-    /**
-     * Show the form for creating a custom report
-     */
-    public function create()
+    public function generate($type, $format = 'pdf')
     {
-        return view('admin.reports.create');
+        $data = $this->getReportData($type);
+        $filename = $type . '_report_' . date('Y-m-d');
+
+        return match($format) {
+            'pdf' => PDF::loadView("admin.reports.$type", compact('data'))
+                       ->download("$filename.pdf"),
+            'excel' => Excel::download(new ReportsExport($data), "$filename.xlsx"),
+            'csv' => Excel::download(new ReportsExport($data), "$filename.csv", \Maatwebsite\Excel\Excel::CSV),
+            default => abort(400, 'Invalid format specified')
+        };
     }
 
-    /**
-     * Generate the requested report
-     */
-    public function generate(Request $request)
+    private function getContributionsData()
     {
-        $validated = $request->validate([
-            'type' => 'required|in:members,contributions,events',
-            'format' => 'required|in:pdf,excel,csv',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date'
-        ]);
-
-        $fileName = str($validated['type'])->singular()->append('-report-') . now()->format('Ymd-His');
-
-        switch ($validated['type']) {
-            case 'members':
-                return $this->handleMemberReport($validated, $fileName);
-                
-            case 'contributions':
-                return $this->handleContributionReport($validated, $fileName);
-                
-            case 'events':
-                return $this->handleEventReport($validated, $fileName);
-        }
-    }
-
-    protected function handleMemberReport($data, $fileName)
-    {
-        $query = Member::with(['contributions', 'events']);
+        $query = Contribution::with(['member.user'])->latest();
         
-        if ($data['format'] === 'pdf') {
-            $members = $query->get();
-            $pdf = PDF::loadView('admin.reports.exports.members-pdf', compact('members'));
-            return $pdf->download("$fileName.pdf");
+        if (request('start_date')) {
+            $query->whereDate('created_at', '>=', request('start_date'));
         }
-
-        return Excel::download(new MembersExport($query), "$fileName.xlsx");
+        
+        if (request('end_date')) {
+            $query->whereDate('created_at', '<=', request('end_date'));
+        }
+        
+        return $query->get();
     }
 
-    protected function handleContributionReport($data, $fileName)
+    private function getMembersData()
     {
-        $query = Contribution::with('member')
-            ->when($data['start_date'], fn($q) => $q->whereDate('created_at', '>=', $data['start_date']))
-            ->when($data['end_date'], fn($q) => $q->whereDate('created_at', '<=', $data['end_date']));
-
-        if ($data['format'] === 'pdf') {
-            $contributions = $query->get();
-            $pdf = PDF::loadView('admin.reports.exports.contributions-pdf', compact('contributions'));
-            return $pdf->download("$fileName.pdf");
-        }
-
-        return Excel::download(new ContributionsExport($query), "$fileName.{$data['format']}");
+        return Member::with(['user', 'jumuiya'])->get();
     }
 
-    protected function handleEventReport($data, $fileName)
+    private function getReportData($type)
     {
-        $query = Event::with(['attendees', 'organizer'])
-            ->when($data['start_date'], fn($q) => $q->whereDate('event_date', '>=', $data['start_date']))
-            ->when($data['end_date'], fn($q) => $q->whereDate('event_date', '<=', $data['end_date']));
-
-        if ($data['format'] === 'pdf') {
-            $events = $query->get();
-            $pdf = PDF::loadView('admin.reports.exports.events-pdf', compact('events'));
-            return $pdf->download("$fileName.pdf");
-        }
-
-        return Excel::download(new EventsExport($query), "$fileName.{$data['format']}");
-    }
-
-    /**
-     * Display a generated report
-     */
-    public function show(string $id)
-    {
-        // If you need to show stored reports
-        $report = Report::findOrFail($id);
-        return view('admin.reports.show', compact('report'));
+        return match($type) {
+            'members' => $this->getMembersData(),
+            'contributions' => $this->getContributionsData(),
+            default => abort(404, 'Invalid report type')
+        };
     }
 }

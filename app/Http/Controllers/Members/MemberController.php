@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Members;
 use App\Models\Event;
+use App\Models\Member;
+use App\Models\Jumuiya;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Resource;
@@ -31,7 +33,10 @@ public function indexContributions()
 
     public function createContribution()
     {
-        return view('member.contributions.create');
+        $member = auth()->user();
+$jumuiyas = $member->jumuiyas; // Only get Jumuiyas for this member
+
+        return view('member.contributions.create', compact('jumuiyas'));
     }
 
     public function storeContribution(Request $request)

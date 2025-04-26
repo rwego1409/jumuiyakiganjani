@@ -9,7 +9,6 @@ return new class extends Migration
 {
     public function up()
     {
-        // Disable foreign key checks temporarily
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
         Schema::create('contributions', function (Blueprint $table) {
@@ -17,46 +16,56 @@ return new class extends Migration
             
             // Relationships
             $table->foreignId('member_id')
-                ->constrained('users')  // Explicit table name
-                ->cascadeOnDelete();    // Delete contributions if member is deleted
+                ->constrained('members')  // Changed to 'members' table for proper relation
+                ->cascadeOnDelete();
             
             $table->foreignId('jumuiya_id')
                 ->constrained()
                 ->cascadeOnDelete();
             
             // Financial data
-            $table->decimal('amount', 10, 2)
-                ->comment('Contribution amount in local currency');
+            $table->decimal('amount', 13, 2)  // Increased precision for large amounts
+                ->comment('Contribution amount in TZS');
+            
+            // Status tracking
+            $table->enum('status', ['pending', 'confirmed', 'rejected'])
+                ->default('pending')
+                ->comment('Contribution approval state');
             
             // Date information
             $table->date('contribution_date')
-                ->index()
-                ->comment('Date when contribution was made');
+                ->useCurrent()
+                ->comment('Actual date of contribution');
             
             // Payment details
-            $table->string('payment_method', 50)
+            $table->enum('payment_method', ['cash', 'mobile', 'bank'])
                 ->default('cash')
-                ->comment('Payment method used: cash, mpesa, bank, etc.');
+                ->comment('Payment method used');
             
             // Additional information
-            $table->text('purpose')
+            $table->string('purpose', 255)
                 ->nullable()
-                ->comment('Optional purpose of the contribution');
+                ->comment('Contribution purpose');
             
-            // Tracking
-            $table->string('receipt_number')
+            // Audit fields
+            $table->foreignId('recorded_by')
+                ->constrained('users')
+                ->comment('Admin who recorded the contribution');
+            
+            // Financial tracking
+            $table->string('receipt_number', 50)
                 ->nullable()
                 ->unique()
-                ->comment('Official receipt number if available');
+                ->comment('Official receipt reference');
             
             $table->timestamps();
             
-            // Indexes for better performance
-            $table->index(['member_id', 'contribution_date']);
+            // Optimized compound indexes
+            $table->index(['member_id', 'status']);
             $table->index(['jumuiya_id', 'contribution_date']);
+            $table->index(['status', 'payment_method']);
         });
 
-        // Enable foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
     }
 

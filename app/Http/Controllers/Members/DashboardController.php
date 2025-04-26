@@ -5,69 +5,66 @@ namespace App\Http\Controllers\Members;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use App\Models\{Event, Contribution, Jumuiya, Member, Resource};
+use App\Models\{Event, Contribution, Jumuiya, Member, Resource, Payment};
 use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
-    {
-        $user = Auth::user();
-        
-        // Eager load relationships with fallbacks
-        $user->load(['member.jumuiya', 'member.contributions']);
-        
-        // Redirect if no member profile exists
-        if (!$user->member) {
-            return redirect()->route('profile.edit')
-                ->with('error', 'Please complete your profile first');
-        }
+{
+    $user = Auth::user();
+    $user->load(['member.jumuiya', 'member.contributions']);
+    $member = $user->member;
 
-        // Get all dashboard data
-        $data = [
-            'user' => $user,
-            'member' => $user->member,
-            'jumuiya' => $user->member->jumuiya,
-            'stats' => $this->getMemberStats($user),
-            'community_data' => $this->getCommunityData($user),
-            'upcoming_events' => $this->getEvents($user),
-            'recent_resources' => $this->getRecentResources(),
-            'recent_contributions' => $this->getContributions($user),
-        ];
-
-        return view('member.dashboard', $data);
+    if (!$member) {
+        return redirect()->route('profile.edit')->with('error', 'Please complete your profile first');
     }
 
-    protected function getMemberStats($user)
-    {
-        // Personal contribution stats
-        $total_contributions = $user->member->contributions->sum('amount');
-        
-        $last_month = $user->member->contributions()
-            ->where('created_at', '>=', Carbon::now()->subMonth())
-            ->sum('amount');
-        
-        $increase = $last_month > 0 
-            ? round((($total_contributions - $last_month) / $last_month) * 100, 2)
-            : ($total_contributions > 0 ? 100 : 0);
+    $jumuiya = $member->jumuiya;
 
-        // Safely parse joined_date
-        $memberSince = $user->member->joined_date
-            ? Carbon::parse($user->member->joined_date)->diffForHumans()
-            : 'Recently';
+    $completedPayments = Payment::where('member_id', $member->id)->where('status', 'completed')->count();
+    $totalContributions = Contribution::where('member_id', $member->id)->sum('amount');
+    $memberSince = optional($member->joined_date)->format('F Y');
 
-        return [
-            'total_contributions' => $total_contributions,
-            'contribution_increase' => $increase,
-            'contribution_count' => $user->member->contributions->count(),
-            'member_since' => $memberSince,
-        ];
-    }
+    $recentPayments = Payment::where('member_id', $member->id)->orderByDesc('created_at')->limit(5)->get();
+    $recentContributions = $member->contributions()->latest()->take(5)->get();
+
+    // Corrected upcoming_events query:
+    $events = Event::with('jumuiya')->latest()->paginate(10);
+
+    $resources = Resource::paginate(10); // Paginate with 10 items per page
+        // return view('member.resources.index', compact('resources'));
+
+    $stats = [
+        'completed_payments' => $completedPayments,
+        'total_contributions' => $totalContributions,
+        'member_since' => $memberSince,
+    ];
+
+    $community_data = $this->getCommunityData($user);
+    $calendarEvents = $this->getCalendarEvents($member);
+    $contributionsChart = $this->getContributionsChartData($member);
+    $activityChart = $this->getActivityChartData($member);
+    $contributionGrowth = $this->calculateContributionIncrease($member);
+    $jumuiyaRank = $community_data['jumuiya_rank'];
+    $totalJumuiyas = $community_data['total_jumuiyas'];
+    $engagementScore = round(($completedPayments * 2 + $member->contributions->count() + $resources->count()) / 5);
+
+
+    $lineChartLabels = ['January', 'February', 'March', 'April']; // Example labels
+    $lineChartData = [10, 20, 30, 40]; // Example data
+    return view('member.dashboard', compact(
+        'member', 'jumuiya', 'recentPayments', 'recentContributions',
+        'events', 'resources', 'stats', 'community_data',
+        'calendarEvents', 'contributionsChart', 'activityChart',
+        'contributionGrowth', 'jumuiyaRank', 'totalJumuiyas', 'engagementScore',
+        'lineChartLabels', 'lineChartData', 'memberSince', 'completedPayments', 'totalContributions'
+    ));
+}
 
     protected function getCommunityData($user)
     {
-        // Cache community data for 1 hour
-        return Cache::remember('community_data_'.$user->id, 3600, function () use ($user) {
+        return Cache::remember('community_data_' . $user->id, 3600, function () use ($user) {
             return [
                 'total_members' => Member::count(),
                 'total_jumuiyas' => Jumuiya::count(),
@@ -80,48 +77,59 @@ class DashboardController extends Controller
     protected function getJumuiyaRank($member)
     {
         if (!$member->jumuiya_id) return null;
-        
-        // Get jumuiyas ranked by total contributions
+
         $ranked = Jumuiya::withSum('contributions', 'amount')
             ->orderByDesc('contributions_sum_amount')
             ->get()
             ->pluck('id')
             ->search($member->jumuiya_id);
-            
+
         return $ranked !== false ? $ranked + 1 : null;
     }
 
-    protected function getEvents($user)
+    private function calculateContributionIncrease($member)
     {
-        // Get events with priority:
-        // 1. Member's jumuiya events
-        // 2. General events (no jumuiya specified)
-        return Event::where(function($query) use ($user) {
-                $query->where('jumuiya_id', $user->member->jumuiya_id)
-                      ->orWhereNull('jumuiya_id');
-            })
-            ->where('start_time', '>', now())
-            ->with('jumuiya')
-            ->orderBy('start_time')
-            ->take(5)
-            ->get();
+        $currentMonth = $member->contributions()->whereMonth('created_at', now()->month)->sum('amount');
+        $lastMonth = $member->contributions()->whereMonth('created_at', now()->subMonth()->month)->sum('amount');
+        if ($lastMonth == 0) return 0;
+        return round((($currentMonth - $lastMonth) / $lastMonth) * 100, 2);
     }
 
-    protected function getRecentResources()
+    private function getContributionsChartData($member)
     {
-        // Get latest resources available to all members
-        return Resource::latest()
-            ->take(5)
-            ->get();
+        return $member->contributions()
+            ->selectRaw('MONTH(created_at) as month, SUM(amount) as total')
+            ->whereYear('created_at', now()->year)
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->map(function($item) {
+                return [
+                    'month' => Carbon::create()->month($item->month)->format('M'),
+                    'amount' => $item->total
+                ];
+            });
     }
 
-    protected function getContributions($user)
+    private function getActivityChartData($member)
     {
-        // Get member's recent contributions with related data
-        return $user->member->contributions()
-            ->with(['jumuiya'])
-            ->latest()
-            ->take(5)
-            ->get();
+        return [
+            'labels' => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            'data' => [65, 59, 80, 81, 56, 55, 40]
+        ];
     }
+
+    private function getCalendarEvents($member)
+{
+    return Event::where('jumuiya_id', $member->jumuiya_id)  // Filter by member's community (jumuiya_id)
+        ->get()
+        ->map(function($event) {
+            return [
+                'title' => $event->title,
+                'start' => $event->start_time->format('Y-m-d'),
+                'url' => route('member.events.show', $event->id)
+            ];
+        });
+}
+
 }

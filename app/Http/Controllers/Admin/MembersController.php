@@ -12,9 +12,13 @@ class MembersController extends Controller
 {
     public function index()
     {
-        $members = Member::with(['user', 'jumuiya'])->paginate(10);
+        $members = Member::with(['user', 'jumuiya'])
+            ->get()
+            ->filter(fn($m) => $m->user && $m->jumuiya);
+    
         return view('admin.members.index', compact('members'));
     }
+    
 
     public function create()
     {
@@ -49,11 +53,15 @@ class MembersController extends Controller
         return view('admin.members.show', compact('member'));
     }
 
-    public function edit(Member $member)
-    {
-        $jumuiyas = Jumuiya::all();
-        return view('admin.members.edit', compact('member', 'jumuiyas'));
-    }
+    public function edit($id)
+{
+    $member = Member::with('user', 'jumuiya')->findOrFail($id);
+    $jumuiyas = Jumuiya::all();
+    return view('admin.members.edit', compact('member', 'jumuiyas'));
+}
+
+
+
 
     public function update(StoreMemberRequest $request, Member $member)
     {

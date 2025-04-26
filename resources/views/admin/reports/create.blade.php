@@ -13,6 +13,17 @@
             </div>
         </div>
 
+        <!-- Display validation errors -->
+        @if ($errors->any())
+            <div class="bg-red-500 text-white p-4 rounded-lg mb-6">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <div class="p-6">
                 <form action="{{ route('admin.reports.generate') }}" method="GET" class="space-y-6">
@@ -76,6 +87,14 @@
                 </form>
             </div>
         </div>
+
+        <!-- Success message after report is generated -->
+        @if(session('report_generated'))
+            <div class="bg-green-500 text-white p-4 rounded-lg mb-6">
+                <p>Your report has been generated successfully!</p>
+                <a href="{{ session('report_link') }}" class="text-blue-300">Download your report here.</a>
+            </div>
+        @endif
     </div>
 </div>
 @endsection
