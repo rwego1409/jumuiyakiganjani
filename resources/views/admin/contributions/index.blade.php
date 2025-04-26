@@ -51,7 +51,7 @@
 @endif
 
                                                 <div class="text-sm text-gray-500">
-                                                    {{ $contribution->member->jumuiya->name ?? 'N/A' }}
+                                                    {{ $contribution->member->user->name ?? 'N/A' }}
                                                 </div>
                                             </div>
                                         </div>
@@ -111,13 +111,24 @@
 @endpush
 
 @push('scripts')
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
     $(document).ready(function () {
-        $('.datatable').DataTable({
+        $('#members-table').DataTable({
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            searching: true,
+            ordering: true,
+            info: true,
             responsive: true,
-            autoWidth: false
+            language: {
+                search: "Search members:",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                paginate: {
+                    previous: "← Prev",
+                    next: "Next →"
+                }
+            }
         });
     });
 </script>
