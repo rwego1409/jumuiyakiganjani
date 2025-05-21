@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreContributionRequest;
 use App\Http\Requests\UpdateContributionRequest;
 use App\Services\PaymentService;
+use App\Models\Course;
+use App\Models\Event;
 
 class ContributionController extends Controller
 {
@@ -46,11 +48,13 @@ class ContributionController extends Controller
         $member = Auth::user()->member;
     
         Contribution::create([
+            'user_id' => Auth::id(), 
             'member_id' => $member->id,
             'jumuiya_id' => $request->jumuiya_id,
             'amount' => $request->amount,
             'contribution_date' => $request->contribution_date,
             'status' => 'pending', // default status
+             'recorded_by' => Auth::id(),
         ]);
     
         return redirect()->route('member.contributions.index')
@@ -62,14 +66,11 @@ class ContributionController extends Controller
      * Display the specified resource.
      */
     public function show(Contribution $contribution)
-    {
-        // Optional: Authorize view access
-        $this->authorize('view', $contribution);
+{
+    // $contribution->load('course');
+    return view('member.contributions.show', compact('contribution'));
+}
 
-        return view('member.contributions.show', [
-            'contribution' => $contribution->load(['member', 'jumuiya'])
-        ]);
-    }
 
     /**
      * Show the form for editing the specified resource.
@@ -186,4 +187,11 @@ class ContributionController extends Controller
 
         return view('member.contributions.payment_receipt', compact('contribution'));
     }
+
+    
+public function course()
+{
+    return $this->belongsTo(Course::class);
+}
+
 }

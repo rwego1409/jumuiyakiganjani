@@ -3,24 +3,17 @@
 namespace App\Policies;
 
 use App\Models\User;
+use Illuminate\Notifications\DatabaseNotification;
 
 class NotificationPolicy
 {
-    /**
-     * Create a new policy instance.
-     */
-    public function __construct()
+    public function view(User $user, DatabaseNotification $notification)
     {
-        //
+        return $user->id === $notification->notifiable_id;
     }
-    // In App\Policies\NotificationPolicy.php
-public function view(User $user, DatabaseNotification $notification)
-{
-    return $user->id === $notification->notifiable_id;
-}
 
-public function update(User $user, DatabaseNotification $notification)
-{
-    return $user->id === $notification->notifiable_id;
-}
+    public function markAsRead(User $user, DatabaseNotification $notification)
+    {
+        return $user->id === $notification->notifiable_id;
+    }
 }

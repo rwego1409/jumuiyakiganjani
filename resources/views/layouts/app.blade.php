@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#ffffff" class="dark:content-[#1a1a1a]">
 
-    <title>Jumuiya Kiganjani - {{ $title ?? 'Community Management' }}</title>
+    <!-- <title>Jumuiya Kiganjani - {{ $title ?? 'Community Management' }}</title> -->
 
     <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
@@ -39,13 +39,13 @@
         <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
                 <!-- Logo and App Name -->
-                <div class="flex items-center space-x-2">
+                <!-- <div class="flex items-center space-x-2">
                     <svg class="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
                     <span class="text-lg font-semibold text-gray-800 dark:text-gray-100">Jumuiya Kiganjani</span>
-                </div>
+                </div> -->
 
                 <div class="flex items-center space-x-4">
                     <!-- Role-based Navigation -->

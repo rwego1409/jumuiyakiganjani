@@ -20,6 +20,8 @@ use App\Http\Controllers\MpesaController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+// routes/api.php
+Route::post('/pay', [PaymentController::class, 'pay']);
 
 // Route::post('/mpesa/callback', [App\Http\Controllers\Api\MpesaController::class, 'callback']);
 // Route::post('/mpesa/stk-push', [App\Http\Controllers\Api\MpesaController::class, 'stkPush']);

@@ -15,6 +15,9 @@ use App\Models\MemberJumuiya;
 use App\Models\MemberCourse;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ContributionsImport;
+use App\Models\User;
 
 class ContributionsController extends Controller
 {
@@ -49,6 +52,22 @@ class ContributionsController extends Controller
         return view('admin.contributions.create', compact('members', 'options','jumuiyas'));
     }
 
+
+    public function import(Request $request)
+    {
+        // Validate the incoming file
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,ods|max:2048',  // Validate file type and size
+        ]);
+
+        // Process the file import
+        try {
+            Excel::import(new ContributionsImport, $request->file('file'));
+            return redirect()->route('admin.contributions.index')->with('success', 'Contributions imported successfully!');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.contributions.index')->with('error', 'There was an error importing the file. Please try again.');
+        }
+    }
     /**
      * Store a newly created resource in storage.
      */

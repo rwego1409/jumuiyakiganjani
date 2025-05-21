@@ -16,7 +16,7 @@ return new class extends Migration
             
             // Relationships
             $table->foreignId('member_id')
-                ->constrained('members')  // Changed to 'members' table for proper relation
+                ->constrained('members')
                 ->cascadeOnDelete();
             
             $table->foreignId('jumuiya_id')
@@ -24,46 +24,43 @@ return new class extends Migration
                 ->cascadeOnDelete();
             
             // Financial data
-            $table->decimal('amount', 13, 2)  // Increased precision for large amounts
+            $table->decimal('amount', 13, 2)
                 ->comment('Contribution amount in TZS');
             
-            // Status tracking
-            $table->enum('status', ['pending', 'confirmed', 'rejected'])
+            // Payment status tracking
+            $table->enum('status', ['pending', 'paid', 'failed', 'confirmed', 'rejected'])
                 ->default('pending')
-                ->comment('Contribution approval state');
+                ->comment('Payment processing state');
             
-            // Date information
+            // Contribution dates
             $table->date('contribution_date')
                 ->useCurrent()
-                ->comment('Actual date of contribution');
-            
-            // Payment details
-            $table->enum('payment_method', ['cash', 'mobile', 'bank'])
-                ->default('cash')
-                ->comment('Payment method used');
-            
-            // Additional information
-            $table->string('purpose', 255)
+                ->comment('Intended contribution date');
+            $table->timestamp('payment_date')
                 ->nullable()
-                ->comment('Contribution purpose');
+                ->comment('Actual payment completion timestamp');
+            
+            // Payment method details
+            $table->enum('payment_method', ['cash', 'palm_pesa', 'bank_transfer', 'mobile_money'])
+                ->default('palm_pesa')
+                ->comment('Payment channel used');
+            
+            // Unique payment reference using UUID
+            $table->uuid('payment_reference')
+                ->unique()
+                ->comment('Unique payment transaction ID');
             
             // Audit fields
             $table->foreignId('recorded_by')
                 ->constrained('users')
-                ->comment('Admin who recorded the contribution');
+                ->comment('User who recorded the contribution');
             
-            // Financial tracking
-            $table->string('receipt_number', 50)
-                ->nullable()
-                ->unique()
-                ->comment('Official receipt reference');
-            
-            $table->timestamps();
-            
-            // Optimized compound indexes
+            // Optimized indexes
             $table->index(['member_id', 'status']);
             $table->index(['jumuiya_id', 'contribution_date']);
-            $table->index(['status', 'payment_method']);
+            $table->index(['payment_method', 'payment_date']);
+
+            $table->timestamps();
         });
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1');

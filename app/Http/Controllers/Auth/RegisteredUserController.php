@@ -11,20 +11,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\View\View;
 use App\Models\Member;
 use App\Models\Jumuiya;
-use App\Models\Notification;
-use App\Models\Contribution;
-use App\Models\Payment;
-use App\Models\Event;
-use App\Models\Resource;
 
 class RegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
      */
+    public function create()
+    {
+        $jumuiyas = Jumuiya::all(); // Load all available Jumuiyas
+        return view('auth.register', compact('jumuiyas'));
+    }
 
     /**
      * Handle an incoming registration request.
@@ -37,8 +36,10 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'jumuiya_id' => ['required', 'exists:jumuiyas,id'], // 🔑 Validate jumuiya_id
         ]);
 
+        // Create the user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -46,9 +47,10 @@ class RegisteredUserController extends Controller
             'role' => 'member'
         ]);
 
-        // Create associated member record
-        $member = Member::create([
+        // Create the linked member record
+        Member::create([
             'user_id' => $user->id,
+            'jumuiya_id' => $request->jumuiya_id, // 🔑 Assign selected jumuiya
             'joined_date' => now(),
             'status' => 'active'
         ]);
@@ -56,13 +58,7 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
         return redirect()->route('verification.notice');
-
-    }
-
-    public function create()
-    {
-        $jumuiyas = Jumuiya::all(); // Or any query to get your jumuiyas
-        return view('auth.register', compact('jumuiyas'));
     }
 }

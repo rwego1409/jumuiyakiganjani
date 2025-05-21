@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Contribution;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class ContributionPolicy
 {
@@ -13,7 +12,8 @@ class ContributionPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        // Allow all authenticated users to view any contributions
+        return true;
     }
 
     /**
@@ -21,7 +21,8 @@ class ContributionPolicy
      */
     public function view(User $user, Contribution $contribution): bool
     {
-        //
+        // Allow if the contribution belongs to the user
+        return $user->id === $contribution->user_id;
     }
 
     /**
@@ -29,7 +30,8 @@ class ContributionPolicy
      */
     public function create(User $user): bool
     {
-        //
+        // Allow all authenticated users to create contributions
+        return true;
     }
 
     /**
@@ -37,7 +39,8 @@ class ContributionPolicy
      */
     public function update(User $user, Contribution $contribution): bool
     {
-        //
+        // Allow if the user owns the contribution
+        return $user->id === $contribution->user_id;
     }
 
     /**
@@ -45,7 +48,8 @@ class ContributionPolicy
      */
     public function delete(User $user, Contribution $contribution): bool
     {
-        //
+        // Allow if the user owns the contribution
+        return $user->id === $contribution->user_id;
     }
 
     /**
@@ -53,7 +57,8 @@ class ContributionPolicy
      */
     public function restore(User $user, Contribution $contribution): bool
     {
-        //
+        // Allow if the user owns the contribution
+        return $user->id === $contribution->user_id;
     }
 
     /**
@@ -61,6 +66,7 @@ class ContributionPolicy
      */
     public function forceDelete(User $user, Contribution $contribution): bool
     {
-        //
+        // Allow if the user owns the contribution
+        return $user->id === $contribution->user_id;
     }
 }

@@ -232,6 +232,47 @@
             @apply py-3 px-6 text-base;
         }
     }
+
+    .dashboard-preview-slider {
+        @apply overflow-hidden;
+    }
+    
+    .dashboard-preview-slider .swiper-slide {
+        @apply bg-gray-900;
+    }
+    
+    .dashboard-preview-slider img {
+        @apply object-contain object-center p-4;
+    }
+    
+    .swiper-button-next:after, 
+    .swiper-button-prev:after {
+        @apply text-gray-400 text-opacity-80 hover:text-opacity-100 transition-all;
+        font-size: 1.5rem;
+    }
+    
+    .swiper-pagination-bullet {
+        @apply bg-gray-600;
+    }
+    
+    .swiper-pagination-bullet-active {
+        @apply bg-indigo-500;
+    }
+
+    .swiper-container {
+    @apply z-0; /* Prevent overlapping with floating elements */
+}
+
+    .swiper-button-next, 
+    .swiper-button-prev {
+        @apply text-gray-400 hover:text-gray-200;
+    }
+    .card-jumuiya {
+    will-change: transform, box-shadow;
+}
+.floating {
+    will-change: transform;
+}
 </style>
 
 <div class="dark-bg min-h-screen relative">
@@ -274,29 +315,81 @@
             </div>
         </div>
         
-        <!-- Hero image or mockup -->
-        <div class="mt-16 relative mx-auto max-w-4xl">
-            <div class="bg-indigo-900 bg-opacity-30 rounded-2xl p-2 shadow-2xl border border-indigo-800">
-                <div class="bg-gray-800 rounded-xl overflow-hidden">
-                    <div class="h-8 bg-gray-900 flex items-center px-4">
-                        <div class="flex space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                        </div>
-                        <div class="mx-auto text-xs text-gray-400">Jumuiya Kiganjani Dashboard</div>
-                    </div>
-                    <div class="h-64 sm:h-96 bg-gradient-to-br from-gray-900 to-indigo-900 flex items-center justify-center">
-                        <p class="text-indigo-300 text-lg font-medium">Dashboard Preview</p>
-                    </div>
+        <!-- Hero image section with dashboard slideshow -->
+<div class="mt-16 relative mx-auto max-w-6xl">
+    <div class="bg-indigo-900 bg-opacity-30 rounded-2xl p-2 shadow-2xl border border-indigo-800">
+        <div class="bg-gray-800 rounded-xl overflow-hidden">
+            <!-- Window chrome -->
+            <div class="h-8 bg-gray-900 flex items-center px-4">
+                <div class="flex space-x-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
                 </div>
+                <div class="mx-auto text-xs text-gray-400">Jumuiya Kiganjani Dashboard</div>
             </div>
             
-            <!-- Decorative elements -->
-            <div class="absolute -top-12 -right-12 w-24 h-24 rounded-full bg-indigo-900 floating opacity-10"></div>
-            <div class="absolute -bottom-8 -left-8 w-16 h-16 rounded-full bg-purple-900 floating-reverse opacity-10"></div>
+            <!-- Dashboard Images Slideshow -->
+            <!-- Container -->
+<div class="swiper-container dashboard-preview-slider h-[600px] sm:h-[90vh]">
+                <div class="swiper-wrapper">
+                    <!-- Admin Dashboard -->
+                    <div class="swiper-slide relative">
+                        <img src="{{ asset('admindashboard.png') }}" 
+                        loading="lazy"
+                             class="w-full h-full object-contain object-center"
+                             alt="Admin Dashboard Overview">
+                        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                            <p class="text-gray-300 text-sm text-center">Admin Dashboard - Community Overview</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Contributions Management -->
+                    <!-- <div class="swiper-slide relative">
+                        <img src="{{ asset('admin.png') }}" 
+                        loading="lazy"
+                             class="w-full h-full object-contain object-center"
+                             alt="Contributions Management">
+                        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                            <p class="text-gray-300 text-sm text-center">Admin View - Community Overview</p>
+                        </div>
+                    </div>  -->
+                    
+                    <!-- Member Dashboard -->
+                    <div class="swiper-slide relative">
+                        <img src="{{ asset('memberdashboard.png') }}" 
+                        loading="lazy"
+                             class="w-full h-full object-contain object-center"
+                             alt="Member Dashboard">
+                        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                            <p class="text-gray-300 text-sm text-center">Member Dashboard - Personal Overview</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Member Contributions -->
+                    <!-- <div class="swiper-slide relative">
+                        <img src="{{ asset('member.png') }}" 
+                        loading="lazy"
+                             class="w-full h-full object-contain object-center"
+                             alt="Member Contributions">
+                        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                            <p class="text-gray-300 text-sm text-center">Member View - Personal Overview</p>
+                        </div>
+                    </div> -->
+                </div>
+                
+                <!-- Navigation and Pagination -->
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-pagination"></div>
+            </div>
         </div>
     </div>
+
+    <!-- Decorative elements -->
+    <div class="absolute -top-12 -right-12 w-24 h-24 rounded-full bg-indigo-900 floating opacity-10"></div>
+    <div class="absolute -bottom-8 -left-8 w-16 h-16 rounded-full bg-purple-900 floating-reverse opacity-10"></div>
+</div>
 
     <!-- Stats Section -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
@@ -784,133 +877,6 @@
         </div>
     </div>
 
-    <!-- Testimonial Section with Enhanced Design -->
-    <!-- <div class="bg-gray-900 bg-opacity-80 py-20 relative z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <span class="inline-block px-4 py-1 rounded-full bg-pink-900 bg-opacity-30 text-pink-300 text-sm font-medium mb-6 border border-pink-800">
-                    Success Stories
-                </span>
-                
-                <h2 class="text-3xl font-bold text-gray-200 sm:text-4xl">
-                    Loved by <span class="text-gradient">faith communities</span> worldwide
-                </h2>
-                
-                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-400">
-                    See how Jumuiya Kiganjani is transforming faith communities across the globe
-                </p>
-            </div>
-            
-            <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
-                <div class="testimonial-card">
-                    <div class="absolute top-4 right-4">
-                        <svg class="h-8 w-8 text-indigo-500 opacity-30" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M14.017 18L14.017 10.609C14.017 4.905 17.748 1.039 23 0L23.995 2.151C21.563 3.068 20 5.789 20 8H24V18H14.017ZM0 18V10.609C0 4.905 3.748 1.038 9 0L9.996 2.151C7.563 3.068 6 5.789 6 8H9.983L9.983 18L0 18Z"/>
-                        </svg>
-                    </div>
-                    
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="h-12 w-12 rounded-full bg-indigo-900 flex items-center justify-center glow">
-                                <span class="text-indigo-300 font-bold">JM</span>
-                            </div>
-                        </div>
-                        <div class="ml-4">
-                            <h4 class="text-lg font-semibold text-gray-200">John Mwangi</h4>
-                            <p class="text-gray-400">Kiganjani Leader</p>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-6 flex mb-4">
-                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                    </div>
-                    
-                    <p class="mt-2 text-gray-400 italic">
-                        "Jumuiya Kiganjani has transformed how we manage our community. The contribution tracking alone has saved us hours of work each week, and our member engagement has increased by 45% since implementation."
-                    </p>
-                    
-                    <div class="mt-6 pt-6 border-t border-gray-800">
-                        <p class="text-sm text-gray-500">Using Jumuiya since 2023</p>
-                    </div>
-                </div> -->
-
-    <!-- Testimonial Section
-    <div class="bg-gray-900 bg-opacity-80 py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <h2 class="text-3xl font-bold text-gray-200 sm:text-4xl">
-                    Loved by <span class="text-gradient">faith communities</span> worldwide
-                </h2>
-            </div>
-            
-            <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
-                <div class="testimonial-card">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="h-12 w-12 rounded-full bg-primary-900 flex items-center justify-center">
-                                <span class="text-primary-400 font-bold">JM</span>
-                            </div>
-                        </div>
-                        <div class="ml-4">
-                            <h4 class="text-lg font-semibold text-gray-200">John Mwangi</h4>
-                            <p class="text-gray-400">Kiganjani Leader</p>
-                        </div>
-                    </div>
-                    <p class="mt-4 text-gray-400 italic">
-                        "Jumuiya Kiganjani has transformed how we manage our community. The contribution tracking alone has saved us hours of work each week."
-                    </p>
-                </div>
-                
-                <div class="testimonial-card">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="h-12 w-12 rounded-full bg-green-900 flex items-center justify-center">
-                                <span class="text-green-400 font-bold">SN</span>
-                            </div>
-                        </div>
-                        <div class="ml-4">
-                            <h4 class="text-lg font-semibold text-gray-200">Sarah Njeri</h4>
-                            <p class="text-gray-400">Treasurer</p>
-                        </div>
-                    </div>
-                    <p class="mt-4 text-gray-400 italic">
-                        "The reporting features give us complete transparency into our finances. Our members appreciate seeing exactly where their contributions go."
-                    </p>
-                </div>
-                
-                <div class="testimonial-card">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="h-12 w-12 rounded-full bg-purple-900 flex items-center justify-center">
-                                <span class="text-purple-400 font-bold">DK</span>
-                            </div>
-                        </div>
-                        <div class="ml-4">
-                            <h4 class="text-lg font-semibold text-gray-200">David Kamau</h4>
-                            <p class="text-gray-400">Youth Coordinator</p>
-                        </div>
-                    </div>
-                    <p class="mt-4 text-gray-400 italic">
-                        "Our youth group engagement has doubled since we started using the event management tools. The reminders keep everyone informed!"
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div> -->
 <!-- Testimonial Section with Enhanced Design -->
 <div class="bg-gray-900 bg-opacity-80 py-20 relative z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1036,6 +1002,154 @@
     </div>
 </div>
 
+<footer class="bg-gray-900 border-t border-gray-800 mt-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            <!-- Platform Info -->
+            <div class="space-y-4">
+                <h3 class="text-gradient text-xl font-bold">Jumuiya Kiganjani</h3>
+                <p class="text-gray-400 leading-relaxed">
+                    Empowering faith communities through digital unity and organized spiritual growth.
+                </p>
+                <div class="flex space-x-5 mt-6">
+                    <a href="#" class="text-gray-400 hover:text-indigo-400 transition-colors duration-300 transform hover:scale-110">
+                        <span class="sr-only">Twitter</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-indigo-400 transition-colors duration-300 transform hover:scale-110">
+                        <span class="sr-only">Facebook</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-indigo-400 transition-colors duration-300 transform hover:scale-110">
+                        <span class="sr-only">Instagram</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 4.004-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-4.004-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd"/>
+                        </svg>
+                    </a>
+                    <!-- Added WhatsApp icon -->
+                    <a href="#" class="text-gray-400 hover:text-indigo-400 transition-colors duration-300 transform hover:scale-110">
+                        <span class="sr-only">WhatsApp</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="space-y-4">
+                <h4 class="text-gray-300 font-semibold text-lg">Platform</h4>
+                <nav class="space-y-3">
+                    <a href="#features" class="text-gray-400 hover:text-indigo-400 block text-sm transition-colors hover:translate-x-1 duration-300 flex items-center">
+                        <svg class="w-3 h-3 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Features
+                    </a>
+                    <a href="#how-it-works" class="text-gray-400 hover:text-indigo-400 block text-sm transition-colors hover:translate-x-1 duration-300 flex items-center">
+                        <svg class="w-3 h-3 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        How It Works
+                    </a>
+                    <a href="/dashboard" class="text-gray-400 hover:text-indigo-400 block text-sm transition-colors hover:translate-x-1 duration-300 flex items-center">
+                        <svg class="w-3 h-3 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="/pricing" class="text-gray-400 hover:text-indigo-400 block text-sm transition-colors hover:translate-x-1 duration-300 flex items-center">
+                        <svg class="w-3 h-3 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Pricing
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Community -->
+            <div class="space-y-4">
+                <h4 class="text-gray-300 font-semibold text-lg">Community</h4>
+                <nav class="space-y-3">
+                    <a href="/about" class="text-gray-400 hover:text-indigo-400 block text-sm transition-colors hover:translate-x-1 duration-300 flex items-center">
+                        <svg class="w-3 h-3 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        About Us
+                    </a>
+                    <a href="/blog" class="text-gray-400 hover:text-indigo-400 block text-sm transition-colors hover:translate-x-1 duration-300 flex items-center">
+                        <svg class="w-3 h-3 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Blog
+                    </a>
+                    <a href="/support" class="text-gray-400 hover:text-indigo-400 block text-sm transition-colors hover:translate-x-1 duration-300 flex items-center">
+                        <svg class="w-3 h-3 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Support
+                    </a>
+                    <a href="/docs" class="text-gray-400 hover:text-indigo-400 block text-sm transition-colors hover:translate-x-1 duration-300 flex items-center">
+                        <svg class="w-3 h-3 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Documentation
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Contact & Newsletter -->
+            <div class="space-y-4">
+                <h4 class="text-gray-300 font-semibold text-lg">Stay Connected</h4>
+                <div class="space-y-4">
+                    <div class="text-gray-400 text-sm">
+                        <p class="flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                            </svg>
+                            <a href="mailto:support@jumuiyakiganjani.com" class="hover:text-indigo-400 transition-colors">support@jumuiyakiganjani.com</a>
+                        </p>
+                        <p class="mt-3 flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+                            </svg>
+                            +255 700 000 000
+                        </p>
+                        <p class="mt-3 flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Dar es salaam, Tanzania
+                        </p>
+                    </div>
+                    <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700/30">
+    <form class="space-y-3">
+        <label class="text-sm text-gray-300 mb-1 block">Subscribe to our newsletter</label>
+        <div class="flex flex-col gap-2">
+            <input type="email" placeholder="Enter your email" 
+                class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-300 w-full focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 placeholder-gray-500">
+            <button type="submit" class="btn-jumuiya px-4 py-2 text-sm rounded-lg w-full flex items-center justify-center">
+                Subscribe
+                <svg class="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+            </button>
+        </div>
+        <p class="text-xs text-gray-500">Get updates about new features and events</p>
+    </form>
+</div>
+                </div>
+            </div>
+        </div>
+
+       
+    </div>
+</footer>
 <script>
     // Add some interactive elements
     document.addEventListener('DOMContentLoaded', function() {
@@ -1067,6 +1181,28 @@
             button.addEventListener('mouseleave', () => {
                 button.style.transform = 'translateY(0)';
             });
+        });
+
+        new Swiper('.dashboard-preview-slider', {
+            loop: true,
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 1,
+                    spaceBetween: 10,
+                }
+            }
         });
     });
 </script>

@@ -3,8 +3,12 @@
     <div class="p-6">
         <div class="flex justify-between items-start">
             <div>
-                <h3 class="text-2xl font-bold text-gray-800">{{ $contribution->course->name }}</h3>
-                <p class="text-gray-600 mt-1">Due by: {{ $contribution->due_date->format('M d, Y') }}</p>
+<h3 class="text-2xl font-bold text-gray-800">
+    {{ $contribution->course ? $contribution->course->name : 'Course not available' }}
+</h3>
+
+                <p class="text-gray-600 mt-1">Due by: {{ $contribution->due_date ? $contribution->due_date->format('M d, Y') : 'No due date' }}</p>
+
             </div>
             <span class="px-3 py-1 rounded-full text-sm font-medium 
                 {{ $contribution->is_complete ? 'bg-green-100 text-green-800' : ($contribution->is_overdue ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800') }}">
@@ -37,37 +41,38 @@
         <div class="mt-8">
             <h4 class="font-medium text-gray-700 mb-3">Recent Payments</h4>
             
-            @if($contribution->payments->isEmpty())
-                <p class="text-gray-500 text-sm">No payments recorded yet</p>
-            @else
-                <div class="space-y-3">
-                    @foreach($contribution->payments->take(3) as $payment)
-                    <div class="border-l-4 border-indigo-500 pl-4 py-2">
-                        <div class="flex justify-between">
-                            <div>
-                                <p class="font-medium">{{ number_format($payment->amount) }} TZS</p>
-                                <p class="text-sm text-gray-500">{{ $payment->created_at->format('M d, Y - h:i A') }}</p>
-                            </div>
-                            <div class="text-right">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {{ ucfirst($payment->payment_method) }}
-                                </span>
-                                @if($payment->transaction_id)
-                                <p class="text-xs text-gray-500 mt-1">Ref: {{ $payment->transaction_id }}</p>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
+           @if($contribution->payments && $contribution->payments->isEmpty())
+    <p class="text-gray-500 text-sm">No payments recorded yet</p>
+@elseif($contribution->payments)
+    <div class="space-y-3">
+        @foreach($contribution->payments->take(3) as $payment)
+        <div class="border-l-4 border-indigo-500 pl-4 py-2">
+            <div class="flex justify-between">
+                <div>
+                    <p class="font-medium">{{ number_format($payment->amount) }} TZS</p>
+                    <p class="text-sm text-gray-500">{{ $payment->created_at->format('M d, Y - h:i A') }}</p>
+                </div>
+                <div class="text-right">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {{ ucfirst($payment->payment_method) }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+@endif
+
                 </div>
                 
-                @if($contribution->payments->count() > 3)
-                <a href="{{ route('member.contributions.payments', $contribution) }}" 
-                   class="inline-block mt-3 text-sm text-indigo-600 hover:text-indigo-800">
-                    View all {{ $contribution->payments->count() }} payments →
-                </a>
-                @endif
-            @endif
+               @if($contribution->payments && $contribution->payments->count() > 3)
+    <a href="{{ route('member.contributions.payments', $contribution) }}"
+       class="inline-block mt-3 text-sm text-indigo-600 hover:text-indigo-800">
+        View all {{ $contribution->payments->count() }} payments →
+    </a>
+@endif
+
+           
         </div>
 
         <!-- Payment Actions -->

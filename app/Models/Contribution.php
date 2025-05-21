@@ -20,7 +20,8 @@ class Contribution extends Model
         'payment_method',
         'purpose',
         'status',
-        'receipt_number'
+        'receipt_number',
+            'recorded_by' 
     ];
 
     // Member relationship (user making contribution)

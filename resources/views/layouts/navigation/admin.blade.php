@@ -13,16 +13,21 @@
             <!-- Navigation Links -->
             <div class="hidden sm:flex sm:items-center sm:ml-6">
                 <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                    {{ __('Dashboard') }}
+                    {{ __('Admin Dashboard') }}
                 </x-nav-link>
                 <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
                     {{ __('Profile') }}
                 </x-nav-link>
+                <x-nav-link :href="route('admin.notifications.index')" :active="request()->routeIs('admin.notifications.index')">
+                    {{ __('Notifications') }}
+                </x-nav-link>
             </div>
 
             @php
+                // Get the unread notifications count for admin
                 $unreadCount = auth()->user()->unreadNotifications()->count();
             @endphp
+
             <!-- Notifications -->
             <div class="hidden sm:flex sm:items-center sm:ml-6">
                 <x-dropdown align="right" width="48">
@@ -44,27 +49,38 @@
                         <div class="px-4 py-2 text-xs text-gray-400 border-b dark:border-gray-600">
                             {{ __('Notifications') }}
                         </div>
-                        
-                        <div class="max-h-64 overflow-y-auto">
-                            @php
-                                $adminNotifications = [
-                                    ['message' => 'New member registration', 'time' => '2 minutes ago', 'type' => 'info'],
-                                    ['message' => 'System update required', 'time' => '30 minutes ago', 'type' => 'warning'],
-                                    ['message' => 'Backup completed', 'time' => '1 hour ago', 'type' => 'success']
-                                ];
-                            @endphp
 
-                            @foreach($adminNotifications as $notification)
-                                <div class="px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <p class="text-sm text-gray-600 dark:text-gray-300">
-                                        {{ $notification['message'] }}
-                                    </p>
-                                    <p class="text-xs text-gray-400 mt-1">
-                                        {{ $notification['time'] }}
-                                    </p>
-                                </div>
+                        <!-- Display notifications -->
+                        <div class="max-h-64 overflow-y-auto">
+                            @foreach(auth()->user()->unreadNotifications as $notification)
+                                @php
+                                    $data = $notification->data;
+                                    $isAdmin = isset($data['admin']) && $data['admin'] === true;
+                                    $url = $data['url'] ?? '#';
+                                    $creator = $isAdmin ? 'Admin' : 'User';
+                                    $model = $data['model'] ?? 'item';
+                                    $action = $data['action'] ?? 'created';
+                                    $title = "{$creator} {$action} {$model}";
+                                @endphp
+                                <a href="{{ $url }}" class="block px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700" wire:click.prevent="markAsRead('{{ $notification->id }}')">
+                                    <div class="flex justify-between">
+                                        <div>
+                                            <p class="font-medium">{{ $title }}</p>
+                                            <p class="text-gray-600 dark:text-gray-400">{{ $data['message'] ?? '' }}</p>
+                                        </div>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ $notification->created_at->diffForHumans() }}</span>
+                                    </div>
+                                </a>
                             @endforeach
                         </div>
+
+                        @if($unreadCount > 0)
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-gray-700 text-center">
+                                <a href="{{ route('admin.notifications.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                    View all notifications
+                                </a>
+                            </div>
+                        @endif
                     </x-slot>
                 </x-dropdown>
             </div>
@@ -115,10 +131,13 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('Admin Dashboard') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
                 {{ __('Profile') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.notifications.index')" :active="request()->routeIs('admin.notifications.index')">
+                {{ __('Notifications') }}
             </x-responsive-nav-link>
         </div>
 

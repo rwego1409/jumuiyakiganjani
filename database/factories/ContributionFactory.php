@@ -4,23 +4,38 @@ namespace Database\Factories;
 
 use App\Models\Member;
 use App\Models\User;
+use App\Models\Jumuiya;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class ContributionFactory extends Factory
 {
     public function definition(): array
     {
         return [
-            'user_id' => User::where('role', 'member')->inRandomOrder()->first()->id,
+            'user_id' => function (array $attributes) {
+                return Member::find($attributes['member_id'])->user_id;
+            },
+            'member_id' => Member::factory(),
+            'jumuiya_id' => function (array $attributes) {
+                return Member::find($attributes['member_id'])->jumuiya_id;
+            },
             'recorded_by' => User::where('role', 'admin')->inRandomOrder()->first()->id,
-            'member_id' => Member::inRandomOrder()->first()->id,
-            'jumuiya_id' => fn(array $attributes) => Member::find($attributes['member_id'])->jumuiya_id,
-            'amount' => $this->faker->numberBetween(5000, 50000),
-            'purpose' => $this->faker->randomElement(['Sunday Service', 'Building Fund', 'Harvest']),
-            'contribution_date' => $this->faker->dateTimeBetween('-3 months', 'now'),
-            'payment_method' => $this->faker->randomElement(['cash', 'mobile', 'bank']),
+            'amount' => $this->faker->numberBetween(5000, 100000),
+            'contribution_date' => function (array $attributes) {
+                $jumuiya = Jumuiya::find($attributes['jumuiya_id']);
+                return $this->faker->dateTimeBetween(
+                    $jumuiya->created_at,
+                    'now'
+                );
+            },
+            'payment_method' => $this->faker->randomElement([
+                'cash', 'palm_pesa', 'bank_transfer', 'mobile_money'
+            ]),
             'status' => $this->faker->randomElement(['pending', 'confirmed', 'rejected']),
-            'receipt_number' => 'RC-' . $this->faker->unique()->numberBetween(1000, 9999)
+            'payment_reference' => Str::uuid(), // UUID generation
+            'created_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
+            'updated_at' => $this->faker->dateTimeBetween('-1 year', 'now')
         ];
     }
 }

@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Http\Controllers\Members;
+
 use App\Models\Event;
 use App\Models\Member;
 use App\Models\Jumuiya;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Resource;
+
 class MemberController extends Controller
 {
     // Notifications
@@ -16,25 +18,23 @@ class MemberController extends Controller
     }
 
     // Contributions
-// app/Http/Controllers/Members/MemberController.php
+    public function indexContributions()
+    {
+        // Assuming you have a Contribution model with a relationship to User
+        $contributions = auth()->user()->contributions()
+                            ->with('jumuiya') // Eager load the jumuiya relationship
+                            ->latest()
+                            ->get();
 
-public function indexContributions()
-{
-    // Assuming you have a Contribution model with a relationship to User
-    $contributions = auth()->user()->contributions()
-                        ->with('jumuiya') // Eager load the jumuiya relationship
-                        ->latest()
-                        ->get();
-
-    return view('member.contributions.index', [
-        'contributions' => $contributions
-    ]);
-}
+        return view('member.contributions.index', [
+            'contributions' => $contributions
+        ]);
+    }
 
     public function createContribution()
     {
         $member = auth()->user();
-$jumuiyas = $member->jumuiyas; // Only get Jumuiyas for this member
+        $jumuiyas = $member->jumuiyas; // Only get Jumuiyas for this member
 
         return view('member.contributions.create', compact('jumuiyas'));
     }
@@ -55,51 +55,49 @@ $jumuiyas = $member->jumuiyas; // Only get Jumuiyas for this member
     }
 
     // Resources
-    // app/Http/Controllers/Members/MemberController.php
+    public function indexResources()
+    {
+        $resources = Resource::orderBy('created_at', 'desc')
+                    ->paginate(10);
 
-
-public function indexResources()
-{
-    $resources = Resource::orderBy('created_at', 'desc')
-                ->paginate(10);
-    
-    return view('member.resources.index', compact('resources'));
-}
-
-public function showResource(Resource $resource)
-{
-    return view('member.resources.show', compact('resource'));
-}
-
-public function downloadResource(Resource $resource)
-{
-    // Verify the file exists
-    $filePath = storage_path('app/public/' . $resource->file_path);
-    
-    if (!file_exists($filePath)) {
-        abort(404);
+        return view('member.resources.index', compact('resources'));
     }
 
-    // Increment download count
-    $resource->increment('download_count');
-    
-    // Return the file download response
-    return response()->download($filePath, $resource->original_filename);
-}
+    public function showResource(Resource $resource)
+    {
+        return view('member.resources.show', compact('resource'));
+    }
+
+    public function downloadResource(Resource $resource)
+    {
+        // Verify the file exists
+        $filePath = storage_path('app/public/' . $resource->file_path);
+
+        if (!file_exists($filePath)) {
+            abort(404);
+        }
+
+        // Increment download count
+        $resource->increment('download_count');
+
+        // Return the file download response
+        return response()->download($filePath, $resource->original_filename);
+    }
 
     // Events
     public function indexEvents()
     {
-        $events = Event::where('start_time', '>=', now())
-                    ->orderBy('start_time')
-                    ->paginate(10); // Paginate for better performance
-    
+        // Fetch all events with related jumuiya, ordered by start_time descending, paginated
+        $events = Event::with('jumuiya')
+                    ->orderBy('start_time', 'desc')
+                    ->paginate(10);
+
         return view('member.events.index', compact('events'));
     }
 
     public function showEvent($event)
     {
-        $event = Event::findOrFail($event); // Consider using route model binding
+        $event = Event::with('jumuiya')->findOrFail($event); // Eager load jumuiya here too
         return view('member.events.show', compact('event'));
     }
 

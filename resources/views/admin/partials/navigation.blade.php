@@ -112,7 +112,7 @@
                         
                         <div class="max-h-96 overflow-y-auto">
                             @forelse(auth()->user()->notifications->take(10) as $notification)
-                                <a href="{{ route('notifications.show', $notification) }}"
+                                <a href="{{ route('admin.notifications.show', $notification) }}"
                                    class="block px-4 py-3 hover:bg-gray-50 {{ $notification->unread() ? 'bg-blue-50' : '' }}"
                                    role="alert">
                                     <div class="flex items-start space-x-3">
@@ -145,7 +145,7 @@
                         </div>
 
                         <div class="p-2 border-t bg-gray-50">
-                            <a href="{{ route('notifications.index') }}"
+                            <a href="{{ route('admin.notifications.index') }}"
                                class="block text-center text-sm font-medium text-primary-600 hover:text-primary-800">
                                 {{ __('View all notifications') }}
                             </a>
@@ -185,7 +185,7 @@
                             <i class="fas fa-user-cog mr-2 text-gray-400"></i>
                             {{ __('Profile Settings') }}
                         </x-dropdown-link>
-                        <x-dropdown-link :href="route('notifications.index')">
+                        <x-dropdown-link :href="route('admin.notifications.index')">
                             <i class="fas fa-bell mr-2 text-gray-400"></i>
                             {{ __('Notifications') }}
                             @if($unreadCount > 0)
@@ -293,7 +293,7 @@
                     <i class="fas fa-user-cog mr-3 text-gray-400"></i>
                     {{ __('Profile Settings') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('notifications.index')">
+                <x-responsive-nav-link :href="route('admin.notifications.index')">
                     <i class="fas fa-bell mr-3 text-gray-400"></i>
                     {{ __('Notifications') }}
                     @if($unreadCount > 0)

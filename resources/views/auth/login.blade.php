@@ -32,7 +32,7 @@
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
+        <div class="flex items-center justify-between mt-4">
             @if (Route::has('password.request'))
                 <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
                     {{ __('Forgot your password?') }}
@@ -44,4 +44,16 @@
             </x-primary-button>
         </div>
     </form>
+
+    <!-- Extra Links -->
+    <div class="mt-6 flex flex-col sm:flex-row sm:justify-between items-center text-sm text-gray-600">
+        @if (Route::has('register'))
+            <p class="mt-2 sm:mt-0">
+                {{ __("Don't have an account?") }}
+                <a href="{{ route('register') }}" class="text-indigo-600 hover:underline">Register</a>
+            </p>
+        @endif
+
+        <a href="{{ url('/') }}" class="mt-2 sm:mt-0 text-indigo-600 hover:underline">← Back to Homepage</a>
+    </div>
 </x-guest-layout>

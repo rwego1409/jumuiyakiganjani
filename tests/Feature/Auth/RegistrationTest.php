@@ -17,16 +17,19 @@ class RegistrationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_new_users_can_register(): void
-    {
-        $response = $this->post('/register', [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ]);
+    // tests/Feature/Auth/RegistrationTest.php
+public function test_new_users_can_register()
+{
+    $response = $this->post('/register', [
+        'name' => 'Test User',
+        'email' => 'test@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+        'jumuiya_id' => 1, // Add valid jumuiya ID
+        'phone' => '255123456789' // Add phone if required
+    ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(RouteServiceProvider::HOME);
-    }
+    $this->assertAuthenticated();
+    $response->assertRedirect(RouteServiceProvider::HOME);
+}
 }

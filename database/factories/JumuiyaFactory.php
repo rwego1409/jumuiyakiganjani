@@ -2,23 +2,23 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Jumuiya>
- */
 class JumuiyaFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected static $counter = 1;
+
     public function definition(): array
     {
         return [
-            'name' => $this->faker->unique()->word,
-            'location' => $this->faker->address, // Add this line
+            'name' => 'Jumuiya ' . static::$counter++ . ' - ' . Str::random(4),
+            'location' => $this->faker->address,
+            'chairperson_id' => User::where('role', 'admin')->exists()
+                ? User::where('role', 'admin')->inRandomOrder()->first()->id
+                : User::factory()->create(['role' => 'admin'])->id,
+            'created_at' => $this->faker->dateTimeBetween('-2 years', '-1 month')
         ];
     }
 }

@@ -272,3 +272,11 @@ Remember to:
 1. Create your `.env` file from `.env.example` before starting
 2. Adjust memory limits in `php.ini` based on your server resources
 3. Update database credentials in both `.env` and `docker-compose.yml` for production
+
+
+
+how ur csv should look
+
+name,email,jumuiya_id,phone,status,joined_date
+John Doe,john@example.com,1,1234567890,active,2023-04-25
+Jane Smith,jane@example.com,2,0987654321,inactive,2023-04-20
