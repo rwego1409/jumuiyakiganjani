@@ -61,8 +61,8 @@ return [
         'base_url' => env('VODACOM_BASE_URL', 'https://api.vodacom.co.tz'),
     ],
 
-    'palm_pesa' => [
-        'url' => env('PALMPESA_API_URL', 'https://palmpesa.drmlelwa.co.tz/api/pay-via-mobile'),
-        'token' => env('PALMPESA_API_TOKEN'),
-    ],
+    'palmpesa' => [
+    // 'url' => env('PALMPESA_URL'),
+    'token' => env('PALMPESA_TOKEN'),
+],
 ];

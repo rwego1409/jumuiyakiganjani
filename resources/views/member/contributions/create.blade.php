@@ -3,266 +3,348 @@
 @section('content')
 <div class="py-6">
   <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
-    <h2 class="text-xl font-semibold">Make a Contribution via PalmPesa</h2>
+    <h2 class="text-2xl font-bold mb-6">Make Contribution</h2>
 
-    @if ($errors->any())
-      <div class="bg-red-500 text-white p-4 rounded mb-4">
-        <ul>
-          @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-          @endforeach
-        </ul>
-      </div>
-    @endif
-
-    @if (session('success'))
-      <div class="bg-green-500 text-white p-4 rounded mb-4">
-        {{ session('success') }}
-      </div>
-    @endif
-
-    <form action="{{ route('member.contributions.store') }}" method="POST" class="mt-4 space-y-4" id="contributionForm">
-      @csrf
-
-      <div>
-        <label for="jumuiya_id" class="block text-sm font-medium text-gray-700">Select Jumuiya</label>
-        <select name="jumuiya_id" id="jumuiya_id" class="form-select w-full mt-1 border-gray-300 rounded-md" required>
-          <option value="">-- Select Jumuiya --</option>
-          @foreach($jumuiyas as $jumuiya)
-            <option value="{{ $jumuiya->id }}" {{ old('jumuiya_id') == $jumuiya->id ? 'selected' : '' }}>
-              {{ $jumuiya->name }}
-            </option>
-          @endforeach
-        </select>
-      </div>
-
-      <div>
-        <label for="amount" class="block text-sm font-medium text-gray-700">Amount (TZS)</label>
-        <input type="number" name="amount" id="amount" 
-          class="form-input w-full mt-1 border-gray-300 rounded-md" 
-          min="1000" max="3000000" 
-          value="{{ old('amount') }}"
-          required>
-        <p class="text-sm text-gray-500 mt-1">Min: 1,000 TZS | Max: 3,000,000 TZS</p>
-      </div>
-
-      <div>
-        <label for="contribution_date" class="block text-sm font-medium text-gray-700">Date</label>
-        <input type="date" name="contribution_date" id="contribution_date"
-          class="form-input w-full mt-1 border-gray-300 rounded-md"
-          value="{{ old('contribution_date', now()->toDateString()) }}"
-          required>
-      </div>
-
-      <div class="pt-2">
-        <div class="flex justify-center">
-          <img src="{{ asset('images/palm-pesa.png') }}" alt="PalmPesa" class="h-16">
+    <!-- Progress Stepper -->
+    <div class="mb-8">
+      <div class="flex justify-between">
+        <div class="flex flex-col items-center">
+          <div class="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center">1</div>
+          <span class="text-xs mt-1">Details</span>
         </div>
-        <p class="text-center text-sm text-gray-500 mt-2">
-          You will be prompted to enter your PalmPesa PIN on your phone
-        </p>
-      </div>
-
-      <button type="button" id="proceedPayment"
-        class="w-full bg-indigo-600 text-white px-4 py-3 rounded-md hover:bg-indigo-700 font-medium">
-        Proceed to Payment
-      </button>
-    </form>
-  </div>
-</div>
-
-<!-- Payment Modal -->
-<div id="paymentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
-  <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
-    <button id="closeModal" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-
-    <div class="flex justify-center mb-4">
-      <img src="{{ asset('images/palm-pesa.png') }}" alt="PalmPesa" class="h-14">
-    </div>
-
-    <div class="text-center mb-6">
-      <h3 class="text-lg font-medium">Confirm PalmPesa Payment</h3>
-      <p class="text-sm text-gray-500">Enter your details to proceed</p>
-    </div>
-
-    <form id="paymentForm" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Amount (TZS)</label>
-        <input type="text" id="modalAmount" class="form-input w-full mt-1 border-gray-300 rounded-md text-center font-bold text-lg" readonly>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Full Name</label>
-        <input type="text" id="fullName" class="form-input w-full mt-1 border-gray-300 rounded-md" 
-          value="{{ auth()->user()->name }}" required>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Phone Number</label>
-        <div class="flex items-center mt-1">
-          <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-            +255
-          </span>
-          <input type="text" id="phoneNumber" class="form-input flex-1 rounded-none rounded-r-md" 
-            placeholder="xxxxxxxxx" 
-            value="{{ substr(auth()->user()->phone, 3) ?? '' }}"
-            required>
+        <div class="flex-1 h-0.5 bg-gray-300 self-center mx-2"></div>
+        <div class="flex flex-col items-center">
+          <div class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center">2</div>
+          <span class="text-xs mt-1">Confirmation</span>
         </div>
       </div>
-
-      <button type="button" id="confirmPayment" class="w-full bg-green-600 text-white py-3 rounded-md font-medium hover:bg-green-700 mt-4">
-        CONFIRM PAYMENT
-      </button>
-    </form>
-  </div>
-</div>
-
-<!-- Payment Processing Modal -->
-<div id="processingModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
-  <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 text-center">
-    <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-green-500 mx-auto mb-4"></div>
-    <h3 class="text-lg font-medium mb-2">Processing Payment</h3>
-    <p class="text-gray-600 mb-4">Please wait while we process your payment</p>
-    <p class="text-sm text-gray-500">You may receive a PIN prompt on your phone</p>
-  </div>
-</div>
-
-<!-- Payment Success Modal -->
-<div id="successModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
-  <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 text-center">
-    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-      <svg class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-      </svg>
     </div>
-    <h3 class="text-lg font-medium mb-2">Payment Successful!</h3>
-    <p class="text-gray-600 mb-4" id="successMessage">Your contribution has been received</p>
-    <button id="closeSuccessModal" class="w-full bg-green-600 text-white py-2 rounded-md font-medium hover:bg-green-700">
-      Continue
-    </button>
+
+    <!-- Messages Container -->
+    <div id="messageContainer" aria-live="polite">
+      @if($errors->any())
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+          <ul>
+            @foreach($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endif
+    </div>
+
+    <!-- Contribution Form -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <form id="contributionForm">
+        @csrf
+
+        <!-- Amount Input -->
+        <div class="mb-6">
+          <label for="amount" class="block text-gray-700 text-sm font-medium mb-2">Amount (TZS)</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-600">TZS</span>
+            <input type="number" 
+                  id="amount" 
+                  name="amount"
+                  class="w-full pl-12 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  min="1000"
+                  max="3000000"
+                  required>
+          </div>
+          <p class="text-gray-500 text-sm mt-1">Minimum: 1,000 TZS | Maximum: 3,000,000 TZS</p>
+        </div>
+
+        <!-- Phone Input -->
+        <div class="mb-6">
+          <label for="phone" class="block text-gray-700 text-sm font-medium mb-2">Mobile Number</label>
+          <div class="relative">
+            <input type="tel" 
+                  id="phone" 
+                  name="phone"
+                  class="w-full pl-4 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  pattern="0\d{9}|255\d{9}"
+                  placeholder="0693662424 or 255693662424"
+                  title="Enter 10 digits starting with 0 or 12 digits starting with 255"
+                  required>
+          </div>
+          <p class="text-gray-500 text-xs mt-1">Formats: 0693662424 (10 digits) or 255693662424 (12 digits)</p>
+        </div>
+
+        @auth
+        <input type="hidden" name="member_id" value="{{ auth()->user()->id }}">
+        @endauth
+
+        @if (isset($contributionId))
+        <input type="hidden" 
+               name="member_course_contribution_id" 
+               value="{{ $contributionId }}">
+        @endif
+
+        <button type="button"
+                id="proceedToPaymentBtn"
+                class="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+          Proceed to Payment
+        </button>
+      </form>
+    </div>
   </div>
 </div>
+
+<!-- Payment Confirmation Modal -->
+<div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
+  <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-semibold">Confirm Payment</h3>
+        <button id="closePaymentModal" class="text-gray-500 hover:text-gray-700">
+          ✕
+        </button>
+      </div>
+      <div class="space-y-4">
+        <div class="bg-gray-50 p-4 rounded-md mb-4">
+          <div class="flex justify-between">
+            <span class="text-gray-700">Amount:</span>
+            <span class="font-semibold" id="summaryAmount">-</span>
+          </div>
+          <div class="flex justify-between mt-2">
+            <span class="text-gray-700">Mobile Number:</span>
+            <span class="font-semibold" id="summaryPhone">-</span>
+          </div>
+        </div>
+        <button type="button" 
+                id="confirmPaymentBtn"
+                class="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors relative">
+          <span class="btn-text">Confirm PalmPesa Payment</span>
+          <svg class="animate-spin h-5 w-5 text-white absolute right-4 top-3 hidden" 
+               xmlns="http://www.w3.org/2000/svg" 
+               fill="none" 
+               viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Pending Modal -->
+<div id="pendingModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
+  <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+    <div class="p-6 text-center">
+      <div class="my-6">
+        <svg class="animate-spin h-12 w-12 text-indigo-600 mx-auto" 
+             xmlns="http://www.w3.org/2000/svg" 
+             fill="none" 
+             viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+      <h3 class="text-xl font-semibold mb-2">Waiting for Payment</h3>
+      <p class="text-gray-600 mb-4">Please check your mobile device to complete the payment</p>
+      <div class="bg-blue-50 p-4 rounded-md mb-4 text-left">
+        <h4 class="font-medium text-blue-800 mb-2">Instructions:</h4>
+        <ol class="list-decimal pl-5 text-blue-800 text-sm">
+          <li>You will receive a payment request on your phone</li>
+          <li>Enter your PIN to authorize the payment</li>
+          <li>Wait for the confirmation message</li>
+        </ol>
+      </div>
+      <div id="statusDetails" class="bg-gray-50 p-4 rounded-md text-sm text-left hidden">
+        <div class="grid grid-cols-2 gap-y-2">
+          <div class="font-medium">Status:</div>
+          <div id="currentStatus">Pending</div>
+        </div>
+      </div>
+      <button id="cancelPaymentBtn" 
+              class="mt-4 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
+          Cancel Payment
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
+  <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+    <div class="p-6 text-center">
+      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <h3 class="text-xl font-semibold mb-2 text-green-600">Payment Successful!</h3>
+      <p class="text-gray-600 mb-6">Your contribution has been received successfully.</p>
+      <button onclick="location.reload()" 
+              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+          Make Another Contribution
+      </button>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  // Elements
-  const proceedPaymentBtn = document.getElementById('proceedPayment');
+document.addEventListener('DOMContentLoaded', function() {
+  const proceedBtn = document.getElementById('proceedToPaymentBtn');
+  const confirmBtn = document.getElementById('confirmPaymentBtn');
+  const cancelBtn = document.getElementById('cancelPaymentBtn');
+  const amountInput = document.getElementById('amount');
+  const phoneInput = document.getElementById('phone');
   const paymentModal = document.getElementById('paymentModal');
-  const processingModal = document.getElementById('processingModal');
+  const pendingModal = document.getElementById('pendingModal');
   const successModal = document.getElementById('successModal');
-  const closeModal = document.getElementById('closeModal');
-  const closeSuccessModal = document.getElementById('closeSuccessModal');
-  const confirmPayment = document.getElementById('confirmPayment');
-  const modalAmount = document.getElementById('modalAmount');
-  const contributionForm = document.getElementById('contributionForm');
+  const closePaymentModal = document.getElementById('closePaymentModal');
+  let paymentCheckInterval = null;
+  let currentReference = null;
 
-  // Open payment modal
-  proceedPaymentBtn.addEventListener('click', function () {
-    const amount = document.getElementById('amount').value;
-    const jumuiya = document.getElementById('jumuiya_id').value;
-
-    // Validate inputs
-    if (!jumuiya) {
-      alert('Please select your Jumuiya');
-      return;
-    }
-
-    if (!amount || amount < 1000 || amount > 3000000) {
-      alert('Please enter a valid amount between 1,000 and 3,000,000 TZS');
-      return;
-    }
-
-    // Format amount with commas
-    modalAmount.value = parseFloat(amount).toLocaleString('en-US') + ' TZS';
-    paymentModal.classList.remove('hidden');
-  });
-
-  // Close modals
-  closeModal.addEventListener('click', function () {
-    paymentModal.classList.add('hidden');
-  });
-
-  closeSuccessModal.addEventListener('click', function () {
-    successModal.classList.add('hidden');
-    window.location.reload();
-  });
-
-  // Format phone number input
-  document.getElementById('phoneNumber').addEventListener('input', function (e) {
-    this.value = this.value.replace(/\D/g, '').substring(0, 9);
-  });
-
-  // Confirm payment
-  confirmPayment.addEventListener('click', async function () {
-    const fullName = document.getElementById('fullName').value;
-    const phoneNumber = '255' + document.getElementById('phoneNumber').value;
-    const amount = document.getElementById('amount').value;
-
-    // Validate inputs
-    if (!fullName) {
-      alert('Please enter your full name');
-      return;
+  function formatPhoneNumber(input) {
+    let numbers = input.replace(/\D/g, '');
+    
+    if (numbers.startsWith('0') && numbers.length === 10) {
+      return '255' + numbers.substring(1);
     }
     
-    if (phoneNumber.length !== 12) {
-      alert('Please enter a valid phone number (9 digits after 255)');
+    if (numbers.startsWith('255') && numbers.length === 12) {
+      return numbers;
+    }
+    
+    return null;
+  }
+
+  function isValidPhoneNumber(phone) {
+    return /^255\d{9}$/.test(phone);
+  }
+
+  proceedBtn.addEventListener('click', function() {
+    const amount = parseInt(amountInput.value);
+    const rawPhone = phoneInput.value;
+    const formattedPhone = formatPhoneNumber(rawPhone);
+
+    if (isNaN(amount) || amount < 1000 || amount > 3000000) {
+      showError('Please enter a valid amount between 1,000 and 3,000,000 TZS');
       return;
     }
 
-    // Show processing modal
+    if (!formattedPhone || !isValidPhoneNumber(formattedPhone)) {
+      showError('Invalid phone number. Use format: 0693662424 or 255693662424');
+      return;
+    }
+
+    document.getElementById('summaryAmount').textContent = `TZS ${amount.toLocaleString()}`;
+    document.getElementById('summaryPhone').textContent = formattedPhone;
+    paymentModal.classList.remove('hidden');
+    paymentModal.classList.add('flex');
+  });
+
+  closePaymentModal.addEventListener('click', () => {
     paymentModal.classList.add('hidden');
-    processingModal.classList.remove('hidden');
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    clearInterval(paymentCheckInterval);
+    pendingModal.classList.add('hidden');
+    paymentModal.classList.add('hidden');
+  });
+
+  confirmBtn.addEventListener('click', async function() {
+    const amount = amountInput.value;
+    const rawPhone = phoneInput.value;
+    const formattedPhone = formatPhoneNumber(rawPhone);
+    const contributionId = document.querySelector('[name="member_course_contribution_id"]')?.value;
+
+    // Clear previous errors
+    document.getElementById('messageContainer').innerHTML = '';
+
+    // Show loading state
+    confirmBtn.disabled = true;
+    confirmBtn.querySelector('.btn-text').textContent = 'Processing...';
+    confirmBtn.querySelector('svg').classList.remove('hidden');
 
     try {
-      const payload = {
-        name: fullName,
-        phone: phoneNumber,
-        amount: parseFloat(amount),
-        transaction_id: 'TXN' + Date.now(),
-        user_id: {{ auth()->id() }},
-        email: '{{ auth()->user()->email }}',
-        address: '{{ auth()->user()->address ?? "Not specified" }}',
-        postcode: '{{ auth()->user()->postcode ?? "00000" }}',
-        buyer_uuid: {{ auth()->id() }},
-        jumuiya_id: document.getElementById('jumuiya_id').value,
-        contribution_date: document.getElementById('contribution_date').value
-      };
-
-      const response = await fetch('{{ route("make-payment") }}', {
+      const response = await fetch("{{ route('payment.process') }}", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
           'Accept': 'application/json'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          phone: formattedPhone,
+          amount: amount,
+          member_id: document.querySelector('[name="member_id"]').value,
+          member_course_contribution_id: contributionId
+        })
       });
 
       const data = await response.json();
-
-      processingModal.classList.add('hidden');
-
-      if (data.success) {
-        document.getElementById('successMessage').textContent = data.message || 'Your contribution has been received';
+      
+      if (!response.ok) throw new Error(data.message || 'Server Error');
+      
+      if (data.pending) {
+        // Payment requires user confirmation
+        paymentModal.classList.add('hidden');
+        pendingModal.classList.remove('hidden');
+        pendingModal.classList.add('flex');
+        currentReference = data.reference;
+        startPaymentStatusCheck(currentReference);
+      } else if (data.success) {
+        // Immediate success
+        paymentModal.classList.add('hidden');
         successModal.classList.remove('hidden');
-        
-        // Optionally submit the form if needed
-        contributionForm.submit();
+        successModal.classList.add('flex');
       } else {
-        throw new Error(data.message || 'Payment initiation failed');
+        throw new Error(data.message || 'Payment Failed');
       }
+
     } catch (error) {
-      processingModal.classList.add('hidden');
-      alert('Payment Error: ' + error.message);
-      paymentModal.classList.remove('hidden');
+      console.error('Payment Error:', error);
+      showError(error.message);
+    } finally {
+      confirmBtn.disabled = false;
+      confirmBtn.querySelector('.btn-text').textContent = 'Confirm PalmPesa Payment';
+      confirmBtn.querySelector('svg').classList.add('hidden');
     }
   });
+
+  function startPaymentStatusCheck(reference) {
+    // Clear any existing interval
+    if (paymentCheckInterval) clearInterval(paymentCheckInterval);
+    
+    paymentCheckInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`/payment/status/${reference}`);
+        const data = await response.json();
+        
+        if (data.status === 'completed') {
+          clearInterval(paymentCheckInterval);
+          pendingModal.classList.add('hidden');
+          successModal.classList.remove('hidden');
+          successModal.classList.add('flex');
+        } else if (data.status === 'failed') {
+          clearInterval(paymentCheckInterval);
+          pendingModal.classList.add('hidden');
+          showError('Payment failed. Please try again.');
+        }
+      } catch (error) {
+        console.error('Status check error:', error);
+      }
+    }, 3000); // Check every 3 seconds
+  }
+
+  function showError(message) {
+    const container = document.getElementById('messageContainer');
+    container.innerHTML = `
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+        ${message}
+      </div>
+    `;
+    paymentModal.classList.add('hidden');
+    pendingModal.classList.add('hidden');
+  }
 });
 </script>
 @endpush

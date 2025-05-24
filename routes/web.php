@@ -25,7 +25,8 @@ use App\Http\Controllers\{
     ProfileSetupController,
     PaymentController,
     NotificationController,
-    ClickPesaController
+    ClickPesaController,
+    PalmPesaController
 };
 use App\Models\User;
 use App\Notifications\TestNotification;
@@ -191,15 +192,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     // Route::post('/pay', [PaymentController::class, 'payViaMobile']);
 
+Route::get('/payment', function () {
+    return view('payment.form');
+})->name('payment.form');
 
+Route::post('/process-payment', [PaymentController::class, 'initiatePayment'])
+     ->name('payment.process');
 
-// For web testing (temporary route)
-Route::get('/test-payment', [PaymentController::class, 'initiatePayment']);
+// Add this with your other routes
+Route::get('/payment/success', function () {
+    return view('member.payment-success');
+})->name('payment.success');
 
-// For actual API implementation (use POST)
-Route::post('/make-payment', [PaymentController::class, 'initiatePayment'])->name('make-payment');
-
-
+Route::post('/payment/callback', [PaymentController::class, 'paymentCallback']);
     // Fallback route for 404s
     Route::fallback(function () {
         return view('errors.404');
