@@ -16,65 +16,98 @@ class PaymentController extends Controller
         $this->palmPesa = $palmPesa;
     }
 
-    public function initiatePayment(Request $request)
-    {
-        $validated = $request->validate([
-            'phone' => ['required', 'string', 'regex:/^(0\d{9}|255\d{9})$/'],
-            'amount' => ['required', 'numeric', 'min:1000', 'max:3000000'],
-            'member_id' => ['required', 'exists:members,id'],
-        ]);
+public function initiatePayment(Request $request)
+{
+    $validated = $request->validate([
+        'phone' => ['required', 'string', 'regex:/^(0\d{9}|255\d{9})$/'],
+        'amount' => ['required', 'numeric', 'min:1000', 'max:3000000'],
+    ]);
 
-        $reference = 'PALMPESA-' . Str::uuid()->toString();
+    $reference = 'PALMPESA-' . Str::uuid();
 
-        Log::info('Initiating payment', [
-            'phone' => $validated['phone'],
-            'amount' => $validated['amount'],
-            'reference' => $reference,
-            'member_id' => $validated['member_id']
-        ]);
+    $response = $this->palmPesa->processPayment(
+        $validated['phone'],
+        $validated['amount'],
+        $reference
+    );
 
-        $response = $this->palmPesa->processPayment(
-            $validated['phone'],
-            $validated['amount'],
-            $reference
-        );
+    if (isset($response['error'])) {
+        return response()->json([
+            'success' => false,
+            'message' => $this->getStkErrorMessage($response),
+            'data' => [
+                'reference' => $reference,
+                'status' => 'failed'
+            ]
+        ], 400);
+    }
 
-        if (isset($response['error'])) {
-            Log::error('Payment failed', ['error' => $response['error'], 'details' => $response['details'] ?? null]);
-            
-            return response()->json([
-                'success' => false,
-                'message' => $this->getErrorMessage($response),
-                'data' => $response['details'] ?? null
-            ], $this->getErrorStatusCode($response));
-        }
-
-        Log::info('Payment processed', ['response' => $response]);
-
-        if ($response['status'] === 'pending') {
-            return response()->json([
-                'success' => true,
-                'pending' => true,
-                'message' => 'Please check your phone to complete payment',
-                'data' => [
-                    'reference' => $reference,
-                    'phone' => $validated['phone'],
-                    'amount' => $validated['amount']
-                ]
-            ]);
-        }
-
+    // Special handling for STK push pending state
+    if ($response['status'] === 'pending') {
         return response()->json([
             'success' => true,
-            'message' => 'Payment processed successfully',
+            'pending' => true,
+            'message' => $this->getStkPendingMessage($validated['phone']),
             'data' => [
                 'reference' => $reference,
                 'phone' => $validated['phone'],
                 'amount' => $validated['amount'],
-                'status' => 'completed'
+                'status' => 'pending'
             ]
         ]);
     }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Payment processed successfully',
+        'data' => [
+            'reference' => $reference,
+            'status' => 'completed'
+        ]
+    ]);
+}
+ public function mobilePayment(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|integer',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => 'required|string',
+            'amount' => 'required|numeric|min:10',
+            'transaction_id' => 'nullable|string',
+            'address' => 'nullable|string',
+            'postcode' => 'nullable|string',
+            'buyer_uuid' => 'nullable|integer'
+        ]);
+
+        $result = $this->palmpesa->processMobilePayment($validated);
+
+        if ($result['status'] === 'success') {
+            return response()->json($result);
+        }
+
+        return response()->json($result, 400);
+    }
+protected function getStkPendingMessage($phone)
+{
+    return "We've sent an STK push request to 0" . substr($phone, 3) . ". " .
+           "Please check your phone and enter your PIN to complete the payment. " .
+           "If you don't receive the prompt within 2 minutes, please try again.";
+}
+
+protected function getStkErrorMessage($response)
+{
+    $error = $response['error'];
+    
+    if (str_contains($error, 'STK push failed')) {
+        return 'Could not send payment request to your phone. Please ensure: ' .
+               '1. Your number is registered with PalmPesa ' .
+               '2. You have mobile money enabled ' .
+               '3. Your phone is connected to the internet';
+    }
+    
+    return $error;
+}
 
     public function paymentCallback(Request $request)
     {

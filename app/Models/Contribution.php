@@ -21,7 +21,8 @@ class Contribution extends Model
         'purpose',
         'status',
         'receipt_number',
-            'recorded_by' 
+            'recorded_by' ,
+        'payment_reference'
     ];
 
     // Member relationship (user making contribution)
@@ -64,7 +65,8 @@ class Contribution extends Model
             'payment_method' => 'required|in:cash,mobile,bank',
             'purpose' => 'nullable|string|max:255',
             'status' => 'required|in:pending,confirmed,rejected',
-            'receipt_number' => 'nullable|string|max:50|unique:contributions'
+            'receipt_number' => 'nullable|string|max:50|unique:contributions',
+            'payment_reference' => 'nullable|string|unique:contributions,payment_reference',
         ];
     }
 }

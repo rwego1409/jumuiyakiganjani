@@ -33,9 +33,12 @@ class ContributionFactory extends Factory
                 'cash', 'palm_pesa', 'bank_transfer', 'mobile_money'
             ]),
             'status' => $this->faker->randomElement(['pending', 'confirmed', 'rejected']),
-            'payment_reference' => Str::uuid(), // UUID generation
+           'payment_reference' => fn() => (string) Str::uuid(),
+// UUID generation
             'created_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
-            'updated_at' => $this->faker->dateTimeBetween('-1 year', 'now')
+            'updated_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
+            'purpose' => $this->faker->sentence(),
+
         ];
     }
 }

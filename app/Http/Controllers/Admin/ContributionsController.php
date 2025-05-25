@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ContributionsImport;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class ContributionsController extends Controller
 {
@@ -72,25 +73,34 @@ class ContributionsController extends Controller
      * Store a newly created resource in storage.
      */
     // In your Controller
-    public function store(Request $request)
+   public function store(Request $request)
 {
+    // Validate request using Contribution model rules
     $validated = $request->validate(Contribution::validationRules());
-    
-    // Get the member's user_id
+
+    // Find the member to get the user_id
     $member = Member::findOrFail($validated['member_id']);
     $validated['user_id'] = $member->user_id;
 
-    // For admin submissions
-    if(auth()->user()->isAdmin()) {
+    // Generate unique payment reference
+    $validated['payment_reference'] = \Illuminate\Support\Str::uuid();
+
+    // Generate unique receipt number (example format: RCPT-{timestamp}-{random})
+    $validated['receipt_number'] = 'RCPT-' . time() . '-' . strtoupper(\Illuminate\Support\Str::random(6));
+
+    if (auth()->user()->isAdmin()) {
+        // If admin is recording, mark status as 'confirmed' and recorded_by as admin user id
         $validated['recorded_by'] = auth()->id();
-    }
-    // For member self-submissions
-    else {
+        $validated['status'] = 'confirmed';
+    } else {
+        // If member self-submitting, assign recorded_by as first admin id
         $validated['recorded_by'] = User::where('role', 'admin')->first()->id;
+        // Keep status from validated input (e.g., 'pending', 'paid', etc.)
     }
 
+    // Create contribution record
     Contribution::create($validated);
-    
+
     return redirect()->route('admin.contributions.index')
         ->with('success', 'Contribution recorded successfully');
 }

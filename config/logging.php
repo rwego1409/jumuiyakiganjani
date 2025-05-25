@@ -127,5 +127,12 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
     ],
-
+'channels' => [
+    'palmpesa' => [
+        'driver' => 'daily',
+        'path' => storage_path('logs/palmpesa.log'),
+        'level' => 'debug',
+        'days' => 14,
+    ],
+],
 ];

@@ -205,6 +205,73 @@ Route::get('/payment/success', function () {
 })->name('payment.success');
 
 Route::post('/payment/callback', [PaymentController::class, 'paymentCallback']);
+Route::get('/payment/callback', function () {
+    return view('payment.callback');
+})->name('payment.callback');
+
+// routes/web.php
+// routes/web.php
+Route::get('/test-stk-push', function() {
+    $phone = request('phone', '255625369871');
+    $amount = request('amount', 1000);
+    
+    $service = app()->make(App\Services\PalmPesaService::class);
+    $response = $service->processPayment(
+        $phone,
+        $amount,
+        'TEST-' . time()
+    );
+    
+    return response()->json([
+        'diagnostic' => [
+            'input_phone' => $phone,
+            'environment' => app()->environment(),
+            'timestamp' => now()->toDateTimeString()
+        ],
+        'api_response' => $response
+    ]);
+});
+Route::prefix('payments')->group(function() {
+    Route::post('/stk-push', [PaymentController::class, 'stkPush']); // Existing
+    Route::post('/mobile', [PaymentController::class, 'mobilePayment']); // New
+});
+
+Route::get('/test-mobile-payment', function() {
+    $service = app()->make(App\Services\PalmPesaService::class);
+    
+    $testData = [
+        'user_id' => 2,
+        'name' => 'Test User',
+        'email' => 'test@example.com',
+        'phone' => '255625369871', // Test with your number
+        'amount' => 1000,
+        'transaction_id' => 'TXN-' . time(),
+        'address' => 'Dar es Salaam',
+        'postcode' => '12345',
+        'buyer_uuid' => 123456
+    ];
+
+    $result = $service->processMobilePayment($testData);
+    
+    return response()->json([
+        'test_data' => $testData,
+        'result' => $result,
+        'logs' => 'Check storage/logs/palmpesa.log for details'
+    ]);
+});
+// routes/web.php
+Route::prefix('palmpesa')->group(function() {
+    Route::get('/debug', [\App\Http\Controllers\PalmPesaDebugController::class, 'testStkPush']);
+    Route::post('/debug', [\App\Http\Controllers\PalmPesaDebugController::class, 'testStkPush']);
+});
+// Check payment status
+Route::get('/payment/status/{reference}', function($reference) {
+    // Implement status check with PalmPesa API
+    return response()->json([
+        'status' => 'pending', // or 'completed'/'failed'
+        'reference' => $reference
+    ]);
+});
     // Fallback route for 404s
     Route::fallback(function () {
         return view('errors.404');

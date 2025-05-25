@@ -49,6 +49,13 @@ $jumuiyas = Jumuiya::factory()->count(5)->create();
             'member_id' => fn() => $members->random()->id,
             'jumuiya_id' => fn() => $members->random()->jumuiya_id,
             'recorded_by' => $admin->id,
+            'payment_method' => $faker->randomElement(['cash', 'palm_pesa', 'bank_transfer', 'mobile_money']),
+            'status' => $faker->randomElement(['pending', 'confirmed', 'rejected']),
+            'payment_reference' => fn() => (string) Str::uuid(),
+
+            'created_at' => $faker->dateTimeBetween('-1 year', 'now'),
+            'updated_at' => $faker->dateTimeBetween('-1 year', 'now'),
+            'purpose' => $faker->sentence(),
             'amount' => $faker->numberBetween(1000, 100000),
             'contribution_date' => function() use ($faker, $jumuiyas) {
                 $jumuiya = $jumuiyas->random();
@@ -56,6 +63,7 @@ $jumuiyas = Jumuiya::factory()->count(5)->create();
                     $jumuiya->created_at,
                     'now'
                 );
+            
             }
         ]);
 

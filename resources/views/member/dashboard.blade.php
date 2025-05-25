@@ -47,7 +47,7 @@
                 ],
                 [
                     'title' => 'Member Since',
-                    'value' => $stats['member_since'] ?? 'March 2025',
+                    'value' => $stats['memberSince'] ?? '',
                     'icon' => 'calendar',
                     'color' => 'bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
                 ],

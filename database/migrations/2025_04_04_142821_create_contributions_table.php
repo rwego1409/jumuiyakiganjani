@@ -29,7 +29,7 @@ return new class extends Migration
             
             // Payment status tracking
             $table->enum('status', ['pending', 'paid', 'failed', 'confirmed', 'rejected'])
-                ->default('pending')
+                ->default('confirmed')
                 ->comment('Payment processing state');
             
             // Contribution dates
