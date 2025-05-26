@@ -12,7 +12,17 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Process WhatsApp reminders every 5 minutes
+        $schedule->command('whatsapp:process-reminders')
+            ->everyFiveMinutes()
+            ->withoutOverlapping();
+
+        // Clean up old reminders weekly
+        $schedule->command('whatsapp:cleanup-reminders')
+            ->weekly()
+            ->sundays()
+            ->at('00:00')
+            ->withoutOverlapping();
     }
 
     /**

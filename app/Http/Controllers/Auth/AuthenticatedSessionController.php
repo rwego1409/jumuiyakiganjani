@@ -15,17 +15,26 @@ class AuthenticatedSessionController extends Controller
 
     protected function redirectTo()
     {
-        // Check user role and redirect accordingly
-        if (auth()->user()->isAdmin()) {
+        $user = auth()->user();
+
+        if ($user->isSuper_Admin()) {
+            return route('super_admin.dashboard');
+        }
+        
+        if ($user->isAdmin()) {
             return route('admin.dashboard');
         }
-    
-        if (auth()->user()->isMember()) {
+
+        if ($user->isChairperson()) {
+            return route('chairperson.dashboard');
+        }
+
+        if ($user->isMember()) {
             return route('member.dashboard');
         }
-    
-        // Default redirect
-        return route('dashboard');
+
+        // Default redirect to member dashboard if no specific role matched
+        return route('member.dashboard');
     }
 
     /**

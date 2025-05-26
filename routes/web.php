@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Chairperson\DashboardController;
 use App\Http\Controllers\Admin\{
     ContributionsController,
     DashboardController as AdminDashboardController,
@@ -47,6 +48,64 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::patch('/profile/picture', [ProfileController::class, 'updatePicture'])->name('profile.update-picture');
 
+    // Super Admin routes
+    Route::prefix('super-admin')
+        ->name('super_admin.')
+        ->middleware(['super_admin'])
+        ->group(function () {
+            Route::get('/dashboard', [App\Http\Controllers\Admin\SuperAdminDashboardController::class, 'index'])->name('dashboard');
+            
+            // Admin Management
+            Route::resource('admins', App\Http\Controllers\Admin\AdminManagementController::class);
+            Route::get('admins/{admin}/activities', [App\Http\Controllers\Admin\AdminManagementController::class, 'activities'])
+                ->name('admins.activities');
+
+            // System Settings
+            Route::get('/settings', [App\Http\Controllers\Admin\SuperAdminSettingsController::class, 'index'])->name('settings');
+            Route::put('/settings', [App\Http\Controllers\Admin\SuperAdminSettingsController::class, 'update'])->name('settings.update');
+        });
+
+    // Chairperson routes
+    Route::prefix('chairperson')
+        ->name('chairperson.')
+        ->middleware(['chairperson'])
+        ->group(function () {
+            Route::get('/dashboard', [App\Http\Controllers\Chairperson\DashboardController::class, 'index'])->name('dashboard');
+            
+            // Contributions management
+            Route::resource('contributions', App\Http\Controllers\Chairperson\ContributionsController::class);
+            Route::post('/contributions/{contribution}/schedule-reminder', [App\Http\Controllers\Chairperson\ContributionsController::class, 'scheduleReminder'])->name('contributions.scheduleReminder');
+            Route::post('/contributions/{contribution}/send-notification', [App\Http\Controllers\Chairperson\ContributionsController::class, 'sendNotification'])->name('contributions.sendNotification');
+            
+            // Members management
+            Route::resource('members', App\Http\Controllers\Chairperson\MembersController::class);
+
+            // Events management
+            Route::resource('events', App\Http\Controllers\Chairperson\EventsController::class);
+
+            // Resources management
+            Route::resource('resources', App\Http\Controllers\Chairperson\ResourcesController::class);
+
+            // Reports
+            Route::prefix('reports')->name('reports.')->group(function () {
+                Route::get('/', [App\Http\Controllers\Chairperson\ReportsController::class, 'index'])->name('index');
+                Route::get('/generate/{type}/{format?}', [App\Http\Controllers\Chairperson\ReportsController::class, 'generate'])
+                    ->name('generate');
+            });
+            
+            // Settings
+            Route::get('/settings', [App\Http\Controllers\Chairperson\SettingsController::class, 'index'])->name('settings');
+            Route::put('/settings', [App\Http\Controllers\Chairperson\SettingsController::class, 'update'])->name('settings.update');
+
+            // Notifications
+            Route::prefix('notifications')->name('notifications.')->group(function () {
+                Route::get('/', [App\Http\Controllers\Chairperson\NotificationController::class, 'index'])->name('index');
+                Route::get('/create', [App\Http\Controllers\Chairperson\NotificationController::class, 'create'])->name('create');
+                Route::post('/', [App\Http\Controllers\Chairperson\NotificationController::class, 'store'])->name('store');
+                Route::get('/{id}', [App\Http\Controllers\Chairperson\NotificationController::class, 'show'])->name('show');
+            });
+        });
+
     // Admin routes
     Route::prefix('admin')
         ->name('admin.')
@@ -72,6 +131,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('contributions', ContributionsController::class);
             Route::post('contributions/import', [ContributionsController::class, 'import'])->name('contributions.import');
             Route::post('/contributions/{contribution}/schedule-reminder', [ContributionsController::class, 'scheduleReminder'])->name('contributions.scheduleReminder');
+            Route::post('/contributions/{contribution}/send-notification', [ContributionsController::class, 'sendNotification'])->name('contributions.sendNotification');
+            Route::get('/contributions/export/pdf', [ContributionsController::class, 'exportPdf'])->name('contributions.export.pdf');
+            Route::get('/contributions/export/excel', [ContributionsController::class, 'exportExcel'])->name('contributions.export.excel');
 
             // Events
             Route::resource('events', EventsController::class);
@@ -115,7 +177,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('/{contribution}', [MemberContributionController::class, 'show'])->name('show');
                 Route::get('/{contribution}/receipt', [MemberContributionController::class, 'downloadReceipt'])->name('receipt');
                 Route::get('/{contribution}/history', [MemberContributionController::class, 'history'])->name('history');
-                Route::get('/{contribution}/payments/create', [PaymentController::class, 'create'])->name('payments.create');
+            });
+
+            // Payments
+            Route::prefix('payments')->name('payments.')->group(function () {
+                Route::get('/create/{contribution}', [PaymentController::class, 'create'])->name('create');
+                Route::post('/', [PaymentController::class, 'store'])->name('store');
+                Route::get('/', [PaymentController::class, 'index'])->name('index');
+                Route::get('/success/{payment}', [PaymentController::class, 'success'])->name('success');
             });
 
             // Resources
@@ -272,6 +341,8 @@ Route::get('/payment/status/{reference}', function($reference) {
         'reference' => $reference
     ]);
 });
+
+// Routes moved to the main chairperson group above
     // Fallback route for 404s
     Route::fallback(function () {
         return view('errors.404');

@@ -2,51 +2,57 @@
 
 namespace App\Exports;
 
-use App\Models\Member;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ReportsExport implements FromCollection, WithHeadings, WithMapping
+class ReportsExport implements FromArray, WithHeadings, WithStyles
 {
     protected $data;
-    protected $type;
+    protected $headers;
 
-    public function __construct($data)
+    /**
+     * Create a new export instance.
+     *
+     * @param array $data The data rows for the report.
+     * @param array $headers The column headers for the report.
+     */
+    public function __construct(array $data, array $headers)
     {
         $this->data = $data;
-        $this->type = $data->first() instanceof Member ? 'members' : 'contributions';
+        $this->headers = $headers;
     }
 
-    public function collection()
+    /**
+     * @return array
+     */
+    public function array(): array
     {
         return $this->data;
     }
 
+    /**
+     * @return array
+     */
     public function headings(): array
     {
-        return $this->type === 'members' 
-            ? ['Name', 'Phone', 'Jumuiya', 'Joined Date', 'Status']
-            : ['Date', 'Member', 'Amount', 'Status'];
+        return $this->headers;
     }
 
-    public function map($row): array
+    /**
+     * @param Worksheet $sheet
+     */
+    public function styles(Worksheet $sheet)
     {
-        if ($this->type === 'members') {
-            return [
-                $row->user?->name ?? 'N/A',
-                $row->phone ?? 'N/A',
-                $row->jumuiya?->name ?? 'N/A',
-                $row->created_at?->format('Y-m-d') ?? 'N/A',
-                $row->status ?? 'N/A'
-            ];
-        }
-
         return [
-            $row->created_at?->format('Y-m-d') ?? 'N/A',
-            $row->member?->user?->name ?? 'N/A',
-            number_format($row->amount ?? 0, 2),
-            $row->status ?? 'N/A'
+            1 => ['font' => ['bold' => true]],
+            'A1:Z1' => [
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'F3F4F6']
+                ]
+            ]
         ];
     }
 }

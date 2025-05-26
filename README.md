@@ -97,6 +97,33 @@ A Dockerized Laravel 10 application running on Ubuntu with Nginx, PHP 8.2, MySQL
 └── .dockerignore
 ```
 
+## Authentication Credentials
+
+### Super Admin Access
+- **Email:** admin@jumuiya.com
+- **Password:** password
+- **Role:** Super Administrator
+
+### Other Test Users
+
+1. Additional Admins:
+   - admin2@jumuiya.com (password: password)
+   - admin3@jumuiya.com (password: password)
+
+2. Chairpersons:
+   - peterchair@jumuiya.com (St. Peter Jumuiya)
+   - paulchair@jumuiya.com (St. Paul Jumuiya)
+   - marychair@jumuiya.com (St. Mary Jumuiya)
+   - johnchair@jumuiya.com (St. John Jumuiya)
+   All with password: password
+
+3. Members:
+   - 5 members per Jumuiya (20 total)
+   - Email format: stpetermember1@jumuiya.com (for St. Peter members)
+   - Email format: stpaulmember1@jumuiya.com (for St. Paul members)
+   - And so on...
+   All with password: password
+
 ## Getting Started
 
 1. Clone the repository:

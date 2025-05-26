@@ -194,19 +194,80 @@ class ContributionsController extends Controller
 
     public function scheduleReminder(Request $request, Contribution $contribution)
     {
-        $request->validate([
+        $validated = $request->validate([
             'reminder_date' => 'required|date|after:now',
         ]);
 
-        // Schedule a reminder
-        Notification::create([
-            'member_id' => $contribution->member_id,
-            'contribution_id' => $contribution->id,
-            'reminder_date' => $request->reminder_date,
-            'status' => 'pending',
-        ]);
+        $contribution->scheduleReminder(
+            $contribution->member->phone,
+            $contribution->formatMessage(),
+            Carbon::parse($validated['reminder_date'])
+        );
 
-        return back()->with('success', 'Reminder scheduled successfully!');
+        return back()->with('success', 'WhatsApp reminder scheduled successfully');
+    }
+
+    public function cancelReminder(Contribution $contribution, $reminderId)
+    {
+        if ($contribution->cancelReminder($reminderId)) {
+            return back()->with('success', 'Reminder cancelled successfully');
+        }
+        return back()->with('error', 'Could not cancel reminder');
+    }
+
+    public function sendNotification(Contribution $contribution)
+    {
+        try {
+            // Send immediate notification to the member
+            NotificationFacade::send(
+                $contribution->member->user,
+                new \App\Notifications\ContributionCreated($contribution)
+            );
+
+            return back()->with('success', 'Notification sent successfully');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Could not send notification: ' . $e->getMessage());
+        }
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $contributions = $this->getFilteredContributions($request);
+        $pdf = PDF::loadView('admin.contributions.pdf', compact('contributions'));
+        return $pdf->download('contributions-' . now()->format('Y-m-d') . '.pdf');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $contributions = $this->getFilteredContributions($request);
+        return Excel::download(new ContributionsExport($contributions), 'contributions-' . now()->format('Y-m-d') . '.xlsx');
+    }
+
+    protected function getFilteredContributions($request)
+    {
+        $query = Contribution::query()->with(['member.user', 'jumuiya']);
+
+        if ($request->jumuiya_id) {
+            $query->where('jumuiya_id', $request->jumuiya_id);
+        }
+
+        if ($request->date_from) {
+            $query->whereDate('contribution_date', '>=', $request->date_from);
+        }
+
+        if ($request->date_to) {
+            $query->whereDate('contribution_date', '<=', $request->date_to);
+        }
+
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->payment_method) {
+            $query->where('payment_method', $request->payment_method);
+        }
+
+        return $query->latest();
     }
 
     public function sendReminders()

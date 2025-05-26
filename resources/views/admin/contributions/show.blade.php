@@ -11,11 +11,45 @@
                         <a href="{{ route('admin.contributions.edit', $contribution) }}" class="btn-primary">
                             Edit Contribution
                         </a>
+                        <form action="{{ route('admin.contributions.sendNotification', $contribution) }}" method="POST" class="inline-block">
+                            @csrf
+                            <button type="submit" class="btn-success">
+                                Send Reminder
+                            </button>
+                        </form>
+                        <div class="inline-block relative">
+                            <button type="button" class="btn-secondary" onclick="toggleExportDropdown()">
+                                Export
+                            </button>
+                            <div id="exportDropdown" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                <div class="py-1">
+                                    <a href="{{ route('admin.contributions.export.pdf', ['id' => $contribution->id]) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Export as PDF</a>
+                                    <a href="{{ route('admin.contributions.export.excel', ['id' => $contribution->id]) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Export as Excel</a>
+                                </div>
+                            </div>
+                        </div>
                         <a href="{{ route('admin.contributions.index') }}" class="btn-secondary">
                             Back to List
                         </a>
                     </div>
                 </div>
+
+                @push('scripts')
+                <script>
+                    function toggleExportDropdown() {
+                        const dropdown = document.getElementById('exportDropdown');
+                        dropdown.classList.toggle('hidden');
+                    }
+
+                    // Close dropdown when clicking outside
+                    window.addEventListener('click', function(e) {
+                        const dropdown = document.getElementById('exportDropdown');
+                        if (!e.target.closest('.relative') && !dropdown.classList.contains('hidden')) {
+                            dropdown.classList.add('hidden');
+                        }
+                    });
+                </script>
+                @endpush
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-gray-50 p-6 rounded-lg">

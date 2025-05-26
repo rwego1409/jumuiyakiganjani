@@ -13,7 +13,8 @@ class JumuiyaPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        // Allow admins and super admins to view all Jumuiyas
+        return $user->isAdmin() || $user->isSuper_Admin();
     }
 
     /**
@@ -21,7 +22,22 @@ class JumuiyaPolicy
      */
     public function view(User $user, Jumuiya $jumuiya): bool
     {
-        //
+        // Allow admins and super admins to view any Jumuiya
+        if ($user->isAdmin() || $user->isSuper_Admin()) {
+            return true;
+        }
+
+        // Allow chairperson to view their own Jumuiya
+        if ($user->isChairperson()) {
+            return $user->id === $jumuiya->chairperson_id;
+        }
+
+        // Allow members to view their Jumuiya
+        if ($user->isMember()) {
+            return $user->member && $user->member->jumuiya_id === $jumuiya->id;
+        }
+
+        return false;
     }
 
     /**
@@ -29,7 +45,8 @@ class JumuiyaPolicy
      */
     public function create(User $user): bool
     {
-        //
+        // Only super admins can create Jumuiyas
+        return $user->isSuper_Admin();
     }
 
     /**
@@ -37,7 +54,8 @@ class JumuiyaPolicy
      */
     public function update(User $user, Jumuiya $jumuiya): bool
     {
-        //
+        // Only super admins can update Jumuiyas
+        return $user->isSuper_Admin();
     }
 
     /**
@@ -45,7 +63,8 @@ class JumuiyaPolicy
      */
     public function delete(User $user, Jumuiya $jumuiya): bool
     {
-        //
+        // Only super admins can delete Jumuiyas
+        return $user->isSuper_Admin();
     }
 
     /**
@@ -53,7 +72,8 @@ class JumuiyaPolicy
      */
     public function restore(User $user, Jumuiya $jumuiya): bool
     {
-        //
+        // Only super admins can restore Jumuiyas
+        return $user->isSuper_Admin();
     }
 
     /**
@@ -61,6 +81,7 @@ class JumuiyaPolicy
      */
     public function forceDelete(User $user, Jumuiya $jumuiya): bool
     {
-        //
+        // Only super admins can permanently delete Jumuiyas
+        return $user->isSuper_Admin();
     }
 }

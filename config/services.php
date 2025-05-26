@@ -30,6 +30,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'whatsapp' => [
+        'api_url' => env('WHATSAPP_API_URL', 'https://graph.facebook.com/v17.0'),
+        'api_token' => env('WHATSAPP_API_TOKEN'),
+        'phone_number_id' => env('WHATSAPP_PHONE_NUMBER_ID'),
+        'business_account_id' => env('WHATSAPP_BUSINESS_ACCOUNT_ID'),
+    ],
+
     'mpesa' => [
         'consumer_key' => env('MPESA_CONSUMER_KEY'),
         'consumer_secret' => env('MPESA_CONSUMER_SECRET'),

@@ -1,0 +1,51 @@
+@props(['id', 'title', 'labels', 'data'])
+
+<div class="bg-white shadow rounded-lg p-6">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $title }}</h3>
+    <div class="relative h-60">
+        <canvas id="{{ $id }}"></canvas>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('{{ $id }}').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($labels) !!},
+                datasets: [{
+                    label: '{{ $title }}',
+                    data: {!! json_encode($data) !!},
+                    backgroundColor: 'rgb(37, 99, 235, 0.8)',
+                    borderWidth: 0,
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false,
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+@endpush

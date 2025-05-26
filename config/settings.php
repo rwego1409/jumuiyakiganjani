@@ -7,7 +7,7 @@ return [
      * put them (manually) here.
      */
     'settings' => [
-
+        \App\Settings\GeneralSettings::class,
     ],
 
     /*
@@ -37,7 +37,7 @@ return [
         'database' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
             'model' => null,
-            'table' => null,
+            'table' => 'settings',
             'connection' => null,
         ],
         'redis' => [

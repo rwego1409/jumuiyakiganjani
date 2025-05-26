@@ -53,19 +53,59 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Jumuiya::class);
     }
 
-    public function isAdmin()
+    /**
+     * All possible roles in the system
+     */
+    const ROLES = [
+        'super_admin',
+        'admin',
+        'chairperson',
+        'member'
+    ];
+
+    /**
+     * Check if user is a super admin
+     */
+    public function isSuper_Admin()
     {
-        return $this->role === 'admin';
+        return $this->role === 'super_admin';
     }
 
-    public function isChairperson()
+    /**
+     * Check if user is an admin
+     */
+    public function isAdmin()
+    {
+        return $this->role === 'admin' || $this->isSuper_Admin();
+    }
+
+    /**
+     * Check if user is a chairperson
+     */
+    public function isChairperson() 
     {
         return $this->role === 'chairperson';
     }
 
+    /**
+     * Check if user is a member
+     */
     public function isMember()
     {
         return $this->role === 'member';
+    }
+
+    /**
+     * Check if user has any of the given roles
+     */
+    public function hasRole(...$roles)
+    {
+        foreach ($roles as $role) {
+            if ($this->role === $role) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function unreadNotifications()

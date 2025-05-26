@@ -18,6 +18,11 @@ class AdminDashboardSeeder extends Seeder
 {
     public function run()
     {
+        // Define SEEDING constant to disable notifications
+        if (!defined('SEEDING')) {
+            define('SEEDING', true);
+        }
+
         $faker = Faker::create();
 
         // Create Jumuiyas

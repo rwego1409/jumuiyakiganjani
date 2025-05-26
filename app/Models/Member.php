@@ -11,6 +11,11 @@ class Member extends Model
 
     protected $fillable = ['user_id', 'jumuiya_id', 'phone', 'address', 'birth_date', 'joined_date', 'status', 'profile_picture',];
 
+    protected $casts = [
+        'birth_date' => 'date',
+        'joined_date' => 'date'
+    ];
+
     // The user that owns the member
     public function user()
     {

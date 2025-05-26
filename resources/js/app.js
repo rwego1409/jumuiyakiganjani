@@ -1,47 +1,56 @@
 import './bootstrap';
 
 // Dark mode initialization
-document.addEventListener('DOMContentLoaded', () => {
-    // Check for dark mode preference
-    const isDark = localStorage.theme === 'dark' || 
-        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    
-    // Set initial dark mode
-    document.documentElement.classList.toggle('dark', isDark);
-
-    // Handle dark mode toggle clicks
-    document.querySelectorAll('[data-dark-toggle]').forEach(button => {
-        button.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-        });
-    });
-});
-
-// Add Dark Mode Store
 document.addEventListener('alpine:init', () => {
     Alpine.store('darkMode', {
-        on: localStorage.getItem('darkMode') === 'true',
+        init() {
+            this.syncFromStorage();
+            this.setupSystemPreferenceListener();
+            this.setupButtonListeners();
+        },
+        on: false,
+        syncFromStorage() {
+            this.on = localStorage.theme === 'dark' || 
+                (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            this.updateDOM();
+        },
         toggle() {
             this.on = !this.on;
-            localStorage.setItem('darkMode', this.on);
+            this.updateDOM();
+        },
+        updateDOM() {
             document.documentElement.classList.toggle('dark', this.on);
+            localStorage.theme = this.on ? 'dark' : 'light';
+            this.updateDataTables();
+        },
+        setupSystemPreferenceListener() {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                if (!('theme' in localStorage)) {
+                    this.on = e.matches;
+                    this.updateDOM();
+                }
+            });
+        },
+        setupButtonListeners() {
+            document.querySelectorAll('[data-dark-toggle], #themeToggle').forEach(button => {
+                button.addEventListener('click', () => this.toggle());
+            });
+        },
+        updateDataTables() {
+            // Update DataTables if they exist
+            if (typeof $.fn.DataTable !== 'undefined') {
+                $('.dataTable').each(function() {
+                    const table = $(this).DataTable();
+                    if (table) {
+                        table.draw();
+                    }
+                });
+            }
         }
     });
+    
+    Alpine.store('darkMode').init();
 });
-
-// Initialize dark mode
-if (localStorage.getItem('darkMode') === 'true' || 
-    (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-    Alpine.store('darkMode').on = true;
-}
-
-// Initialize dark mode on page load
-if (localStorage.getItem('darkMode') === 'true' || 
-    (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-}
 // resources/js/app.js
 window.Echo.private(`App.Models.User.${userId}`)
     .notification((notification) => {
