@@ -2,10 +2,14 @@
 
 use Spatie\LaravelSettings\Migrations\SettingsMigration;
 
-return new class extends SettingsMigration
+class CreateGeneralSettingsTable extends SettingsMigration
 {
     public function up(): void
     {
+        $this->migrator->add('general.app_name', 'Jumuiya Kiganjani');
+        $this->migrator->add('general.app_url', config('app.url'));
+        $this->migrator->add('general.support_email', config('mail.from.address'));
+        
         // Notification settings
         $this->migrator->add('general.email_enabled', true);
         $this->migrator->add('general.whatsapp_enabled', false);
@@ -19,4 +23,4 @@ return new class extends SettingsMigration
         $this->migrator->add('general.meeting_reminders_enabled', true);
         $this->migrator->add('general.meeting_reminder_hours', 24);
     }
-};
+}

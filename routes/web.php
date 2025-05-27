@@ -53,8 +53,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('super_admin.')
         ->middleware(['super_admin'])
         ->group(function () {
-            Route::get('/dashboard', [App\Http\Controllers\Admin\SuperAdminDashboardController::class, 'index'])->name('dashboard');
+            // Dashboard
+            Route::get('/dashboard', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'dashboard'])->name('dashboard');
             
+            // Jumuiya Management
+            Route::prefix('jumuiyas')->name('jumuiyas.')->group(function () {
+                Route::get('/', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'jumuiyasList'])->name('index');
+                Route::get('/create', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'createJumuiya'])->name('create');
+                Route::post('/', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'storeJumuiya'])->name('store');
+                Route::get('/{jumuiya}/edit', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'editJumuiya'])->name('edit');
+                Route::put('/{jumuiya}', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'updateJumuiya'])->name('update');
+                Route::delete('/{jumuiya}', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'deleteJumuiya'])->name('destroy');
+            });
+
             // Admin Management
             Route::resource('admins', App\Http\Controllers\Admin\AdminManagementController::class);
             Route::get('admins/{admin}/activities', [App\Http\Controllers\Admin\AdminManagementController::class, 'activities'])

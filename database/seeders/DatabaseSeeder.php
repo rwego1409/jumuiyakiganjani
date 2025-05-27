@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
 
     
         $this->call([
-           
+            SettingsSeeder::class, // Run settings seeder first
             UserSeeder::class,
             JumuiyaSeeder::class,
             AdminDashboardSeeder::class,

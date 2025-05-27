@@ -113,6 +113,15 @@
                     @enderror
                 </div>
 
+                <div class="flex items-center">
+                    <input type="checkbox" name="whatsapp_reminder" id="whatsapp_reminder" value="1"
+                           {{ old('whatsapp_reminder') ? 'checked' : '' }}
+                           class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 dark:border-gray-600">
+                    <label for="whatsapp_reminder" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Also send as WhatsApp message
+                    </label>
+                </div>
+
                 <div class="flex justify-end">
                     <button type="submit"
                             class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">

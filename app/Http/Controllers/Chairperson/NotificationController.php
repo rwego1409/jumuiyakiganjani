@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Member;
 use App\Models\Jumuiya;
 use App\Notifications\ChairpersonNotification;
+use App\Jobs\SendWhatsAppNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 
@@ -44,6 +45,7 @@ class NotificationController extends Controller
             'member_ids' => 'required_if:recipient_type,specific|array',
             'member_ids.*' => 'exists:members,id',
             'action_url' => 'nullable|url',
+            'whatsapp_reminder' => 'nullable|boolean',
         ]);
 
         // Get members to notify
@@ -60,12 +62,23 @@ class NotificationController extends Controller
             'member_ids' => $validated['recipient_type'] === 'specific' ? $validated['member_ids'] : [],
             'action_url' => $validated['action_url'] ?? null,
             'created_by' => auth()->id(),
+            'send_whatsapp' => $request->boolean('whatsapp_reminder', false),
         ]);
 
         // Send notifications to members
         foreach ($members as $member) {
             if ($member->user) {
+                // Send in-app notification
                 $member->user->notify(new ChairpersonNotification($notification));
+
+                // Send WhatsApp notification if enabled and phone number exists
+                if ($request->boolean('whatsapp_reminder') && $member->phone) {
+                    SendWhatsAppNotification::dispatch(
+                        $member->phone,
+                        $validated['title'],
+                        $validated['message']
+                    );
+                }
             }
         }
 

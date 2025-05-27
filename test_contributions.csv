@@ -1,0 +1,3 @@
+member_id,amount,date,purpose,payment_method,status,receipt_number
+1,50000,2023-05-27,Monthly Contribution,cash,paid,RCP001
+1,30000,2023-05-27,Special Event,mpesa,paid,RCP002

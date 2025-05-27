@@ -214,6 +214,63 @@ A Dockerized Laravel 10 application running on Ubuntu with Nginx, PHP 8.2, MySQL
 2. Set proper database credentials
 3. Configure proper SSL certificates
 4. Use `npm run prod` for production assets
+
+## WhatsApp Notifications
+
+The system supports sending notifications via WhatsApp to Jumuiya members. This feature allows chairpersons to send notifications both in-app and through WhatsApp.
+
+### Configuration
+
+1. Add these environment variables to your `.env` file:
+```bash
+WHATSAPP_API_BASE_URL=your_whatsapp_api_url
+WHATSAPP_API_KEY=your_whatsapp_api_key
+```
+
+2. Configure your queue worker for WhatsApp notifications:
+```bash
+php artisan queue:work
+```
+
+### How It Works
+
+1. **Creating Notifications**
+   - Chairpersons can create notifications from their dashboard
+   - Option to enable WhatsApp delivery using a checkbox
+   - Can select all members or specific members to notify
+
+2. **Notification Types**
+   - General notifications
+   - Alerts
+   - Reminders
+   - Updates
+
+3. **Features**
+   - Asynchronous message delivery via queue
+   - Automatic phone number formatting
+   - Failure handling and retries
+   - Message delivery tracking
+   - Support for both individual and group messages
+
+4. **Requirements**
+   - Members must have valid phone numbers recorded
+   - WhatsApp Business API credentials
+   - Active queue worker for processing notifications
+
+### Usage Example
+
+As a chairperson:
+1. Go to Notifications > Create New
+2. Fill in the notification details
+3. Check "Also send as WhatsApp message"
+4. Select recipients
+5. Click "Send Notification"
+
+The system will:
+- Send in-app notifications immediately
+- Queue WhatsApp messages for delivery
+- Track delivery status
+- Handle any failures automatically
 ```
 
 ### .dockerignore
@@ -307,3 +364,4 @@ how ur csv should look
 name,email,jumuiya_id,phone,status,joined_date
 John Doe,john@example.com,1,1234567890,active,2023-04-25
 Jane Smith,jane@example.com,2,0987654321,inactive,2023-04-20
+```

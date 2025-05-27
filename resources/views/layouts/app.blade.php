@@ -50,10 +50,12 @@
                 <div class="flex items-center space-x-4">
                     <!-- Role-based Navigation -->
                     @auth
-                        @if(auth()->user()->member)
-                            @include('member.partials.navigation')
-                        @elseif(auth()->user()->is_admin)
+                        @if(auth()->user()->isSuper_Admin())
+                            @include('super_admin.partials.navigation')
+                        @elseif(auth()->user()->isAdmin())
                             @include('admin.partials.navigation')
+                        @elseif(auth()->user()->member)
+                            @include('member.partials.navigation')
                         @endif
                     @endauth
 

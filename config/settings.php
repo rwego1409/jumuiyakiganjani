@@ -37,7 +37,7 @@ return [
         'database' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
             'model' => null,
-            'table' => 'settings',
+            'table' => null,
             'connection' => null,
         ],
         'redis' => [
@@ -91,9 +91,4 @@ return [
      * need to be searched each time the application boots up.
      */
     'discovered_settings_cache_path' => base_path('bootstrap/cache'),
-
-    'settings' => [
-    App\Settings\GeneralSettings::class,
-],
-
 ];
