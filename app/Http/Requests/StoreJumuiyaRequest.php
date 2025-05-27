@@ -11,7 +11,7 @@ class StoreJumuiyaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->role === 'admin';
     }
 
     /**
@@ -22,7 +22,10 @@ class StoreJumuiyaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:255|unique:jumuiyas',
+            'location' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'chairperson_id' => 'required|exists:users,id'
         ];
     }
 }

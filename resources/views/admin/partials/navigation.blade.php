@@ -32,6 +32,12 @@
                         <i class="fas fa-tachometer-alt mr-2 text-primary-500"></i>
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('admin.jumuiyas.index')" 
+                               :active="request()->routeIs('admin.jumuiyas.*')"
+                               aria-label="Jumuiyas">
+                        <i class="fas fa-users-cog mr-2 text-orange-500"></i>
+                        {{ __('Jumuiyas') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('admin.members.index')" 
                                :active="request()->routeIs('admin.members.*')"
                                aria-label="Members">
@@ -49,6 +55,12 @@
                                aria-label="Events">
                         <i class="fas fa-calendar-alt mr-2 text-purple-500"></i>
                         {{ __('Events') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.jumuiyas.index')" 
+                               :active="request()->routeIs('admin.jumuiyas.*')"
+                               aria-label="Jumuiyas">
+                        <i class="fas fa-users-cog mr-2 text-orange-500"></i>
+                        {{ __('Jumuiyas') }}
                     </x-nav-link>
                     <x-nav-link :href="route('admin.resources.index')" 
                                :active="request()->routeIs('admin.resources.*')"
@@ -244,6 +256,12 @@
                 <i class="fas fa-tachometer-alt mr-3 text-primary-500"></i>
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.jumuiyas.index')" 
+                                  :active="request()->routeIs('admin.jumuiyas.*')"
+                                  aria-label="Mobile Jumuiyas">
+                <i class="fas fa-users-cog mr-3 text-orange-500"></i>
+                {{ __('Jumuiyas') }}
+            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.members.index')" 
                                   :active="request()->routeIs('admin.members.*')"
                                   aria-label="Mobile Members">
@@ -261,6 +279,12 @@
                                   aria-label="Mobile Events">
                 <i class="fas fa-calendar-alt mr-3 text-purple-500"></i>
                 {{ __('Events') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.jumuiyas.index')" 
+                                  :active="request()->routeIs('admin.jumuiyas.*')"
+                                  aria-label="Mobile Jumuiyas">
+                <i class="fas fa-users-cog mr-3 text-orange-500"></i>
+                {{ __('Jumuiyas') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.resources.index')" 
                                   :active="request()->routeIs('admin.resources.*')"

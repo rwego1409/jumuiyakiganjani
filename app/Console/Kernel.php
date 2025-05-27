@@ -17,6 +17,11 @@ class Kernel extends ConsoleKernel
             ->everyFiveMinutes()
             ->withoutOverlapping();
 
+        // Monitor WhatsApp message delivery status every 5 minutes
+        $schedule->command('whatsapp:monitor-delivery')
+            ->everyFiveMinutes()
+            ->withoutOverlapping();
+
         // Clean up old reminders weekly
         $schedule->command('whatsapp:cleanup-reminders')
             ->weekly()

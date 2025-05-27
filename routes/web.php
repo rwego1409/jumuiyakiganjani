@@ -170,6 +170,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/notifications/create', [AdminNotificationController::class, 'create'])->name('notifications.create');
             Route::post('/notifications', [AdminNotificationController::class, 'store'])->name('notifications.store');
             Route::get('/notifications/{id}', [AdminNotificationController::class, 'show'])->name('notifications.show');
+
+            // Jumuiya Management
+            Route::prefix('jumuiyas')->name('jumuiyas.')->group(function () {
+                Route::get('/', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'jumuiyasList'])->name('index');
+                Route::get('/create', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'createJumuiya'])->name('create');
+                Route::post('/', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'storeJumuiya'])->name('store');
+                Route::get('/{jumuiya}/edit', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'editJumuiya'])->name('edit');
+                Route::put('/{jumuiya}', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'updateJumuiya'])->name('update');
+                Route::delete('/{jumuiya}', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'deleteJumuiya'])->name('destroy');
+            });
         });
 
     // Member routes
@@ -353,8 +363,7 @@ Route::get('/payment/status/{reference}', function($reference) {
     ]);
 });
 
-// Routes moved to the main chairperson group above
-    // Fallback route for 404s
+// Fallback route for 404s
     Route::fallback(function () {
         return view('errors.404');
     });

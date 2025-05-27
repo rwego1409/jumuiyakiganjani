@@ -32,7 +32,8 @@ class ContributionsImport implements ToModel, WithHeadingRow, WithValidation
             'recorded_by' => $this->admin_id,
             'jumuiya_id' => $member->jumuiya_id,
             'contribution_date' => \Carbon\Carbon::parse($row['date']),
-            'user_id' => $member->user_id
+            'user_id' => $member->user_id,
+            'payment_reference' => \Illuminate\Support\Str::uuid()->toString()
         ]);
     }
 
@@ -43,7 +44,7 @@ class ContributionsImport implements ToModel, WithHeadingRow, WithValidation
             'amount' => 'required|numeric|min:0',
             'date' => 'required|date',
             'purpose' => 'required|string',
-            'payment_method' => 'required|in:cash,mpesa,bank',
+            'payment_method' => 'required|in:cash,palm_pesa,bank_transfer,mobile_money',
             'status' => 'nullable|in:pending,paid,failed,confirmed,rejected',
             'receipt_number' => 'nullable|string'
         ];
