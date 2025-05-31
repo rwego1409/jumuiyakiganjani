@@ -1,83 +1,82 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Super Admin Dashboard') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Stats Overview -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <!-- Total Jumuiyas -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="text-gray-500 text-sm mb-1">Total Jumuiyas</div>
-                        <div class="text-3xl font-bold text-gray-800">{{ $totalJumuiyas }}</div>
-                    </div>
-                </div>
-
-                <!-- Total Chairpersons -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="text-gray-500 text-sm mb-1">Total Chairpersons</div>
-                        <div class="text-3xl font-bold text-gray-800">{{ $totalChairpersons }}</div>
-                    </div>
-                </div>
-
-                <!-- Total Members -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="text-gray-500 text-sm mb-1">Total Members</div>
-                        <div class="text-3xl font-bold text-gray-800">{{ $totalMembers }}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Jumuiyas -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-medium text-gray-900">Recent Jumuiyas</h3>
-                        <a href="{{ route('super_admin.jumuiyas.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Create New Jumuiya
-                        </a>
-                    </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead>
-                                <tr>
-                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chairperson</th>
-                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                                    <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($recentJumuiyas as $jumuiya)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $jumuiya->name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $jumuiya->location }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ $jumuiya->chairperson->name ?? 'No Chairperson' }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $jumuiya->created_at->diffForHumans() }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="{{ route('super_admin.jumuiyas.edit', $jumuiya) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="mt-4">
-                        <a href="{{ route('super_admin.jumuiyas.index') }}" class="text-blue-600 hover:text-blue-800">View All Jumuiyas →</a>
-                    </div>
-                </div>
-            </div>
+@section('content')
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 md:mb-0">Super Admin Dashboard</h2>
+        @if(auth()->user()->isChairperson())
+            <a href="{{ route('chairperson.notifications.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors">
+                <i class="fas fa-bell mr-2"></i> Create Notification
+            </a>
+        @endif
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="text-3xl font-bold text-primary-600">{{ $totalJumuiyas }}</div>
+            <div class="text-gray-700 dark:text-gray-300 mt-2">Total Jumuiyas</div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="text-3xl font-bold text-primary-600">{{ $totalChairpersons }}</div>
+            <div class="text-gray-700 dark:text-gray-300 mt-2">Total Chairpersons</div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="text-3xl font-bold text-primary-600">{{ $totalMembers }}</div>
+            <div class="text-gray-700 dark:text-gray-300 mt-2">Total Members</div>
         </div>
     </div>
-</x-app-layout>
+    <!-- Charts Section -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Statistics Overview</h3>
+        <canvas id="superAdminChart" height="100"></canvas>
+    </div>
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Jumuiyas</h3>
+        <ul>
+            @forelse($recentJumuiyas as $jumuiya)
+                <li class="mb-2">
+                    <span class="font-semibold">{{ $jumuiya->name }}</span>
+                    <span class="text-gray-500 ml-2">({{ $jumuiya->chairperson->name ?? 'No Chairperson' }})</span>
+                </li>
+            @empty
+                <li class="text-gray-500">No recent Jumuiyas found.</li>
+            @endforelse
+        </ul>
+    </div>
+</div>
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('superAdminChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Jumuiyas', 'Chairpersons', 'Members'],
+            datasets: [{
+                label: 'Count',
+                data: [{{ $totalJumuiyas }}, {{ $totalChairpersons }}, {{ $totalMembers }}],
+                backgroundColor: [
+                    'rgba(59, 130, 246, 0.7)',
+                    'rgba(236, 72, 153, 0.7)',
+                    'rgba(34, 197, 94, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(59, 130, 246, 1)',
+                    'rgba(236, 72, 153, 1)',
+                    'rgba(34, 197, 94, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+@endpush

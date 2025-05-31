@@ -56,12 +56,19 @@ class ResourcesController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
             'type' => 'required|in:document,video,audio,image,other',
             'description' => 'nullable|string',
             'status' => 'required|in:active,inactive',
             'file' => 'required|file|max:10240' // 10MB max
         ]);
+
+        // Get the chairperson's jumuiya
+        $jumuiya = auth()->user()->jumuiyas()->first();
+        if (!$jumuiya) {
+            return redirect()->route('chairperson.resources.index')->with('error', 'No jumuiya assigned to your account.');
+        }
+        $validated['jumuiya_id'] = $jumuiya->id;
 
         // Handle file upload
         if ($request->hasFile('file')) {

@@ -71,6 +71,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('admins/{admin}/activities', [App\Http\Controllers\Admin\AdminManagementController::class, 'activities'])
                 ->name('admins.activities');
 
+            // Chairpersons Management
+            Route::resource('chairpersons', App\Http\Controllers\SuperAdmin\ChairpersonsController::class);
+
+            // Members Management
+            Route::resource('members', App\Http\Controllers\SuperAdmin\MembersController::class);
+
+            Route::resource('notifications', NotificationController::class);
+
             // System Settings
             Route::get('/settings', [App\Http\Controllers\Admin\SuperAdminSettingsController::class, 'index'])->name('settings');
             Route::put('/settings', [App\Http\Controllers\Admin\SuperAdminSettingsController::class, 'update'])->name('settings.update');
@@ -95,6 +103,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('events', App\Http\Controllers\Chairperson\EventsController::class);
 
             // Resources management
+            // Download resource file
+            Route::get('resources/{resource}/download', [App\Http\Controllers\Chairperson\ResourcesController::class, 'download'])->name('resources.download');
             Route::resource('resources', App\Http\Controllers\Chairperson\ResourcesController::class);
 
             // Reports
@@ -115,6 +125,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::post('/', [App\Http\Controllers\Chairperson\NotificationController::class, 'store'])->name('store');
                 Route::get('/{id}', [App\Http\Controllers\Chairperson\NotificationController::class, 'show'])->name('show');
             });
+
+            // WhatsApp Reminders
+            Route::get('reminders', [App\Http\Controllers\Chairperson\RemindersController::class, 'index'])->name('reminders.index');
+            Route::post('reminders', [App\Http\Controllers\Chairperson\RemindersController::class, 'store'])->name('reminders.store');
         });
 
     // Admin routes
@@ -173,13 +187,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             // Jumuiya Management
             Route::prefix('jumuiyas')->name('jumuiyas.')->group(function () {
-                Route::get('/', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'jumuiyasList'])->name('index');
-                Route::get('/create', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'createJumuiya'])->name('create');
-                Route::post('/', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'storeJumuiya'])->name('store');
-                Route::get('/{jumuiya}/edit', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'editJumuiya'])->name('edit');
-                Route::put('/{jumuiya}', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'updateJumuiya'])->name('update');
-                Route::delete('/{jumuiya}', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'deleteJumuiya'])->name('destroy');
+                Route::get('/', [\App\Http\Controllers\Admin\JumuiyasController::class, 'index'])->name('index');
+                Route::get('/{jumuiya}', [\App\Http\Controllers\Admin\JumuiyasController::class, 'show'])->name('show');
+                Route::get('/{jumuiya}/edit', [\App\Http\Controllers\Admin\JumuiyasController::class, 'edit'])->name('edit');
+                Route::put('/{jumuiya}', [\App\Http\Controllers\Admin\JumuiyasController::class, 'update'])->name('update');
+                Route::delete('/{jumuiya}', [\App\Http\Controllers\Admin\JumuiyasController::class, 'destroy'])->name('destroy');
             });
+
+            Route::resource('chairpersons', \App\Http\Controllers\Admin\ChairpersonsController::class);
+            
         });
 
     // Member routes
@@ -232,6 +248,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('/', [MemberController::class, 'indexActivities'])->name('index');
                 Route::get('/{activity}', [MemberController::class, 'showActivity'])->name('show');
             });
+
+            // Notifications for members
+            Route::prefix('notifications')->name('notifications.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Members\NotificationController::class, 'index'])->name('index');
+                Route::get('/{notification}', [\App\Http\Controllers\Members\NotificationController::class, 'show'])->name('show');
+            });
         });
 
     // Notifications (general for all users)
@@ -245,11 +267,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('mpesa')->name('mpesa.')->group(function () {
         Route::post('/payment', [PaymentController::class, 'initiatePayment'])->name('payment');
         Route::post('/callback', [MpesaController::class, 'callback'])->name('callback');
-    });
-
-    Route::prefix('clickpesa')->name('clickpesa.')->group(function () {
-        Route::post('/payment', [ClickPesaController::class, 'initiate'])->name('payment');
-        Route::post('/callback', [ClickPesaController::class, 'callback'])->name('callback');
     });
 
     // Test Routes (for development)
@@ -362,6 +379,14 @@ Route::get('/payment/status/{reference}', function($reference) {
         'reference' => $reference
     ]);
 });
+
+// Superuser WhatsApp Reminders Management
+Route::prefix('superuser')
+    ->name('superuser.')
+    ->middleware(['auth', 'role:super_user'])
+    ->group(function () {
+        Route::resource('whatsapp_reminders', App\Http\Controllers\Superuser\WhatsAppRemindersController::class);
+    });
 
 // Fallback route for 404s
     Route::fallback(function () {

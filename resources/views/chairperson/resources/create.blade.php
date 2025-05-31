@@ -18,15 +18,15 @@
                 @csrf
 
                 <div class="space-y-6">
-                    <!-- Name -->
+                    <!-- Title -->
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('Resource Name') }}
+                        <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {{ __('Resource Title') }}
                         </label>
-                        <input type="text" name="name" id="name" value="{{ old('name') }}" 
+                        <input type="text" name="title" id="title" value="{{ old('title') }}" 
                                class="mt-1 block w-full rounded-md shadow-sm border-gray-300 dark:border-gray-700 
                                       dark:bg-gray-900 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
-                        @error('name')
+                        @error('title')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
                     </div>

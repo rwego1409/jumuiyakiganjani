@@ -54,10 +54,16 @@ class ReportsController extends Controller
      */
     private function getReportData(?string $type, ?Carbon $startDate, ?Carbon $endDate): array
     {
+        $user = auth()->user();
+        // Always use the jumuiya the chairperson is assigned to (not .jumuiyas() relationship)
+        $jumuiya = $user->jumuiya;
+        if (!$jumuiya) {
+            throw new \Exception('You are not assigned to a Jumuiya.');
+        }
         $query = match($type) {
-            'members' => Member::query(),
-            'events' => Event::query(),
-            'resources' => Resource::query(),
+            'members' => Member::where('jumuiya_id', $jumuiya->id),
+            'events' => Event::where('jumuiya_id', $jumuiya->id),
+            'resources' => Resource::where('jumuiya_id', $jumuiya->id),
             default => throw new \InvalidArgumentException('Invalid report type')
         };
 
@@ -83,11 +89,11 @@ class ReportsController extends Controller
      */
     private function formatMembersReport($query): array
     {
-        $members = $query->with(['jumuiya'])->get();
+        $members = $query->with(['user', 'jumuiya'])->get();
         
         $data = $members->map(fn($member) => [
-            'name' => $member->name,
-            'email' => $member->email,
+            'name' => $member->user?->name ?? '-',
+            'email' => $member->user?->email ?? '-',
             'phone' => $member->phone,
             'jumuiya' => $member->jumuiya?->name ?? '-',
             'status' => Str::ucfirst($member->status),

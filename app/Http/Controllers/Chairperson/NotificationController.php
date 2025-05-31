@@ -15,22 +15,25 @@ class NotificationController extends Controller
 {
     public function index()
     {
-        $notifications = auth()->user()
-            ->jumuiya
-            ->notifications()
-            ->latest()
-            ->paginate(10);
+        $user = auth()->user();
+        $jumuiya = $user->jumuiya;
+        if (!$jumuiya) {
+            // Show a friendly message if the chairperson is not assigned to a jumuiya
+            return view('chairperson.notifications.index', [
+                'notifications' => collect(),
+                'noJumuiya' => true
+            ]);
+        }
+        $notifications = $jumuiya->notifications()->latest()->paginate(10);
             
         return view('chairperson.notifications.index', compact('notifications'));
     }
 
     public function create()
     {
-        $members = auth()->user()
-            ->jumuiya
-            ->members()
-            ->with('user')
-            ->get();
+        $jumuiya = auth()->user()->jumuiya;
+        // Remove the restriction: always allow access to the form, but only show members if assigned
+        $members = $jumuiya ? $jumuiya->members()->with('user')->get() : collect();
             
         return view('chairperson.notifications.create', compact('members'));
     }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ darkMode: (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) }" :class="{ 'dark': darkMode }">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,67 +10,54 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.11.4/r-2.2.9/datatables.min.css"/>
-<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.11.4/r-2.2.9/datatables.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
-    <!-- Alpine.js CDN -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
-    <!-- Scripts -->
+    <!-- Styles & Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @livewireStyles
-
-    <script>
-        // Initialize dark mode
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        }
-    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+<body class="font-sans antialiased bg-gray-100 dark:bg-gray-900" x-init="document.documentElement.classList.toggle('dark', darkMode)">
     <div class="min-h-screen">
-
-        @include('member.partials.navigation')
-
-        <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1 flex justify-end">
-                <button data-dark-toggle 
-                        class="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 
-                               transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                    <span class="sr-only">Toggle dark mode</span>
-                    <!-- Sun icon -->
-                    <svg class="hidden dark:block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707" />
-                    </svg>
-                    <!-- Moon icon -->
-                    <svg class="block dark:hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 9.003 0 0012 21a9.003 9.003 9.003 0 008.354-5.646z" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-
-        <!-- Page Heading -->
-        @if (isset($header))
-            <header class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-                @yield('header')
-                </div>
-            </header>
-        @endif
+        @include('member.partials.navigation', ['showDarkModeToggle' => true])
 
         <!-- Page Content -->
-        <main class="container mx-auto px-4 py-6">
-        @yield('content')
+        <main class="py-10">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                @if (session('success'))
+                    <div class="mb-4 px-4 py-2 bg-green-100 border border-green-200 text-green-700 rounded">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="mb-4 px-4 py-2 bg-red-100 border border-red-200 text-red-700 rounded">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                @yield('content')
+            </div>
         </main>
     </div>
 
-    @livewireScripts
     @stack('scripts')
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('darkMode', () => ({
+                darkMode: (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)),
+                init() {
+                    this.$watch('darkMode', val => {
+                        document.documentElement.classList.toggle('dark', val);
+                        localStorage.theme = val ? 'dark' : 'light';
+                    });
+                    document.documentElement.classList.toggle('dark', this.darkMode);
+                },
+                toggle() {
+                    this.darkMode = !this.darkMode;
+                }
+            }));
+        });
+    </script>
 </body>
 </html>

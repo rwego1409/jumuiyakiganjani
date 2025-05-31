@@ -8,13 +8,6 @@
             <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200">
                 Manage Jumuiyas
             </h2>
-            <a href="{{ route('admin.jumuiyas.create') }}" 
-               class="btn-jumuiya inline-flex items-center px-4 py-2 rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700">
-                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                New Jumuiya
-            </a>
         </div>
 
         <!-- Jumuiyas List -->
@@ -87,7 +80,7 @@
                     </tbody>
                 </table>
             </div>
-            @if($jumuiyas->hasPages())
+            @if($jumuiyas instanceof \Illuminate\Pagination\LengthAwarePaginator && $jumuiyas->hasPages())
                 <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
                     {{ $jumuiyas->links() }}
                 </div>

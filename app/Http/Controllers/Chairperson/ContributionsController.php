@@ -90,6 +90,8 @@ class ContributionsController extends Controller
 
         $validated['jumuiya_id'] = $jumuiya->id;
         $validated['recorded_by'] = Auth::id();
+        $validated['user_id'] = $member->user_id;
+        $validated['payment_reference'] = \Illuminate\Support\Str::uuid();
 
         Contribution::create($validated);
 

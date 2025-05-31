@@ -5,6 +5,12 @@
     <div class="p-6 text-gray-900 dark:text-gray-100">
         <h2 class="text-2xl font-semibold mb-6">{{ __('Jumuiya Dashboard') }}</h2>
 
+        @if(auth()->user()->isChairperson())
+            <a href="{{ route('chairperson.notifications.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors mb-6">
+                <i class="fas fa-bell mr-2"></i> Create Notification
+            </a>
+        @endif
+
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-white dark:bg-gray-700 overflow-hidden shadow rounded-lg">

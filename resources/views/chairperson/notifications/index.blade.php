@@ -53,7 +53,9 @@
             </div>
 
             <div class="mt-6">
-                {{ $notifications->links() }}
+                @if(($notifications instanceof \Illuminate\Pagination\LengthAwarePaginator || $notifications instanceof \Illuminate\Pagination\Paginator) && $notifications->hasPages())
+                    {{ $notifications->links() }}
+                @endif
             </div>
         </div>
     </div>

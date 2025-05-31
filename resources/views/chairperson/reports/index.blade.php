@@ -154,3 +154,17 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function updateFormAction(type) {
+    var form = document.getElementById('reportForm');
+    if (!type) {
+        type = 'members';
+    }
+    // Use the base URL up to /generate/ and append the type
+    var baseUrl = "{{ url('chairperson/reports/generate') }}";
+    form.action = baseUrl + '/' + type;
+}
+</script>
+@endpush

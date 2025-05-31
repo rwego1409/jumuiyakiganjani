@@ -12,6 +12,11 @@
             </div>
             @endif
 
+            @if(isset($noJumuiya) && $noJumuiya)
+                <div class="max-w-2xl mx-auto mt-8 p-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded">
+                    <strong>Notice:</strong> You are not currently assigned to a Jumuiya. Please contact your system administrator to be assigned before sending notifications.
+                </div>
+            @else
             <form action="{{ route('chairperson.notifications.store') }}" method="POST" class="space-y-6">
                 @csrf
 
@@ -20,7 +25,8 @@
                         Title
                     </label>
                     <input type="text" name="title" id="title" value="{{ old('title') }}"
-                           class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                           class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                           required autofocus placeholder="Enter notification title">
                     @error('title')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -30,8 +36,9 @@
                     <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Message
                     </label>
-                    <textarea name="message" id="message" rows="4"
-                              class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">{{ old('message') }}</textarea>
+                    <textarea name="message" id="message" rows="5"
+                              class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                              required placeholder="Enter detailed notification message">{{ old('message') }}</textarea>
                     @error('message')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -43,10 +50,10 @@
                     </label>
                     <select name="type" id="type"
                             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
-                        <option value="general" {{ old('type') == 'general' ? 'selected' : '' }}>General</option>
+                        <option value="general" {{ old('type') == 'general' ? 'selected' : '' }}>General Notification</option>
                         <option value="alert" {{ old('type') == 'alert' ? 'selected' : '' }}>Alert</option>
                         <option value="reminder" {{ old('type') == 'reminder' ? 'selected' : '' }}>Reminder</option>
-                        <option value="update" {{ old('type') == 'update' ? 'selected' : '' }}>Update</option>
+                        <option value="update" {{ old('type') == 'update' ? 'selected' : '' }}>System Update</option>
                     </select>
                     @error('type')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -80,7 +87,7 @@
                     @enderror
                 </div>
 
-                <div id="member-selection" class="hidden">
+                <div id="member-selection" class="{{ old('recipient_type') == 'specific' ? '' : 'hidden' }}">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Select Members
                     </label>
@@ -103,11 +110,12 @@
 
                 <div>
                     <label for="action_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Action URL (Optional)
+                        Action Link (optional)
                     </label>
                     <input type="url" name="action_url" id="action_url" value="{{ old('action_url') }}"
                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                           placeholder="https://...">
+                           placeholder="https://example.com/action">
+                    <p class="mt-1 text-sm text-gray-500">URL to direct users when they click the notification</p>
                     @error('action_url')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -122,13 +130,18 @@
                     </label>
                 </div>
 
-                <div class="flex justify-end">
+                <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <a href="{{ route('chairperson.notifications.index') }}"
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancel
+                    </a>
                     <button type="submit"
                             class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                         Send Notification
                     </button>
                 </div>
             </form>
+            @endif
         </div>
     </div>
 </div>
