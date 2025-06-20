@@ -35,6 +35,10 @@
 
     <!-- Contribution Form -->
     <div class="bg-white p-6 rounded-lg shadow-md">
+      <div class="zenopay-brand">
+        <img src="https://zenoapi.com/logo.png" alt="ZenoPay Logo" class="zenopay-logo">
+        <span class="text-green-700 font-semibold">Secured by ZenoPay</span>
+      </div>
       <form id="contributionForm">
         @csrf
 
@@ -111,10 +115,14 @@
             <span class="font-semibold" id="summaryPhone">-</span>
           </div>
         </div>
+        <div class="bg-blue-50 p-3 rounded text-blue-800 text-sm flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" /></svg>
+          You will receive a payment prompt on your phone. Enter your mobile money PIN to complete the payment.
+        </div>
         <button type="button" 
                 id="confirmPaymentBtn"
                 class="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors relative">
-          <span class="btn-text">Confirm PalmPesa Payment</span>
+          <span class="btn-text">Confirm Mobile Money Payment</span>
           <svg class="animate-spin h-5 w-5 text-white absolute right-4 top-3 hidden" 
                xmlns="http://www.w3.org/2000/svg" 
                fill="none" 
@@ -186,6 +194,10 @@
 
 @endsection
 
+@push('head')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+@endpush
+
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -200,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const closePaymentModal = document.getElementById('closePaymentModal');
   let paymentCheckInterval = null;
   let currentReference = null;
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
   function formatPhoneNumber(input) {
     let numbers = input.replace(/\D/g, '');
@@ -219,25 +232,37 @@ document.addEventListener('DOMContentLoaded', function() {
     return /^255\d{9}$/.test(phone);
   }
 
-  proceedBtn.addEventListener('click', function() {
-    const amount = parseInt(amountInput.value);
-    const rawPhone = phoneInput.value;
-    const formattedPhone = formatPhoneNumber(rawPhone);
-
-    if (isNaN(amount) || amount < 1000 || amount > 3000000) {
-      showError('Please enter a valid amount between 1,000 and 3,000,000 TZS');
-      return;
+  document.getElementById('proceedToPaymentBtn').addEventListener('click', async function(e) {
+    e.preventDefault();
+    const amount = document.getElementById('amount').value;
+    const phone = document.getElementById('phone').value;
+    // You may want to get jumuiya_id and contribution_date from the form as well
+    const reference = 'CONTRIB-' + Date.now();
+    try {
+      const response = await fetch('/zenopay/initiate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrfToken
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          phone: phone,
+          amount: amount,
+          reference: reference
+        })
+      });
+      const data = await response.json();
+      if (response.ok && data.status === 'success') {
+        // Show payment modal or success
+        // Optionally, start polling status using data.order_id
+        startPaymentStatusCheck(data.order_id);
+      } else {
+        showError(data.message || 'Payment failed.');
+      }
+    } catch (error) {
+      showError(error.message);
     }
-
-    if (!formattedPhone || !isValidPhoneNumber(formattedPhone)) {
-      showError('Invalid phone number. Use format: 0693662424 or 255693662424');
-      return;
-    }
-
-    document.getElementById('summaryAmount').textContent = `TZS ${amount.toLocaleString()}`;
-    document.getElementById('summaryPhone').textContent = formattedPhone;
-    paymentModal.classList.remove('hidden');
-    paymentModal.classList.add('flex');
   });
 
   closePaymentModal.addEventListener('click', () => {
@@ -269,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+          'X-CSRF-TOKEN': csrfToken,
           'Accept': 'application/json'
         },
         body: JSON.stringify({
@@ -305,20 +330,17 @@ document.addEventListener('DOMContentLoaded', function() {
       showError(error.message);
     } finally {
       confirmBtn.disabled = false;
-      confirmBtn.querySelector('.btn-text').textContent = 'Confirm PalmPesa Payment';
+      confirmBtn.querySelector('.btn-text').textContent = 'Confirm Mobile Money Payment';
       confirmBtn.querySelector('svg').classList.add('hidden');
     }
   });
 
   function startPaymentStatusCheck(reference) {
-    // Clear any existing interval
     if (paymentCheckInterval) clearInterval(paymentCheckInterval);
-    
     paymentCheckInterval = setInterval(async () => {
       try {
         const response = await fetch(`/payment/status/${reference}`);
         const data = await response.json();
-        
         if (data.status === 'completed') {
           clearInterval(paymentCheckInterval);
           pendingModal.classList.add('hidden');
@@ -328,11 +350,14 @@ document.addEventListener('DOMContentLoaded', function() {
           clearInterval(paymentCheckInterval);
           pendingModal.classList.add('hidden');
           showError('Payment failed. Please try again.');
+        } else {
+          // Update status in modal
+          document.getElementById('currentStatus').textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
         }
       } catch (error) {
         console.error('Status check error:', error);
       }
-    }, 3000); // Check every 3 seconds
+    }, 3000);
   }
 
   function showError(message) {
@@ -345,6 +370,29 @@ document.addEventListener('DOMContentLoaded', function() {
     paymentModal.classList.add('hidden');
     pendingModal.classList.add('hidden');
   }
+
+  // Auto-format phone to 255XXXXXXXXX if user enters 0XXXXXXXXX
+  document.getElementById('phone').addEventListener('blur', function(e) {
+    let val = e.target.value.trim();
+    if (/^0\d{9}$/.test(val)) {
+      e.target.value = '255' + val.substring(1);
+    }
+  });
 });
 </script>
+@endpush
+
+@push('styles')
+<style>
+    .zenopay-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .zenopay-logo {
+        width: 32px;
+        height: 32px;
+    }
+</style>
 @endpush

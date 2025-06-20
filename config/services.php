@@ -72,4 +72,9 @@ return [
     // 'url' => env('PALMPESA_URL'),
     'token' => env('PALMPESA_TOKEN'),
 ],
+
+    'zenopay' => [
+        'api_key' => env('ZENOPAY_API_KEY', 'YOUR_API_KEY_HERE'),
+        'base_url' => env('ZENOPAY_BASE_URL', 'https://zenoapi.com/api/payments'),
+    ],
 ];

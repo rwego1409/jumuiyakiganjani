@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Services\DarajaService;
 use App\Services\ClickPesaService;
 use App\Services\MpesaService;
+use App\Services\ZenoPayService;
 use Illuminate\Support\Str;
 
 class PaymentService
@@ -12,7 +13,8 @@ class PaymentService
     public function __construct(
         protected DarajaService $daraja,
         protected ClickPesaService $clickPesa,
-        protected MpesaService $vodacom
+        protected MpesaService $vodacom,
+        protected ZenoPayService $zenopay
     ) {}
 
     public function initiateMobilePayment(string $phone, float $amount, string $reference): array
@@ -21,11 +23,13 @@ class PaymentService
         $amount = round($amount, 2);
 
         try {
-            return match($countryCode) {
-                '254' => $this->handleKenya($phone, $amount, $reference),
-                '255' => $this->handleTanzania($phone, $amount, $reference),
-                default => throw new \InvalidArgumentException('Unsupported country code')
-            };
+            if ($countryCode === '254') {
+                return $this->handleKenya($phone, $amount, $reference);
+            } elseif ($countryCode === '255') {
+                return $this->handleTanzania($phone, $amount, $reference);
+            } else {
+                throw new \InvalidArgumentException('Unsupported country code');
+            }
         } catch (\Exception $e) {
             return $this->handlePaymentError($e, $phone, $countryCode);
         }
@@ -43,22 +47,12 @@ class PaymentService
 
     protected function handleTanzania(string $phone, float $amount, string $reference): array
     {
-        // First try ClickPesa
-        $response = $this->clickPesa->initiatePayment(
-            phone: $this->formatPhone($phone, '255'),
-            amount: $amount,
-            reference: $reference
+        // Use ZenoPay for Tanzania
+        $response = $this->zenopay->initiatePayment(
+            $this->formatPhone($phone, '255'),
+            $amount,
+            $reference
         );
-
-        // If ClickPesa fails, fallback to Vodacom
-        if (isset($response['error'])) {
-            return $this->vodacom->makePayment(
-                phone: $phone,
-                amount: $amount,
-                reference: $reference
-            );
-        }
-
         return $response;
     }
 
@@ -80,39 +74,4 @@ class PaymentService
             'error' => config('app.debug') ? $e->getMessage() : 'Payment processing failed'
         ];
     }
-
-    // In DarajaService.php
-public function stkPush(string $phone, float $amount, string $reference, string $callback): array
-{
-    try {
-        // Get the raw response body before parsing
-        $rawResponse = $this->makeApiRequest(/* your parameters */);
-        
-        // Log the raw response for inspection
-        \Log::debug('Daraja API raw response', [
-            'response' => $rawResponse,
-            'length' => strlen($rawResponse),
-            'first_few_bytes' => bin2hex(substr($rawResponse, 0, 20)) // Check for BOM or invisible chars
-        ]);
-        
-        // Try decoding with safety checks
-        $decodedResponse = json_decode($rawResponse, true);
-        
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            \Log::error('JSON decode error: ' . json_last_error_msg(), [
-                'response' => $rawResponse
-            ]);
-            throw new \Exception('Invalid response format: ' . json_last_error_msg());
-        }
-        
-        // Continue with your existing code
-        
-    } catch (\Exception $e) {
-        \Log::error('STK Push error: ' . $e->getMessage());
-        return [
-            'success' => false,
-            'error' => $e->getMessage()
-        ];
-    }
-}
 }

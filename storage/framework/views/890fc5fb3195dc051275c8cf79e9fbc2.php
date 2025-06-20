@@ -1,4 +1,4 @@
-<nav x-data="{ mobileMenuOpen: false, darkMode: false }" x-init="darkMode = (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches))" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 shadow-lg" aria-label="Super Admin navigation">
+<nav x-data="{ mobileMenuOpen: false, darkMode: false }" x-init="darkMode = (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches))" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 shadow-lg fixed w-full z-30 top-0 left-0" aria-label="Super Admin navigation">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <!-- Left Section -->

@@ -36,6 +36,7 @@ use App\Http\Controllers\SuperAdmin\{
     MembersController as SuperAdminMembersController,
     NotificationController as SuperAdminNotificationController
 };
+use App\Http\Controllers\ZenoPayController;
 use App\Models\User;
 use App\Notifications\TestNotification;
 
@@ -423,6 +424,12 @@ Route::get('/test-notification', function() {
     \App\Jobs\DispatchNotifications::dispatch($notification);
     
     return 'Test notification sent!';
+});
+
+// ZenoPay routes
+Route::prefix('zenopay')->name('zenopay.')->group(function () {
+    Route::post('/initiate', [ZenoPayController::class, 'initiate'])->name('initiate');
+    Route::get('/status', [ZenoPayController::class, 'status'])->name('status');
 });
 
 // Fallback route for 404s

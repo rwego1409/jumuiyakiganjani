@@ -365,3 +365,6 @@ name,email,jumuiya_id,phone,status,joined_date
 John Doe,john@example.com,1,1234567890,active,2023-04-25
 Jane Smith,jane@example.com,2,0987654321,inactive,2023-04-20
 ```
+
+
+C:\xampp\php\php.exe artisan migrate:fresh --seed

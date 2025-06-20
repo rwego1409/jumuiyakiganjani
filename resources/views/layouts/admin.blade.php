@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" 
-      x-data="{ darkMode: (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) }" 
-      :class="{ 'dark': darkMode }">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ darkMode: false }" :class="{ 'dark': darkMode }">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,6 +15,23 @@
     <!-- Styles & Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('darkMode', () => ({
+                darkMode: localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+                init() {
+                    this.$watch('darkMode', val => {
+                        document.documentElement.classList.toggle('dark', val);
+                        localStorage.theme = val ? 'dark' : 'light';
+                    });
+                    document.documentElement.classList.toggle('dark', this.darkMode);
+                },
+                toggle() {
+                    this.darkMode = !this.darkMode;
+                }
+            }));
+        });
+    </script>
 
     <!-- DataTables Styles -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwindcss.min.css">
@@ -64,10 +79,7 @@
         }
     </style>
 </head>
-
-<body class="font-sans antialiased bg-gray-100 dark:bg-gray-900" 
-      x-init="document.documentElement.classList.toggle('dark', darkMode)">
-    
+<body class="font-sans antialiased bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
     <div class="min-h-screen">
         @include('admin.partials.navigation', ['showDarkModeToggle' => true])
 
@@ -93,62 +105,5 @@
     </div>
 
     @stack('scripts')
-
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('darkMode', () => ({
-                darkMode: (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)),
-                init() {
-                    this.$watch('darkMode', val => {
-                        document.documentElement.classList.toggle('dark', val);
-                        localStorage.theme = val ? 'dark' : 'light';
-                    });
-                    document.documentElement.classList.toggle('dark', this.darkMode);
-                },
-                toggle() {
-                    this.darkMode = !this.darkMode;
-                }
-            }));
-        });
-
-        // DataTables Management
-        (function() {
-            let dataTablesInstances = [];
-            
-            function initDataTables() {
-                document.querySelectorAll('.datatable').forEach(table => {
-                    if (!$.fn.DataTable.isDataTable(table)) {
-                        const dt = $(table).DataTable({
-                            responsive: true,
-                            pagingType: "full_numbers",
-                            dom: "<'flex justify-between items-center mb-2'<'mr-2'l><'ml-2'f>>" +
-                                 "<'overflow-x-auto'tr>" +
-                                 "<'flex justify-between items-center mt-2'<'text-sm'i>p>",
-                            language: {
-                                search: "",
-                                searchPlaceholder: "Search records...",
-                                lengthMenu: "Show _MENU_ entries",
-                                info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                                paginate: {
-                                    previous: "‹ Prev",
-                                    next: "Next ›",
-                                    first: "«",
-                                    last: "»"
-                                }
-                            }
-                        });
-                        dataTablesInstances.push(dt);
-                    }
-                });
-            }
-            
-            initDataTables();
-            document.addEventListener('livewire:load', initDataTables);
-            document.addEventListener('livewire:navigating', () => {
-                dataTablesInstances.forEach(dt => dt.destroy());
-                dataTablesInstances = [];
-            });
-        })();
-    </script>
 </body>
 </html>

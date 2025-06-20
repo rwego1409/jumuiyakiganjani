@@ -22,7 +22,10 @@ class StoreContributionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'jumuiya_id' => 'required|exists:jumuiyas,id',
+            'amount' => 'required|numeric|min:1000|max:3000000',
+            'contribution_date' => 'required|date',
+            'phone' => ['required', 'regex:/^255\d{9}$/'], // ZenoPay expects 12 digits starting with 255
         ];
     }
 }
