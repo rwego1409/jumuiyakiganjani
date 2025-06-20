@@ -29,6 +29,13 @@ use App\Http\Controllers\{
     ClickPesaController,
     PalmPesaController
 };
+use App\Http\Controllers\SuperAdmin\{
+    SuperAdminController,
+    JumuiyaController,
+    ChairpersonsController,
+    MembersController as SuperAdminMembersController,
+    NotificationController as SuperAdminNotificationController
+};
 use App\Models\User;
 use App\Notifications\TestNotification;
 
@@ -57,14 +64,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/dashboard', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'dashboard'])->name('dashboard');
             
             // Jumuiya Management
-            Route::prefix('jumuiyas')->name('jumuiyas.')->group(function () {
-                Route::get('/', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'jumuiyasList'])->name('index');
-                Route::get('/create', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'createJumuiya'])->name('create');
-                Route::post('/', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'storeJumuiya'])->name('store');
-                Route::get('/{jumuiya}/edit', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'editJumuiya'])->name('edit');
-                Route::put('/{jumuiya}', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'updateJumuiya'])->name('update');
-                Route::delete('/{jumuiya}', [App\Http\Controllers\SuperAdmin\SuperAdminController::class, 'deleteJumuiya'])->name('destroy');
-            });
+            Route::resource('jumuiyas', App\Http\Controllers\SuperAdmin\JumuiyaController::class);
 
             // Admin Management
             Route::resource('admins', App\Http\Controllers\Admin\AdminManagementController::class);
@@ -77,7 +77,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Members Management
             Route::resource('members', App\Http\Controllers\SuperAdmin\MembersController::class);
 
+            // Notifications
             Route::resource('notifications', NotificationController::class);
+
+            // Notifications Management for Super Admin
+            Route::prefix('notifications')->name('notifications.')->group(function () {
+                Route::get('/', [App\Http\Controllers\SuperAdmin\SuperAdminNotificationController::class, 'index'])->name('index');
+                Route::get('/create', [App\Http\Controllers\SuperAdmin\SuperAdminNotificationController::class, 'create'])->name('create');
+                Route::post('/', [App\Http\Controllers\SuperAdmin\SuperAdminNotificationController::class, 'store'])->name('store');
+                Route::get('/{notification}', [App\Http\Controllers\SuperAdmin\SuperAdminNotificationController::class, 'show'])->name('show');
+                Route::post('/mark-all-read', [App\Http\Controllers\SuperAdmin\SuperAdminNotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+            });
 
             // System Settings
             Route::get('/settings', [App\Http\Controllers\Admin\SuperAdminSettingsController::class, 'index'])->name('settings');
@@ -106,29 +116,36 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Download resource file
             Route::get('resources/{resource}/download', [App\Http\Controllers\Chairperson\ResourcesController::class, 'download'])->name('resources.download');
             Route::resource('resources', App\Http\Controllers\Chairperson\ResourcesController::class);
-
-            // Reports
-            Route::prefix('reports')->name('reports.')->group(function () {
-                Route::get('/', [App\Http\Controllers\Chairperson\ReportsController::class, 'index'])->name('index');
-                Route::get('/generate/{type}/{format?}', [App\Http\Controllers\Chairperson\ReportsController::class, 'generate'])
-                    ->name('generate');
-            });
             
-            // Settings
-            Route::get('/settings', [App\Http\Controllers\Chairperson\SettingsController::class, 'index'])->name('settings');
-            Route::put('/settings', [App\Http\Controllers\Chairperson\SettingsController::class, 'update'])->name('settings.update');
-
             // Notifications
+            // Notifications Management
             Route::prefix('notifications')->name('notifications.')->group(function () {
                 Route::get('/', [App\Http\Controllers\Chairperson\NotificationController::class, 'index'])->name('index');
                 Route::get('/create', [App\Http\Controllers\Chairperson\NotificationController::class, 'create'])->name('create');
                 Route::post('/', [App\Http\Controllers\Chairperson\NotificationController::class, 'store'])->name('store');
-                Route::get('/{id}', [App\Http\Controllers\Chairperson\NotificationController::class, 'show'])->name('show');
+                Route::get('/{notification}', [App\Http\Controllers\Chairperson\NotificationController::class, 'show'])->name('show');
+                Route::post('/mark-all-read', [App\Http\Controllers\Chairperson\NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
             });
+
+            // Settings Management
+            Route::get('settings', [App\Http\Controllers\Chairperson\SettingsController::class, 'index'])->name('settings.index');
+            Route::put('settings', [App\Http\Controllers\Chairperson\SettingsController::class, 'update'])->name('settings.update');
+            Route::get('notifications/create', [App\Http\Controllers\Chairperson\NotificationController::class, 'create'])->name('notifications.create');
+            Route::post('notifications', [App\Http\Controllers\Chairperson\NotificationController::class, 'store'])->name('notifications.store');
+            Route::get('notifications/{notification}', [App\Http\Controllers\Chairperson\NotificationController::class, 'show'])->name('notifications.show');
+            Route::post('notifications/mark-all-read', [App\Http\Controllers\Chairperson\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 
             // WhatsApp Reminders
             Route::get('reminders', [App\Http\Controllers\Chairperson\RemindersController::class, 'index'])->name('reminders.index');
             Route::post('reminders', [App\Http\Controllers\Chairperson\RemindersController::class, 'store'])->name('reminders.store');
+
+            // Reports Management
+            Route::prefix('reports')->name('reports.')->group(function () {
+                Route::get('/', [App\Http\Controllers\Chairperson\ReportsController::class, 'index'])->name('index');
+                Route::get('/generate/{type}/{format?}', [App\Http\Controllers\Chairperson\ReportsController::class, 'generate'])->name('generate');
+                Route::post('/download', [App\Http\Controllers\Chairperson\ReportsController::class, 'download'])->name('download');
+                Route::get('/export/{id}/{format}', [App\Http\Controllers\Chairperson\ReportsController::class, 'export'])->name('export');
+            });
         });
 
     // Admin routes
@@ -387,6 +404,26 @@ Route::prefix('superuser')
     ->group(function () {
         Route::resource('whatsapp_reminders', App\Http\Controllers\Superuser\WhatsAppRemindersController::class);
     });
+
+Route::get('/test-notification', function() {
+    $admin = \App\Models\User::where('role', 'admin')->first();
+    
+    if (!$admin) {
+        return 'No admin user found!';
+    }
+    
+    $notification = \App\Models\AdminNotification::create([
+        'title' => 'Test Notification for Chairperson',
+        'message' => 'This is a test notification to verify chairperson notifications are working.',
+        'type' => 'general',
+        'recipients' => ['all'],
+        'created_by' => $admin->id
+    ]);
+
+    \App\Jobs\DispatchNotifications::dispatch($notification);
+    
+    return 'Test notification sent!';
+});
 
 // Fallback route for 404s
     Route::fallback(function () {

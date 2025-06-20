@@ -20,7 +20,7 @@ class ResourceController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Resource::query();
+        $query = Resource::whereNotNull('file_path');
     
         // Filter by type if provided and not 'all'
         if ($request->filled('type') && $request->type !== 'all') {
@@ -48,13 +48,17 @@ class ResourceController extends Controller
      */
     public function store(StoreResourceRequest $request)
     {
-        Resource::create([
-            'jumuiya_id' => $request->jumuiya_id,
-            'name' => $request->name,
-            'type' => $request->type,
-            'description' => $request->description,
-            'status' => $request->status
-        ]);
+        $data = $request->only(['jumuiya_id', 'name', 'type', 'description', 'status']);
+
+        // Handle file upload
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $path = $file->store('resources', 'public'); // stores in storage/app/public/resources
+            $data['file_path'] = $path;
+            $data['original_filename'] = $file->getClientOriginalName();
+        }
+
+        Resource::create($data);
 
         return redirect()->route('admin.resources.index')
             ->with('success', 'Resource created successfully');
@@ -106,17 +110,10 @@ class ResourceController extends Controller
      */
     public function download(Resource $resource): StreamedResponse
     {
-        // Check if the resource file exists
+        // Verify the resource exists
         if (!Storage::exists($resource->file_path)) {
-            abort(404, 'Resource file not found.');
+            abort(404);
         }
-
-        // Check if the logged-in user belongs to the same jumuiya as the resource
-        if ($resource->jumuiya_id != auth()->user()->member->jumuiya_id) {
-            abort(403, 'You do not have permission to download this resource.');
-        }
-
-        // Return the file as a download response
         return Storage::download($resource->file_path, $resource->original_filename);
     }
 }

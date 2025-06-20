@@ -132,4 +132,13 @@ class User extends Authenticatable implements MustVerifyEmail
         }
         return null;
     }
+
+    /**
+     * Get the Jumuiyas that this admin manages.
+     */
+    public function managedJumuiyas()
+    {
+        return $this->belongsToMany(Jumuiya::class, 'jumuiya_managers', 'user_id', 'jumuiya_id')
+                    ->withTimestamps();
+    }
 }

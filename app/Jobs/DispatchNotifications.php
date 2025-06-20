@@ -31,10 +31,15 @@ class DispatchNotifications implements ShouldQueue
 
     protected function getRecipients(AdminNotification $notification)
     {
+        $query = \App\Models\User::where('id', '!=', $notification->created_by);
+        
         if (in_array('all', $notification->recipients)) {
-            return \App\Models\User::where('id', '!=', $notification->created_by)->get();
+            // Include chairpersons and members in the recipients
+            $query->whereIn('role', ['chairperson', 'member']);
+        } else {
+            $query->whereIn('id', $notification->user_ids);
         }
-
-        return \App\Models\User::whereIn('id', $notification->user_ids)->get();
+        
+        return $query->get();
     }
 }

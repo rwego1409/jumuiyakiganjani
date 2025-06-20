@@ -28,10 +28,7 @@
                         <i class="fas fa-user-tie mr-2 text-pink-500"></i>
                         {{ __('Chairpersons') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('super_admin.members.index')" :active="request()->routeIs('super_admin.members.*')" aria-label="Members">
-                        <i class="fas fa-users mr-2 text-blue-500"></i>
-                        {{ __('Members') }}
-                    </x-nav-link>
+                   
                     <x-nav-link :href="route('super_admin.admins.index')" :active="request()->routeIs('super_admin.admins.*')" aria-label="Admins">
                         <i class="fas fa-user-shield mr-2 text-indigo-500"></i>
                         {{ __('Admins') }}

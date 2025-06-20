@@ -194,4 +194,9 @@ public function course()
     return $this->belongsTo(Course::class);
 }
 
+    public function history($id)
+    {
+        $contribution = Contribution::with(['jumuiya', 'user', 'payments'])->findOrFail($id);
+        return view('member.contributions.history', compact('contribution'));
+    }
 }

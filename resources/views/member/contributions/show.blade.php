@@ -1,3 +1,7 @@
+@extends('layouts.member')
+
+@section('content')
+
 <!-- resources/views/member/contributions/show.blade.php -->
 <div class="bg-white rounded-lg shadow-md overflow-hidden">
     <div class="p-6">
@@ -97,3 +101,4 @@
         </div>
     </div>
 </div>
+@endsection

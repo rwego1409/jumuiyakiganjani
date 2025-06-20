@@ -13,7 +13,6 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $user->load(['member.jumuiya', 'member.contributions']);
         $member = $user->member;
 
         if (!$member) {
@@ -24,7 +23,7 @@ class DashboardController extends Controller
 
         $completedPayments = Payment::where('member_id', $member->id)->where('status', 'completed')->count();
         $totalContributions = Contribution::where('member_id', $member->id)->sum('amount');
-        $memberSince = optional($member->joined_date)->format('F Y');
+        $memberSince = $member->joined_date ? $member->joined_date->format('F j, Y') : '';
 
         $recentPayments = Payment::where('member_id', $member->id)->orderByDesc('created_at')->limit(5)->get();
         $recentContributions = $member->contributions()->latest()->limit(5)->get();
@@ -39,7 +38,7 @@ class DashboardController extends Controller
             ->get();
 
         // Just show 10 latest resources (not paginated to avoid error on non-paginated view)
-        $resources = Resource::latest()->take(10)->get();
+        $resources = Resource::whereNotNull('file_path')->latest()->paginate(10);
 
         $stats = [
             'completed_payments' => $completedPayments,
@@ -61,13 +60,18 @@ class DashboardController extends Controller
         $lineChartLabels = $contributionsChart->pluck('month');
         $lineChartData = $contributionsChart->pluck('amount');
 
+        // Fetch unread notifications using notifications() relationship
+        $unreadCount = $user->notifications()->whereNull('read_at')->count();
+        $notifications = $user->notifications()->whereNull('read_at')->latest()->take(5)->get();
+
         return view('member.dashboard', compact(
             'member', 'jumuiya', 'recentPayments', 'recentContributions',
             'events', 'resources', 'stats', 'community_data',
             'calendarEvents', 'contributionsChart', 'activityChart',
             'contributionGrowth', 'jumuiyaRank', 'totalJumuiyas', 'engagementScore',
             'lineChartLabels', 'lineChartData', 'completedPayments', 'totalContributions',
-            'memberSince', 'resources', 'completedPayments', 'totalContributions'
+            'memberSince', 'resources', 'completedPayments', 'totalContributions',
+            'unreadCount', 'notifications'
         ));
     }
 

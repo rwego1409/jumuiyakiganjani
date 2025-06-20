@@ -95,10 +95,13 @@ class ReportsController extends Controller
 
     private function exportReport($data, string $format, string $filename, string $type, array $filters = []): BinaryFileResponse
     {
+        // Define headers based on type
+        $headers = $this->getHeaders($type);
+        
         return match ($format) {
             'pdf' => $this->handlePdfExport($data, $filename, $type, $filters),
-            'excel' => Excel::download(new ReportsExport($data), "$filename.xlsx"),
-            'csv' => Excel::download(new ReportsExport($data), "$filename.csv", \Maatwebsite\Excel\Excel::CSV),
+            'excel' => Excel::download(new ReportsExport($data, $headers), "$filename.xlsx"),
+            'csv' => Excel::download(new ReportsExport($data, $headers), "$filename.csv", \Maatwebsite\Excel\Excel::CSV),
             default => abort(400, 'Invalid format specified')
         };
     }
@@ -120,5 +123,43 @@ class ReportsController extends Controller
 
         return response()->download($tempPath, "{$filename}.pdf")
             ->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Get headers based on report type
+     *
+     * @param string $type
+     * @return array
+     */
+    private function getHeaders(string $type): array
+    {
+        return match ($type) {
+            'events' => [
+                'Event Name',
+                'Description',
+                'Start Date',
+                'End Date',
+                'Location',
+                'Attendees Count',
+                'Created At'
+            ],
+            'contributions' => [
+                'Member Name',
+                'Amount',
+                'Type',
+                'Payment Method',
+                'Date',
+                'Status'
+            ],
+            'members' => [
+                'Name',
+                'Email',
+                'Phone',
+                'Jumuiya',
+                'Role',
+                'Joined Date'
+            ],
+            default => []
+        };
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Jumuiya;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use function Spatie\Activitylog\activity;
 
 class AdminManagementController extends Controller
 {
@@ -59,14 +60,12 @@ class AdminManagementController extends Controller
 
         return redirect()->route('super_admin.admins.index')
             ->with('success', 'Administrator created successfully');
-    }
-
-    public function edit(User $admin)
+    }    public function edit(User $admin)
     {
         abort_if($admin->role !== 'admin', 404);
-        
+
         $jumuiyas = Jumuiya::all();
-        $assignedJumuiyas = $admin->managedJumuiyas->pluck('id')->toArray();
+        $assignedJumuiyas = Jumuiya::where('chairperson_id', $admin->id)->pluck('id')->toArray();
         
         return view('admin.super.admins.edit', compact('admin', 'jumuiyas', 'assignedJumuiyas'));
     }
@@ -149,5 +148,25 @@ class AdminManagementController extends Controller
             ->paginate(20);
 
         return view('admin.super.admins.activities', compact('admin', 'activities'));
+    }
+
+    /**
+     * Display the specified admin.
+     */
+    public function show($id)
+    {
+        $admin = User::findOrFail($id);
+        abort_if($admin->role !== 'admin', 404);
+
+        // Get jumuiyas where this admin is a chairperson
+        $jumuiyas = Jumuiya::with('members')
+            ->where('chairperson_id', $admin->id)
+            ->get();
+            
+        $totalMembers = $jumuiyas->sum(function ($jumuiya) {
+            return $jumuiya->members->count();
+        });
+
+        return view('admin.super.admins.show', compact('admin', 'jumuiyas', 'totalMembers'));
     }
 }

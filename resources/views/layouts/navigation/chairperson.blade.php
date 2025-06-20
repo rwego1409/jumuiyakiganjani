@@ -54,12 +54,12 @@
                         <span class="hidden md:inline">{{ __('Reports') }}</span>
                     </x-nav-link>
                     @endif
-                    @if(Route::has('chairperson.reminders.index'))
+                    <!-- @if(Route::has('chairperson.reminders.index'))
                     <x-nav-link :href="route('chairperson.reminders.index')" :active="request()->routeIs('chairperson.reminders.*')">
                         <i class="fas fa-bell mr-1 text-orange-500"></i>
                         <span class="hidden md:inline">{{ __('WhatsApp Reminders') }}</span>
                     </x-nav-link>
-                    @endif
+                    @endif -->
                     <x-nav-link :href="route('chairperson.notifications.index')" :active="request()->routeIs('chairperson.notifications.*')">
                         <i class="fas fa-bell mr-1 text-red-500"></i>
                         <span class="hidden md:inline">{{ __('Notifications') }}</span>
@@ -149,7 +149,7 @@
                         </button>
                     </x-slot>
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('chairperson.settings')">
+                        <x-dropdown-link :href="route('chairperson.settings.index')">
                             <i class="fas fa-cog mr-2"></i> {{ __('Settings') }}
                         </x-dropdown-link>
                         <x-dropdown-link :href="route('profile.edit')">
@@ -250,7 +250,7 @@
                 </div>
             </div>
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('chairperson.settings')">
+                <x-responsive-nav-link :href="route('chairperson.settings.index')">
                     <i class="fas fa-cog mr-2"></i> {{ __('Settings') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('profile.edit')">

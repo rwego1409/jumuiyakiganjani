@@ -15,13 +15,21 @@
                     <!-- Header Section -->
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-medium text-gray-800 dark:text-gray-100">Notifications</h3>
-                        <form method="POST" action="{{ route('notifications.mark-all-read') }}">
-                            @csrf
-                            <button type="submit"
-                                class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition duration-150">
-                                Mark all as read
-                            </button>
-                        </form>
+                        <div class="flex items-center space-x-4">
+                            @if($role === 'chairperson')
+                                <a href="{{ route('chairperson.notifications.create') }}" 
+                                   class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors duration-200">
+                                    Create Notification
+                                </a>
+                            @endif
+                            <form method="POST" action="{{ route('notifications.mark-all-read') }}">
+                                @csrf
+                                <button type="submit"
+                                    class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition duration-150">
+                                    Mark all as read
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
                     <!-- Notification List -->
@@ -47,10 +55,10 @@
                                 <div class="flex justify-between">
                                     <div>
                                         <p class="font-medium text-gray-800 dark:text-gray-100">
-                                            {{ $notification->data['title'] }}
+                                            {{ $notification->data['title'] ?? 'Notification' }}
                                         </p>
                                         <p class="text-gray-600 dark:text-gray-300 mt-1">
-                                            {{ $notification->data['message'] }}
+                                            {{ $notification->data['message'] ?? 'No message content' }}
                                         </p>
                                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
                                             From: {{ $sender }}

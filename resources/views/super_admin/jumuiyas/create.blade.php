@@ -21,9 +21,9 @@
             @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
         <div class="mb-4">
-            <label class="block mb-1">Chairperson Name</label>
-            <input type="text" name="chairperson_name" class="form-input w-full" value="{{ old('chairperson_name') }}" required>
-            @error('chairperson_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            <label class="block mb-1">Chairperson Email</label>
+            <input type="email" name="chairperson_email" class="form-input w-full" value="{{ old('chairperson_email') }}" required>
+            @error('chairperson_email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
         <div class="flex justify-end">
             <button type="submit" class="btn btn-primary">Create Jumuiya</button>

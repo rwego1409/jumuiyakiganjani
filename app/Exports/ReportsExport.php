@@ -15,12 +15,12 @@ class ReportsExport implements FromArray, WithHeadings, WithStyles
     /**
      * Create a new export instance.
      *
-     * @param array $data The data rows for the report.
+     * @param mixed $data The data rows for the report.
      * @param array $headers The column headers for the report.
      */
-    public function __construct(array $data, array $headers)
+    public function __construct($data, array $headers = [])
     {
-        $this->data = $data;
+        $this->data = $data instanceof \Illuminate\Support\Collection ? $data->toArray() : $data;
         $this->headers = $headers;
     }
 

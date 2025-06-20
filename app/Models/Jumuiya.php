@@ -9,7 +9,7 @@ class Jumuiya extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'location', 'description', 'chairperson_id'];
+    protected $fillable = ['name', 'location', 'description', 'chairperson_id', 'meeting_day', 'meeting_time', 'status'];
 
     public function chairperson()
     {

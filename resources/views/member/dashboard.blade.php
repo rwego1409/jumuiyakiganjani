@@ -47,7 +47,7 @@
                 ],
                 [
                     'title' => 'Member Since',
-                    'value' => $stats['memberSince'] ?? '',
+                    'value' => $stats['member_since'] ?? '',
                     'icon' => 'calendar',
                     'color' => 'bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
                 ],
@@ -197,7 +197,7 @@
                                     <p class="text-sm text-gray-500 dark:text-gray-400">{{ $resource->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
-                            <a href="{{ route('member.resources.download', $resource->id) }}" class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
+                            <a href="{{ asset('storage/' . $resource->file_path) }}" class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300" download>
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                 </svg>

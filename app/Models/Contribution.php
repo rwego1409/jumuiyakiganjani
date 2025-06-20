@@ -60,6 +60,11 @@ class Contribution extends Model
         return $this->belongsTo(User::class, 'recorded_by');
     }
 
+    public function payments()
+    {
+        return $this->hasMany(\App\Models\Payment::class, 'member_course_contribution_id');
+    }
+
     // Validation rules (reusable in requests)
     public static function validationRules(): array
     {

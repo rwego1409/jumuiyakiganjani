@@ -41,6 +41,21 @@ export default {
             backgroundImage: {
                 'community-pattern': "url('/images/community-bg.svg')",
             },
+            // Added the animation configurations here
+            animation: {
+                'float': 'float 6s ease-in-out infinite',
+                'float-reverse': 'floatReverse 8s ease-in-out infinite',
+            },
+            keyframes: {
+                float: {
+                    '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                    '50%': { transform: 'translateY(-10px) rotate(5deg)' },
+                },
+                floatReverse: {
+                    '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                    '50%': { transform: 'translateY(-15px) rotate(-5deg)' },
+                }
+            }
         },
     },
 

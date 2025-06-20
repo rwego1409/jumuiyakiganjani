@@ -4,42 +4,131 @@ namespace App\Http\Controllers\Chairperson;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Member;
 use App\Models\Jumuiya;
+use App\Models\Member;
+use App\Models\JumuiyaNotification;
 use App\Notifications\ChairpersonNotification;
-use App\Jobs\SendWhatsAppNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Carbon\Carbon;
 
 class NotificationController extends Controller
 {
+    protected function getJumuiya()
+    {
+        return Jumuiya::where('chairperson_id', auth()->id())->first();
+    }
+
     public function index()
     {
         $user = auth()->user();
-        $jumuiya = $user->jumuiya;
-        if (!$jumuiya) {
-            // Show a friendly message if the chairperson is not assigned to a jumuiya
-            return view('chairperson.notifications.index', [
-                'notifications' => collect(),
-                'noJumuiya' => true
-            ]);
+        $jumuiya = $this->getJumuiya();
+
+        // Sent notifications - convert to object-like for Blade compatibility
+        $sentNotifications = JumuiyaNotification::where('created_by', $user->id)
+            ->where('jumuiya_id', $jumuiya ? $jumuiya->id : 0)
+            ->latest()
+            ->get()
+            ->map(function ($notification) {
+                $fake = new \stdClass();
+                $fake->id = $notification->id;
+                $fake->data = [
+                    'title' => $notification->title,
+                    'message' => $notification->message,
+                    'type' => $notification->type,
+                    'recipient_type' => $notification->recipient_type,
+                    'member_ids' => $notification->member_ids,
+                ];
+                $fake->created_at = $notification->created_at;
+                $fake->read_at = null;
+                $fake->type = 'sent';
+                $fake->is_sent = true;
+                return $fake;
+            });
+
+        // Received notifications - real Laravel notification objects
+        $receivedNotifications = DatabaseNotification::where('notifiable_type', User::class)
+            ->where('notifiable_id', $user->id)
+            ->latest()
+            ->get()
+            ->map(function ($notification) {
+                $notification->type = 'received'; // Tag type for UI
+                return $notification;
+            });
+
+        // Merge both, sort by time
+        $allNotifications = $sentNotifications->concat($receivedNotifications)
+            ->sortByDesc('created_at')
+            ->values();
+
+        // Manual pagination
+        $page = request()->get('page', 1);
+        $perPage = 10;
+        $notifications = new LengthAwarePaginator(
+            $allNotifications->forPage($page, $perPage),
+            $allNotifications->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url()]
+        );
+
+        return view('chairperson.notifications.index', [
+            'notifications' => $notifications,
+            'jumuiya' => $jumuiya
+        ]);
+    }
+
+    public function show($id)
+    {
+        $notification = DatabaseNotification::where('notifiable_type', User::class)
+            ->where('notifiable_id', auth()->id())
+            ->findOrFail($id);
+        
+        if (!$notification->read_at) {
+            $notification->markAsRead();
         }
-        $notifications = $jumuiya->notifications()->latest()->paginate(10);
-            
-        return view('chairperson.notifications.index', compact('notifications'));
+
+        if (isset($notification->data['contribution_id'])) {
+            return redirect()->route('chairperson.contributions.show', $notification->data['contribution_id']);
+        }
+
+        return redirect()->route('chairperson.notifications.index')
+            ->with('success', 'Notification marked as read');
+    }
+
+    public function markAllAsRead()
+    {
+        DatabaseNotification::where('notifiable_type', User::class)
+            ->where('notifiable_id', auth()->id())
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+        
+        return redirect()->route('chairperson.notifications.index')
+            ->with('success', 'All notifications marked as read');
     }
 
     public function create()
     {
-        $jumuiya = auth()->user()->jumuiya;
-        // Remove the restriction: always allow access to the form, but only show members if assigned
-        $members = $jumuiya ? $jumuiya->members()->with('user')->get() : collect();
-            
+        $jumuiya = $this->getJumuiya();
+        if (!$jumuiya) {
+            return redirect()->route('chairperson.notifications.index')
+                ->with('error', 'You need to be assigned to a Jumuiya first.');
+        }
+
+        $members = $jumuiya->members()->with('user')->get();
         return view('chairperson.notifications.create', compact('members'));
     }
 
     public function store(Request $request)
     {
+        $jumuiya = $this->getJumuiya();
+        if (!$jumuiya) {
+            return back()->with('error', 'You need to be assigned to a Jumuiya first.');
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'message' => 'required|string',
@@ -47,56 +136,42 @@ class NotificationController extends Controller
             'recipient_type' => 'required|in:all,specific',
             'member_ids' => 'required_if:recipient_type,specific|array',
             'member_ids.*' => 'exists:members,id',
-            'action_url' => 'nullable|url',
-            'whatsapp_reminder' => 'nullable|boolean',
+            'action_url' => 'nullable|url'
         ]);
 
-        // Get members to notify
-        $members = $validated['recipient_type'] === 'all' 
-            ? auth()->user()->jumuiya->members 
-            : Member::whereIn('id', $validated['member_ids'])->get();
-
-        // Create notification record
-        $notification = auth()->user()->jumuiya->notifications()->create([
+        // Store Jumuiya-level notification
+        $notificationData = [
             'title' => $validated['title'],
             'message' => $validated['message'],
             'type' => $validated['type'],
             'recipient_type' => $validated['recipient_type'],
-            'member_ids' => $validated['recipient_type'] === 'specific' ? $validated['member_ids'] : [],
-            'action_url' => $validated['action_url'] ?? null,
+            'jumuiya_id' => $jumuiya->id,
             'created_by' => auth()->id(),
-            'send_whatsapp' => $request->boolean('whatsapp_reminder', false),
-        ]);
+            'action_url' => $validated['action_url'] ?? null,
+        ];
 
-        // Send notifications to members
+        if ($validated['recipient_type'] === 'specific') {
+            $notificationData['member_ids'] = $validated['member_ids'];
+        }
+
+        $notification = JumuiyaNotification::create($notificationData);
+
+        // Determine recipients
+        $members = $validated['recipient_type'] === 'all'
+            ? $jumuiya->members()->with('user')->get()
+            : Member::whereIn('id', $validated['member_ids'])
+                ->where('jumuiya_id', $jumuiya->id)
+                ->with('user')
+                ->get();
+
+        // Send out Laravel notifications
         foreach ($members as $member) {
             if ($member->user) {
-                // Send in-app notification
                 $member->user->notify(new ChairpersonNotification($notification));
-
-                // Send WhatsApp notification if enabled and phone number exists
-                if ($request->boolean('whatsapp_reminder') && $member->phone) {
-                    SendWhatsAppNotification::dispatch(
-                        $member->phone,
-                        $validated['title'],
-                        $validated['message']
-                    );
-                }
             }
         }
 
-        return redirect()
-            ->route('chairperson.notifications.index')
+        return redirect()->route('chairperson.notifications.index')
             ->with('success', 'Notification sent successfully to ' . $members->count() . ' members');
-    }
-
-    public function show($id)
-    {
-        $notification = auth()->user()
-            ->jumuiya
-            ->notifications()
-            ->findOrFail($id);
-            
-        return view('chairperson.notifications.show', compact('notification'));
     }
 }

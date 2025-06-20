@@ -23,9 +23,9 @@
                     <x-slot name="trigger">
                         <button class="relative p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             <span class="sr-only">View notifications</span>
-                            @if($notificationsData['member']['count'] > 0)
+                            @if(isset($unreadCount) && $unreadCount > 0)
                                 <span class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
-                                    {{ $notificationsData['member']['count'] }}
+                                    {{ $unreadCount }}
                                 </span>
                             @endif
                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -40,24 +40,24 @@
                         </div>
                         
                         <div class="max-h-64 overflow-y-auto">
-                            @php
-                                $memberNotifications = [
-                                    ['message' => 'Your contribution was received', 'time' => '5 minutes ago', 'type' => 'success'],
-                                    ['message' => 'Upcoming event: Community meeting', 'time' => '1 hour ago', 'type' => 'info'],
-                                    ['message' => 'Payment reminder', 'time' => '2 hours ago', 'type' => 'warning']
-                                ];
-                            @endphp
-
-                            @foreach($memberNotifications as $notification)
-                                <div class="px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <p class="text-sm text-gray-600 dark:text-gray-300">
-                                        {{ $notification['message'] }}
-                                    </p>
-                                    <p class="text-xs text-gray-400 mt-1">
-                                        {{ $notification['time'] }}
+                            @if(isset($notifications) && $notifications->count())
+                                @foreach($notifications as $notification)
+                                    <div class="px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                                            {{ $notification->data['message'] ?? $notification->data['body'] ?? $notification->type }}
+                                        </p>
+                                        <p class="text-xs text-gray-400 mt-1">
+                                            {{ $notification->created_at->diffForHumans() }}
+                                        </p>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="px-4 py-3">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ __('No new notifications') }}
                                     </p>
                                 </div>
-                            @endforeach
+                            @endif
                         </div>
                     </x-slot>
                 </x-dropdown>
