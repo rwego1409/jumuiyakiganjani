@@ -111,7 +111,9 @@
                                 </div>
                                 
                                 <!-- Card Content -->
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{{ $resource->title }}</h3>
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center">
+                                    {{ $resource->title }}
+                                </h3>
                                 <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
                                     {{ Str::limit($resource->description, 100) }}
                                 </p>

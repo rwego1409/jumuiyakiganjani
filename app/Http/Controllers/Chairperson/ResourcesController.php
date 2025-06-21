@@ -73,8 +73,9 @@ class ResourcesController extends Controller
         // Handle file upload
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $filePath = $file->store('resources');
+            $filePath = $file->store('resources', 'public');
             $validated['file_path'] = $filePath;
+            $validated['original_filename'] = $file->getClientOriginalName();
         }
 
         $resource = Resource::create($validated);
@@ -115,13 +116,13 @@ class ResourcesController extends Controller
         // Handle file upload if a new file is provided
         if ($request->hasFile('file')) {
             // Delete old file if it exists
-            if ($resource->file_path && Storage::exists($resource->file_path)) {
-                Storage::delete($resource->file_path);
+            if ($resource->file_path && Storage::disk('public')->exists($resource->file_path)) {
+                Storage::disk('public')->delete($resource->file_path);
             }
-
             $file = $request->file('file');
-            $filePath = $file->store('resources');
+            $filePath = $file->store('resources', 'public');
             $validated['file_path'] = $filePath;
+            $validated['original_filename'] = $file->getClientOriginalName();
         }
 
         $resource->update($validated);
@@ -151,10 +152,10 @@ class ResourcesController extends Controller
      */
     public function download(Resource $resource): StreamedResponse
     {
-        if (!$resource->file_path || !Storage::exists($resource->file_path)) {
+        if (!$resource->file_path || !Storage::disk('public')->exists($resource->file_path)) {
             abort(404, __('Resource file not found.'));
         }
-
-        return Storage::download($resource->file_path, basename($resource->file_path));
+        $downloadName = $resource->original_filename ?? basename($resource->file_path);
+        return Storage::disk('public')->download($resource->file_path, $downloadName);
     }
 }

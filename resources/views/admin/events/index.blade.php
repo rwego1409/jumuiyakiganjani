@@ -84,72 +84,85 @@
 
                 <!-- Table View (Hidden by default) -->
                 <div id="tableView" class="hidden">
-                    <div class="overflow-x-auto">
-                        <table id="eventsTable" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Title
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Description
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Date
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @foreach($events as $event)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $event->title }}</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm text-gray-500 dark:text-gray-300">{{ Str::limit($event->description, 50) }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-500 dark:text-gray-300">
-                                            {{ \Carbon\Carbon::parse($event->start_time)->format('M d, Y h:i A') }}
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 py-1 text-xs font-medium rounded-full 
-                                            {{ $event->status === 'upcoming' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 
-                                               ($event->status === 'ongoing' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
-                                               'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200') }}">
-                                            {{ ucfirst($event->status) }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="{{ route('admin.events.edit', $event->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3">Edit</a>
-                                        <form class="inline-block" action="{{ route('admin.events.destroy', $event->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300" onclick="return confirm('Are you sure you want to delete this event?')">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700" x-data="{
+    search: '',
+    sortKey: '',
+    sortAsc: true,
+    get filtered() {
+        let data = [...this.$refs.tbody.querySelectorAll('tr[data-title]')];
+        if (this.search) {
+            data = data.filter(row =>
+                row.dataset.title.toLowerCase().includes(this.search.toLowerCase()) ||
+                row.dataset.status.toLowerCase().includes(this.search.toLowerCase())
+            );
+        }
+        if (this.sortKey) {
+            data.sort((a, b) => {
+                let aVal = a.dataset[this.sortKey] || '';
+                let bVal = b.dataset[this.sortKey] || '';
+                if (aVal < bVal) return this.sortAsc ? -1 : 1;
+                if (aVal > bVal) return this.sortAsc ? 1 : -1;
+                return 0;
+            });
+        }
+        return data;
+    },
+    sortBy(key) {
+        if (this.sortKey === key) {
+            this.sortAsc = !this.sortAsc;
+        } else {
+            this.sortKey = key;
+            this.sortAsc = true;
+        }
+    }
+}">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">All Events</h3>
+        <div class="flex items-center gap-2">
+            <input x-model="search" type="text" placeholder="Search..." class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+        </div>
+    </div>
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-800">
+            <tr>
+                <th @click="sortBy('title')" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer select-none">Title</th>
+                <th @click="sortBy('status')" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer select-none">Status</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+            </tr>
+        </thead>
+        <tbody x-ref="tbody">
+            @foreach($events as $event)
+            <tr x-show="filtered.includes($el)" data-title="{{ strtolower($event->title) }}" data-status="{{ strtolower($event->status) }}">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $event->title }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full 
+                        {{ $event->status === 'upcoming' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 
+                           ($event->status === 'ongoing' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
+                           'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200') }}">
+                        {{ ucfirst($event->status) }}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-500 dark:text-gray-300">
+                        {{ \Carbon\Carbon::parse($event->start_time)->format('M d, Y h:i A') }}
                     </div>
-                    
-                    <!-- Pagination for Table View -->
-                    <div class="mt-4">
-                        @if($events->isEmpty())
-                            <div class="text-center text-gray-600 dark:text-gray-300">
-                                No events available.
-                            </div>
-                        @endif
-                    </div>
-                </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <a href="{{ route('admin.events.edit', $event->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3">Edit</a>
+                    <form class="inline-block" action="{{ route('admin.events.destroy', $event->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300" onclick="return confirm('Are you sure you want to delete this event?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
             </div>
         </div>
     </div>

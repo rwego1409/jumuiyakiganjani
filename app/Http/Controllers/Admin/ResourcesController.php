@@ -15,9 +15,11 @@ class ResourcesController extends Controller
      */
     public function index()
     {
+        // Show all global resources (jumuiya_id is null) and all resources for all jumuiyas
         $resources = Resource::orderBy('created_at', 'desc')
-                      ->paginate(10); // 10 items per page
-
+            ->paginate(10);
+        // Optionally, if you want to show only global and per-jumuiya resources, you can filter here
+        // $resources = Resource::whereNull('jumuiya_id')->orWhere('jumuiya_id', $adminJumuiyaId)->orderBy('created_at', 'desc')->paginate(10);
         return view('admin.resources.index', compact('resources'));
     }
 
@@ -49,7 +51,7 @@ class ResourcesController extends Controller
             'type' => 'required|string|in:document,video,audio,image,other',
             'description' => 'nullable|string',
             'file' => 'required|file|mimes:pdf,jpeg,png,jpg,docx,mp4,mov,mp3,wav|max:20480',
-            'jumuiya_id' => 'required|exists:jumuiyas,id' // Add validation
+            'jumuiya_id' => 'nullable|exists:jumuiyas,id' // Now nullable for global
         ]);
     
         $file = $request->file('file');
@@ -58,7 +60,7 @@ class ResourcesController extends Controller
             'title' => $validated['title'],
             'type' => $validated['type'],
             'description' => $validated['description'],
-            'jumuiya_id' => $validated['jumuiya_id'], // Add this line
+            'jumuiya_id' => $validated['jumuiya_id'] ?? null,
             'file_path' => $file->store('resources', 'public'),
             'original_filename' => $file->getClientOriginalName(),
             'file_size' => round($file->getSize() / 1024),

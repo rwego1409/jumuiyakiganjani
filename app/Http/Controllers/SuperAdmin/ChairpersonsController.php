@@ -13,7 +13,8 @@ class ChairpersonsController extends Controller
     public function index()
     {
         $chairpersons = User::where('role', 'chairperson')->latest()->paginate(10);
-        return view('super_admin.chairpersons.index', compact('chairpersons'));
+        $members = User::where('role', 'member')->orderBy('name')->get();
+        return view('super_admin.chairpersons.index', compact('chairpersons', 'members'));
     }
 
     public function create()
@@ -70,5 +71,21 @@ class ChairpersonsController extends Controller
         if ($chairperson->role !== 'chairperson') abort(404);
         $chairperson->delete();
         return redirect()->route('super_admin.chairpersons.index')->with('success', 'Chairperson deleted successfully');
+    }
+
+    /**
+     * Assign a member as chairperson.
+     */
+    public function assign(Request $request)
+    {
+        $request->validate([
+            'member_id' => 'required|exists:users,id',
+        ]);
+
+        $member = User::findOrFail($request->member_id);
+        $member->role = 'chairperson';
+        $member->save();
+
+        return redirect()->route('super_admin.chairpersons.index')->with('success', $member->name . ' has been assigned as Chairperson.');
     }
 }

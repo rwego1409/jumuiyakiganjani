@@ -39,8 +39,13 @@ class EventsController extends Controller
             'end_time' => 'required|date|after:start_time',
             'location' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'jumuiya_id' => 'required|exists:jumuiyas,id',
+            'jumuiya_id' => 'required',
         ]);
+
+        // If 'All Jumuiya' is selected, set jumuiya_id to null
+        if ($validated['jumuiya_id'] === 'all') {
+            $validated['jumuiya_id'] = null;
+        }
 
         $event = Event::create($validated);
 
@@ -81,8 +86,12 @@ class EventsController extends Controller
             'end_time' => 'required|date|after:start_time',
             'location' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'jumuiya_id' => 'required|exists:jumuiyas,id',
+            'jumuiya_id' => 'required',
         ]);
+
+        if ($validated['jumuiya_id'] === 'all') {
+            $validated['jumuiya_id'] = null;
+        }
 
         $event->update($validated);
 

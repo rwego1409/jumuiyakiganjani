@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('content'); ?>
 <div class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
     <!-- Hero Section -->
@@ -120,7 +118,7 @@
                 <h3 class="mt-6 text-xl font-bold text-gray-900 dark:text-white text-center">Member Directory</h3>
                 
                 <p class="mt-3 text-base text-gray-600 dark:text-gray-400 text-center">
-                    Create comprehensive member profiles with photos, contact details, and family relationships.
+                    Create comprehensive member profiles with contact details.
                 </p>
             </div>
 
@@ -172,7 +170,7 @@
                 <h3 class="mt-6 text-xl font-bold text-gray-900 dark:text-white text-center">Performance Analytics</h3>
                 
                 <p class="mt-3 text-base text-gray-600 dark:text-gray-400 text-center">
-                    Track community engagement with visual reports on attendance, contributions, and member growth.
+                    Track community engagement with visual reports on contributions and member growth.
                 </p>
             </div>
 
@@ -185,7 +183,7 @@
                 <h3 class="mt-6 text-xl font-bold text-gray-900 dark:text-white text-center">Smart Reminders</h3>
                 
                 <p class="mt-3 text-base text-gray-600 dark:text-gray-400 text-center">
-                    Keep everyone informed with automated SMS and email notifications for events and important dates.
+                    Keep everyone informed with notifications for events and important dates.
                 </p>
             </div>
         </div>
@@ -201,7 +199,7 @@
                 <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
                     Become part of the movement transforming faith communities across Tanzania. Sign up today and experience the difference.
                 </p>
-                <div class="space-y-4">
+                <!-- <div class="space-y-4">
                     <div class="flex items-start">
                         <div class="flex-shrink-0">
                             <div class="flex items-center justify-center h-6 w-6 rounded-md bg-indigo-500 text-white">
@@ -238,7 +236,7 @@
                             Dedicated support for all community leaders
                         </p>
                     </div>
-                </div>
+                </div> -->
             </div>
             
             <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
@@ -262,15 +260,15 @@
                             <div class="w-full border-t border-gray-300 dark:border-gray-700"></div>
                         </div>
                         <div class="relative flex justify-center text-sm">
-                            <span class="px-2 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                            <!-- <span class="px-2 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
                                 University Project
-                            </span>
+                            </span> -->
                         </div>
                     </div>
                     
-                    <div class="text-center text-sm text-gray-600 dark:text-gray-400">
+                    <!-- <div class="text-center text-sm text-gray-600 dark:text-gray-400">
                         <p>Final Year Project by University of Dar es Salaam Students</p>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -298,7 +296,7 @@
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">John Doe</h3>
+                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Magdalena</h3>
                             <p class="text-xs text-gray-500 dark:text-gray-400">Community Member</p>
                         </div>
                     </div>
@@ -316,7 +314,7 @@
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Jane Smith</h3>
+                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Modimo Mendoza</h3>
                             <p class="text-xs text-gray-500 dark:text-gray-400">Group Leader</p>
                         </div>
                     </div>
@@ -334,7 +332,7 @@
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Mark Johnson</h3>
+                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Sarah Mwaifuge</h3>
                             <p class="text-xs text-gray-500 dark:text-gray-400">Administrator</p>
                         </div>
                     </div>
@@ -345,6 +343,53 @@
             </div>
         </div>
     </section>
+
+    <!-- Team Section -->
+    <section id="team-section" class="py-16 bg-white dark:bg-gray-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    Meet the Developers
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400">
+                    The team behind Jumuiya Kiganjani
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Ludovick Bakera -->
+                <div class="transition hover:scale-105 hover:shadow-lg bg-indigo-50 dark:bg-indigo-900/30 rounded-lg p-8 shadow-md text-center">
+                    <div class="flex items-center justify-center mb-4">
+                        <div class="h-14 w-14 rounded-full bg-indigo-200 dark:bg-indigo-800 flex items-center justify-center">
+                            <i class="fas fa-user-tie text-indigo-700 dark:text-indigo-300 text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Ludovick Bakera</h3>
+                    <p class="text-indigo-700 dark:text-indigo-300 font-medium mb-1">Full Stack Developer</p>
+                </div>
+                <!-- Dickson Boniphace -->
+                <div class="transition hover:scale-105 hover:shadow-lg bg-indigo-50 dark:bg-indigo-900/30 rounded-lg p-8 shadow-md text-center">
+                    <div class="flex items-center justify-center mb-4">
+                        <div class="h-14 w-14 rounded-full bg-indigo-200 dark:bg-indigo-800 flex items-center justify-center">
+                            <i class="fas fa-user-cog text-indigo-700 dark:text-indigo-300 text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Dickson Boniphace</h3>
+                    <p class="text-indigo-700 dark:text-indigo-300 font-medium mb-1">Front End Developer & Project Manager</p>
+                </div>
+                <!-- Magdalena Munisi -->
+                <div class="transition hover:scale-105 hover:shadow-lg bg-indigo-50 dark:bg-indigo-900/30 rounded-lg p-8 shadow-md text-center">
+                    <div class="flex items-center justify-center mb-4">
+                        <div class="h-14 w-14 rounded-full bg-indigo-200 dark:bg-indigo-800 flex items-center justify-center">
+                            <i class="fas fa-user-edit text-indigo-700 dark:text-indigo-300 text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Magdalena Munisi</h3>
+                    <p class="text-indigo-700 dark:text-indigo-300 font-medium mb-1">Web Designer & Database Development</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Team Section -->
 
     <!-- Final CTA -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">

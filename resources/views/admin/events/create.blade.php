@@ -77,6 +77,7 @@
                             <x-input-label for="jumuiya_id" :value="__('Jumuiya')" />
                             <select id="jumuiya_id" name="jumuiya_id" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
                                 <option value="">Select Jumuiya</option>
+                                <option value="all" {{ old('jumuiya_id') === 'all' ? 'selected' : '' }}>All Jumuiya</option>
                                 @foreach($jumuiyas as $jumuiya)
                                     <option value="{{ $jumuiya->id }}" {{ old('jumuiya_id') == $jumuiya->id ? 'selected' : '' }}>
                                         {{ $jumuiya->name }}

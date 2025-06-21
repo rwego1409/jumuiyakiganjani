@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('jumuiya_id')->constrained();
+            $table->foreignId('jumuiya_id')->nullable()->constrained();
             $table->string('title');
             $table->text('description');
             $table->dateTime('start_time');

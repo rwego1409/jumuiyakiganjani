@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('content'); ?>
     <div class="container mx-auto mt-10">
         <div class="flex justify-between items-center mb-6">

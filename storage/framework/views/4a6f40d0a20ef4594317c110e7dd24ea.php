@@ -207,10 +207,9 @@
         </div>
         
         <div class="hidden md:flex space-x-8">
-            <a href="#features" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition">Features</a>
-            <a href="#testimonials" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition">Testimonials</a>
-            <a href="#pricing" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition">Pricing</a>
-            <a href="#team" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition">Team</a>
+            <a href="#features" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition hover:scale-105 hover:shadow-lg">Features</a>
+            <a href="#testimonials" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition hover:scale-105 hover:shadow-lg">Testimonials</a>
+            <a href="#team" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition hover:scale-105 hover:shadow-lg" onclick="event.preventDefault(); document.getElementById('team-section').scrollIntoView({behavior: 'smooth'});">Team</a>
         </div>
         
         <div class="flex items-center space-x-4">
@@ -292,7 +291,7 @@
 
             <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
                 <p class="text-base text-gray-500 dark:text-gray-400 text-center">
-                    &copy; 2023 Jumuiya Kiganjani. University of Dar es Salaam Final Year Project. All rights reserved.
+                    &copy; 2023 Jumuiya Kiganjani All rights reserved.
                 </p>
             </div>
         </div>

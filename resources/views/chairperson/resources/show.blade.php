@@ -54,30 +54,13 @@
                             <i class="fas fa-file mr-2 text-gray-400"></i>
                             <span class="text-gray-900 dark:text-white">{{ basename($resource->file_path) }}</span>
                         </div>
-                        <a href="{{ route('chairperson.resources.download', $resource->id) }}" 
+                        <a href="{{ route('chairperson.resources.download', $resource->id) }}"
                            class="bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded-md text-sm">
                             <i class="fas fa-download mr-1"></i>{{ __('Download') }}
                         </a>
                     </div>
                 </div>
                 @endif
-
-                <!-- Actions -->
-                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <a href="{{ route('chairperson.resources.edit', $resource->id) }}" 
-                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md">
-                        <i class="fas fa-edit mr-2"></i>{{ __('Edit Resource') }}
-                    </a>
-                    <form action="{{ route('chairperson.resources.destroy', $resource->id) }}" method="POST" class="inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" 
-                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
-                                onclick="return confirm('{{ __('Are you sure you want to delete this resource?') }}')">
-                            <i class="fas fa-trash mr-2"></i>{{ __('Delete Resource') }}
-                        </button>
-                    </form>
-                </div>
             </div>
         </div>
     </div>

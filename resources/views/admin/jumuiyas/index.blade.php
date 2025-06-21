@@ -1,31 +1,73 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="py-12">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
-        <div class="mb-6 flex justify-between items-center">
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                Manage Jumuiyas
-            </h2>
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Manage Jumuiyas</h2>
         </div>
 
         <!-- Jumuiyas List -->
-        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden" x-data="{
+            search: '',
+            sortKey: '',
+            sortAsc: true,
+            get filtered() {
+                let data = [...this.$refs.tbody.querySelectorAll('tr[data-name]')];
+                if (this.search) {
+                    data = data.filter(row =>
+                        row.dataset.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                        row.dataset.location.toLowerCase().includes(this.search.toLowerCase()) ||
+                        row.dataset.chairperson.toLowerCase().includes(this.search.toLowerCase())
+                    );
+                }
+                if (this.sortKey) {
+                    data.sort((a, b) => {
+                        let aVal = a.dataset[this.sortKey] || '';
+                        let bVal = b.dataset[this.sortKey] || '';
+                        if (aVal < bVal) return this.sortAsc ? -1 : 1;
+                        if (aVal > bVal) return this.sortAsc ? 1 : -1;
+                        return 0;
+                    });
+                }
+                return data;
+            },
+            sortBy(key) {
+                if (this.sortKey === key) {
+                    this.sortAsc = !this.sortAsc;
+                } else {
+                    this.sortKey = key;
+                    this.sortAsc = true;
+                }
+            }
+        }">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">All Jumuiyas</h3>
+                <div class="flex items-center gap-2">
+                    <input x-model="search" type="text" placeholder="Search..." class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                </div>
+            </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Chairperson</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Members</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                            <th @click="sortBy('name')" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer select-none">
+                                Name
+                                <span x-show="sortKey === 'name'">
+                                    <svg x-show="sortAsc" class="inline w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg>
+                                    <svg x-show="!sortAsc" class="inline w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                </span>
+                            </th>
+                            <th @click="sortBy('location')" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer select-none">Location</th>
+                            <th @click="sortBy('chairperson')" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer select-none">Chairperson</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Members</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody x-ref="tbody" class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                         @forelse($jumuiyas as $jumuiya)
-                            <tr>
+                            <tr x-show="filtered.includes($el)" data-name="{{ strtolower($jumuiya->name) }}" data-location="{{ strtolower($jumuiya->location) }}" data-chairperson="{{ strtolower($jumuiya->chairperson->name) }}">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                                         {{ $jumuiya->name }}
@@ -46,33 +88,21 @@
                                         {{ $jumuiya->members->count() }}
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="{{ route('admin.jumuiyas.show', $jumuiya) }}" 
-                                       class="text-blue-600 hover:text-blue-900 mr-3">
-                                        View
-                                    </a>
-                                    <a href="{{ route('admin.jumuiyas.edit', $jumuiya) }}" 
-                                       class="text-indigo-600 hover:text-indigo-900 mr-3">
-                                        Edit
-                                    </a>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
+                                    <a href="{{ route('admin.jumuiyas.show', $jumuiya) }}" class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 rounded-md transition-colors duration-150" title="View Jumuiya">View</a>
+                                    <a href="{{ route('admin.jumuiyas.edit', $jumuiya) }}" class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-indigo-700 hover:text-indigo-900 bg-indigo-100 hover:bg-indigo-200 rounded-md transition-colors duration-150" title="Edit Jumuiya">Edit</a>
                                     @if($jumuiya->members->count() === 0)
-                                        <form action="{{ route('admin.jumuiyas.destroy', $jumuiya) }}" 
-                                              method="POST" 
-                                              class="inline-block">
+                                        <form action="{{ route('admin.jumuiyas.destroy', $jumuiya) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this Jumuiya?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" 
-                                                    class="text-red-600 hover:text-red-900"
-                                                    onclick="return confirm('Are you sure you want to delete this Jumuiya?')">
-                                                Delete
-                                            </button>
+                                            <button type="submit" class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-700 hover:text-red-900 bg-red-100 hover:bg-red-200 rounded-md transition-colors duration-150" title="Delete Jumuiya">Delete</button>
                                         </form>
                                     @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500 dark:text-gray-400">
+                                <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                                     No Jumuiyas found.
                                 </td>
                             </tr>
@@ -80,11 +110,6 @@
                     </tbody>
                 </table>
             </div>
-            @if($jumuiyas instanceof \Illuminate\Pagination\LengthAwarePaginator && $jumuiyas->hasPages())
-                <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                    {{ $jumuiyas->links() }}
-                </div>
-            @endif
         </div>
     </div>
 </div>

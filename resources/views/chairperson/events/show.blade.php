@@ -29,56 +29,43 @@
             </div>
 
             <!-- Event Details -->
-            <div class="space-y-6">
-                <!-- Date & Time -->
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div>
-                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Start Date & Time') }}</h3>
-                        <p class="mt-1 text-lg text-gray-900 dark:text-white">
-                            {{ $event->start_time->format('M d, Y H:i') }}
-                        </p>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('End Date & Time') }}</h3>
-                        <p class="mt-1 text-lg text-gray-900 dark:text-white">
-                            {{ $event->end_time->format('M d, Y H:i') }}
-                        </p>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 shadow border border-gray-100 dark:border-gray-800">
+                    <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{{ __('Start Date & Time') }}</h3>
+                    <p class="text-lg font-medium text-gray-900 dark:text-white">{{ $event->start_time->format('M d, Y H:i') }}</p>
                 </div>
-
-                <!-- Location -->
-                <div>
-                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Location') }}</h3>
-                    <p class="mt-1 text-lg text-gray-900 dark:text-white">
-                        {{ $event->location }}
-                    </p>
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 shadow border border-gray-100 dark:border-gray-800">
+                    <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{{ __('End Date & Time') }}</h3>
+                    <p class="text-lg font-medium text-gray-900 dark:text-white">{{ $event->end_time->format('M d, Y H:i') }}</p>
                 </div>
-
-                <!-- Description -->
-                <div>
-                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Description') }}</h3>
-                    <div class="mt-1 text-lg text-gray-900 dark:text-white prose dark:prose-invert max-w-none">
-                        {{ $event->description }}
-                    </div>
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 shadow border border-gray-100 dark:border-gray-800 md:col-span-2">
+                    <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{{ __('Location') }}</h3>
+                    <p class="text-lg font-medium text-gray-900 dark:text-white">{{ $event->location }}</p>
                 </div>
-
-                <!-- Actions -->
-                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <a href="{{ route('chairperson.events.edit', $event->id) }}" 
-                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md">
-                        <i class="fas fa-edit mr-2"></i>{{ __('Edit Event') }}
-                    </a>
-                    <form action="{{ route('chairperson.events.destroy', $event->id) }}" method="POST" class="inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" 
-                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
-                                onclick="return confirm('{{ __('Are you sure you want to delete this event?') }}')">
-                            <i class="fas fa-trash mr-2"></i>{{ __('Delete Event') }}
-                        </button>
-                    </form>
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 shadow border border-gray-100 dark:border-gray-800 md:col-span-2">
+                    <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{{ __('Description') }}</h3>
+                    <div class="text-lg text-gray-900 dark:text-white prose dark:prose-invert max-w-none">{{ $event->description }}</div>
                 </div>
             </div>
+
+            <!-- Actions -->
+            @if($event->created_by === auth()->id())
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700 mt-8">
+                <a href="{{ route('chairperson.events.edit', $event->id) }}" 
+                   class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md shadow transition duration-200">
+                    <i class="fas fa-edit mr-2"></i>{{ __('Edit Event') }}
+                </a>
+                <form action="{{ route('chairperson.events.destroy', $event->id) }}" method="POST" class="inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" 
+                            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md shadow transition duration-200"
+                            onclick="return confirm('{{ __('Are you sure you want to delete this event?') }}')">
+                        <i class="fas fa-trash mr-2"></i>{{ __('Delete Event') }}
+                    </button>
+                </form>
+            </div>
+            @endif
         </div>
     </div>
 </div>

@@ -14,7 +14,16 @@ class EventsController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
         $query = Event::query();
+
+        // Show global events or events for the chairperson's jumuiya(s)
+        $query->where(function($q) use ($user) {
+            $q->whereNull('jumuiya_id');
+            if ($user->jumuiya_id) {
+                $q->orWhere('jumuiya_id', $user->jumuiya_id);
+            }
+        });
 
         // Apply search filter
         if ($request->filled('search')) {

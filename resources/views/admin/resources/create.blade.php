@@ -32,6 +32,10 @@
                                 <option value="bible" {{ old('type') == 'bible' ? 'selected' : '' }}>Bible</option>
                                 <option value="document" {{ old('type') == 'document' ? 'selected' : '' }}>Document</option>
                                 <option value="news" {{ old('type') == 'news' ? 'selected' : '' }}>News</option>
+                                <option value="audio" {{ old('type') == 'audio' ? 'selected' : '' }}>Audio</option>
+                                <option value="image" {{ old('type') == 'image' ? 'selected' : '' }}>Image</option>
+                                <option value="video" {{ old('type') == 'video' ? 'selected' : '' }}>Video</option>
+                                <option value="other" {{ old('type') == 'other' ? 'selected' : '' }}>Other</option>
                             </select>
                             @error('type')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -41,8 +45,8 @@
                         <!-- Jumuiya Field -->
                         <div>
                             <x-input-label for="jumuiya_id" :value="__('Jumuiya')" />
-                            <select id="jumuiya_id" name="jumuiya_id" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                <option value="">Select a Jumuiya</option>
+                            <select id="jumuiya_id" name="jumuiya_id" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <option value="">All Jumuiya (Global)</option>
                                 @foreach($jumuiyas as $jumuiya)
                                     <option value="{{ $jumuiya->id }}" {{ old('jumuiya_id') == $jumuiya->id ? 'selected' : '' }}>
                                         {{ $jumuiya->name }}

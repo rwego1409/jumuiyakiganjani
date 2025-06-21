@@ -110,10 +110,11 @@ class ResourceController extends Controller
      */
     public function download(Resource $resource): StreamedResponse
     {
-        // Verify the resource exists
-        if (!Storage::exists($resource->file_path)) {
-            abort(404);
+        // Verify the resource exists on the public disk
+        if (!$resource->file_path || !Storage::disk('public')->exists($resource->file_path)) {
+            abort(404, __('Resource file not found.'));
         }
-        return Storage::download($resource->file_path, $resource->original_filename);
+        $downloadName = $resource->original_filename ?? basename($resource->file_path);
+        return Storage::disk('public')->download($resource->file_path, $downloadName);
     }
 }

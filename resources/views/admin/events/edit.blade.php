@@ -76,10 +76,25 @@
                             <x-input-error :messages="$errors->get('location')" class="mt-2" />
                         </div>
 
+                        <!-- Jumuiya Selection -->
+                        <div class="md:col-span-2">
+                            <x-input-label for="jumuiya_id" :value="__('Jumuiya')" />
+                            <select id="jumuiya_id" name="jumuiya_id" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                <option value="">Select Jumuiya</option>
+                                <option value="all" {{ old('jumuiya_id', $event->jumuiya_id ?? '') === 'all' ? 'selected' : '' }}>All Jumuiya</option>
+                                @foreach($jumuiyas as $jumuiya)
+                                    <option value="{{ $jumuiya->id }}" {{ old('jumuiya_id', $event->jumuiya_id ?? '') == $jumuiya->id ? 'selected' : '' }}>
+                                        {{ $jumuiya->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('jumuiya_id')" class="mt-2" />
+                        </div>
+
                         <!-- Description -->
                         <div class="md:col-span-2">
                             <x-input-label for="description" :value="__('Description')" />
-                            <textarea id="description" name="description" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows="4">{{ old('description', $event->description) }}</textarea>
+                            <textarea id="description" name="description" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows="4">{{ old('description', $event->description ?? '') }}</textarea>
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
                     </div>

@@ -12,40 +12,34 @@
         </div>
 
         <!-- Events Container -->
-        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             @foreach ($events as $event)
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
-                <!-- Event Header -->
-                <div class="flex items-start justify-between mb-4">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">{{ $event->name }}</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $event->location }}</p>
-                    </div>
-                    <span class="px-2.5 py-0.5 text-xs rounded-full {{ 
-                        $event->status === 'upcoming' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100' :
+            <div class="transition transform hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700 group cursor-pointer">
+                <!-- Event Title & Status -->
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300">{{ $event->title ?? $event->name }}</h3>
+                    <span class="px-3 py-1 text-xs font-semibold rounded-full 
+                        {{ $event->status === 'upcoming' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100' :
                         ($event->status === 'ongoing' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100' :
-                        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100') 
-                    }}">
+                        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100') }}">
                         {{ ucfirst($event->status) }}
                     </span>
                 </div>
-
-                <!-- Event Details -->
-                <div class="space-y-2">
-                    <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                        <svg class="h-4 w-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        {{ $event->start_time->format('M j, Y H:i') }}
-                    </div>
-
-                    @if($event->description)
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                        {{ $event->description }}
-                    </p>
+                <!-- Event Date & Location -->
+                <div class="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-2">
+                    <svg class="h-4 w-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {{ $event->start_time->format('M j, Y H:i') }}
+                    @if($event->location)
+                        <span class="mx-2">|</span>
+                        <span class="truncate">{{ $event->location }}</span>
                     @endif
                 </div>
-
+                <!-- Event Description -->
+                @if($event->description)
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-3 group-hover:line-clamp-none transition-all">{{ $event->description }}</p>
+                @endif
                 <!-- Action Button -->
                 <div class="mt-4">
                     <a href="{{ route('member.events.show', $event->id) }}" 

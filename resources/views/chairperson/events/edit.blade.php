@@ -11,8 +11,8 @@
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
         <div class="p-6">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-                    {{ __('Edit Event') }}
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white truncate max-w-xl" title="{{ $event->name }}">
+                    {{ $event->name }}
                 </h2>
                 <!-- Status Badge -->
                 <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full

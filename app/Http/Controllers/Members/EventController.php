@@ -23,11 +23,13 @@ class EventController extends Controller
 
      public function index()
      {
-         // Ensure no filters are applied, and fetch all events
-         $events = Event::with('jumuiya')->latest()->paginate(10);  // Pagination enabled
-         // If you want all events without pagination, use ->get() instead
-         // $events = Event::with('jumuiya')->latest()->get();
-     
+         $events = Event::with('jumuiya')
+             ->where(function($query) {
+                 $query->whereNull('jumuiya_id') // global events
+                       ->orWhere('jumuiya_id', auth()->user()->jumuiya_id);
+             })
+             ->latest()
+             ->paginate(10);
          return view('member.events.index', compact('events'));
      }
      

@@ -46,6 +46,26 @@
             </div>
         <?php endif; ?>
 
+        <!-- Assign Member as Chairperson Form -->
+        <div class="mb-8">
+            <form action="<?php echo e(route('super_admin.chairpersons.assign')); ?>" method="POST" class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col sm:flex-row items-center gap-4">
+                <?php echo csrf_field(); ?>
+                <label for="member_id" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2 sm:mb-0">Assign Member as Chairperson:</label>
+                <select name="member_id" id="member_id" required class="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+                    <option value="">Select a member...</option>
+                    <?php $__currentLoopData = $members; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $member): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($member->id); ?>"><?php echo e($member->name); ?> (<?php echo e($member->email); ?>)</option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </select>
+                <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition-all duration-200">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Assign
+                </button>
+            </form>
+        </div>
+
         <!-- Main Content Card -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             <!-- Table Header -->

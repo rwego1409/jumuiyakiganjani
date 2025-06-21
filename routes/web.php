@@ -213,7 +213,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             });
 
             Route::resource('chairpersons', \App\Http\Controllers\Admin\ChairpersonsController::class);
-            
+            Route::post('chairpersons/assign', [\App\Http\Controllers\Admin\ChairpersonsController::class, 'assign'])->name('chairpersons.assign');
         });
 
     // Member routes
@@ -246,7 +246,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::prefix('resources')->name('resources.')->group(function () {
                 Route::get('/', [ResourceController::class, 'index'])->name('index');
                 Route::get('/resource', [ResourceController::class, 'show'])->name('show');
-                Route::get('/resource/download', [ResourceController::class, 'download'])->name('download');
+                Route::get('/{resource}/download', [ResourceController::class, 'download'])->name('download');
             });
 
             // Payments

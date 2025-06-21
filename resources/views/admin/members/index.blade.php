@@ -49,19 +49,57 @@
                 </form> 
 
                 <!-- Data Table with improved styling -->
-                <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700" x-data="{
+                    search: '',
+                    sortKey: '',
+                    sortAsc: true,
+                    get filtered() {
+                        let data = [...this.$refs.tbody.querySelectorAll('tr[data-name]')];
+                        if (this.search) {
+                            data = data.filter(row =>
+                                row.dataset.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                                row.dataset.jumuiya.toLowerCase().includes(this.search.toLowerCase()) ||
+                                row.dataset.status.toLowerCase().includes(this.search.toLowerCase())
+                            );
+                        }
+                        if (this.sortKey) {
+                            data.sort((a, b) => {
+                                let aVal = a.dataset[this.sortKey] || '';
+                                let bVal = b.dataset[this.sortKey] || '';
+                                if (aVal < bVal) return this.sortAsc ? -1 : 1;
+                                if (aVal > bVal) return this.sortAsc ? 1 : -1;
+                                return 0;
+                            });
+                        }
+                        return data;
+                    },
+                    sortBy(key) {
+                        if (this.sortKey === key) {
+                            this.sortAsc = !this.sortAsc;
+                        } else {
+                            this.sortKey = key;
+                            this.sortAsc = true;
+                        }
+                    }
+                }">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">All Members</h3>
+                        <div class="flex items-center gap-2">
+                            <input x-model="search" type="text" placeholder="Search..." class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                        </div>
+                    </div>
                     <table id="members-table" class="stripe hover display nowrap w-full text-sm text-left">
                         <thead class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                             <tr>
-                                <th class="px-6 py-4 font-semibold">Member Info</th>
-                                <th class="px-6 py-4 font-semibold">Jumuiya</th>
-                                <th class="px-6 py-4 font-semibold">Status</th>
+                                <th @click="sortBy('name')" class="px-6 py-4 font-semibold cursor-pointer select-none">Member Info</th>
+                                <th @click="sortBy('jumuiya')" class="px-6 py-4 font-semibold cursor-pointer select-none">Jumuiya</th>
+                                <th @click="sortBy('status')" class="px-6 py-4 font-semibold cursor-pointer select-none">Status</th>
                                 <th class="px-6 py-4 font-semibold">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody x-ref="tbody" class="divide-y divide-gray-200 dark:divide-gray-700">
                             @foreach($members as $member)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 {{ $member->status === 'inactive' ? 'opacity-60' : '' }}">
+                            <tr x-show="filtered.includes($el)" data-name="{{ strtolower($member->user->name ?? '') }}" data-jumuiya="{{ strtolower($member->jumuiya->name ?? '') }}" data-status="{{ strtolower($member->status ?? '') }}" class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 {{ $member->status === 'inactive' ? 'opacity-60' : '' }}">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center">
                                         @php
