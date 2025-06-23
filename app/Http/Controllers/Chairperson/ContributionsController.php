@@ -39,7 +39,7 @@ class ContributionsController extends Controller
                 'total_amount' => Contribution::where('jumuiya_id', $jumuiyaId)->sum('amount'),
                 'total_contributions' => Contribution::where('jumuiya_id', $jumuiyaId)->count(),
                 'pending_contributions' => Contribution::where('jumuiya_id', $jumuiyaId)
-                    ->where('status', 'pending')
+                   
                     ->count()
             ];
         });
@@ -124,7 +124,13 @@ class ContributionsController extends Controller
             ->with('user')
             ->get();
 
-        return view('chairperson.contributions.edit', compact('contribution', 'members'));
+        // Fetch all contributions for this member for cashbook ledger
+        $cashbook = Contribution::where('member_id', $contribution->member_id)
+            ->orderBy('contribution_date')
+            ->get();
+
+        // Do not allow editing of the contribution itself
+        return view('chairperson.contributions.edit', compact('contribution', 'members', 'cashbook'));
     }
 
     public function update(Request $request, Contribution $contribution)

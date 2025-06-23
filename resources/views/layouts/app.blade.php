@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ darkMode: false }" :class="{ 'dark': darkMode }" class="h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="darkMode" x-init="init()" :class="{ 'dark': darkMode }" class="h-full">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +8,8 @@
 
     <!-- <title>Jumuiya Kiganjani - {{ $title ?? 'Community Management' }}</title> -->
 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
 
@@ -49,9 +51,16 @@
         <!-- Role-based Navigation (fixed at top) -->
         <div class="fixed w-full z-30 top-0 left-0">
             @auth
-               
-                    @include('super_admin.partials.navigation', ['showDarkModeToggle' => true])
-
+                @php $role = Auth::user()->role ?? null; @endphp
+                @if ($role === 'admin')
+                    @include('admin.partials.navigation')
+                @elseif ($role === 'member')
+                    @include('member.partials.navigation')
+                @elseif ($role === 'chairperson')
+                    @include('layouts.navigation.chairperson')
+                @elseif ($role === 'super_admin')
+                    @include('super_admin.partials.navigation')
+                @endif
             @endauth
         </div>
         <!-- Add top padding to main content to prevent overlap with fixed navbar -->

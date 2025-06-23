@@ -1,92 +1,44 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="py-6">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white shadow-sm sm:rounded-lg">
-            <div class="p-6 bg-white border-b border-gray-200">
-                @if(session('success'))
-                <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                    {{ session('success') }}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-blue-900 dark:via-gray-800 dark:to-blue-900 py-12">
+    <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-2xl rounded-2xl border border-blue-200/50 dark:border-blue-900/50 p-8">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-3xl font-bold text-blue-700 dark:text-blue-300">Resource Details</h2>
+                <div class="space-x-4">
+                    <a href="{{ route('admin.resources.edit', $resource->id) }}" class="inline-flex items-center px-4 py-2 rounded-xl shadow font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                        Edit Resource
+                    </a>
+                    <a href="{{ route('admin.resources.index') }}" class="inline-flex items-center px-4 py-2 rounded-xl shadow font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-all">
+                        Back to List
+                    </a>
                 </div>
-                @endif
-
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-semibold">Resource Details</h2>
-                    <div class="space-x-4">
-                        <a href="{{ route('admin.resources.edit', $resource) }}" 
-                           class="btn-primary inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
-                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Edit Resource
-                        </a>
-                        <a href="{{ route('admin.resources.index') }}" 
-                           class="btn-secondary inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50">
-                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                            Back to List
-                        </a>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-medium mb-4">Resource Information</h3>
-                        <dl class="space-y-4">
-                            <div>
-                                <dt class="text-sm font-medium text-gray-500">Title</dt>
-                                <dd class="mt-1 text-gray-900">{{ $resource->title }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-sm font-medium text-gray-500">Type</dt>
-                                <dd class="mt-1 text-gray-900 capitalize">{{ $resource->type }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-sm font-medium text-gray-500">Upload Date</dt>
-                                <dd class="mt-1 text-gray-900">{{ $resource->created_at->format('M d, Y H:i') }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-sm font-medium text-gray-500">Downloads</dt>
-                                <dd class="mt-1 text-gray-900">{{ $resource->download_count ?? 0 }}</dd>
-                            </div>
-                        </dl>
-                    </div>
-
-                    <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-medium mb-4">File Details</h3>
-                        <dl class="space-y-4">
-                            <div>
-                                <dt class="text-sm font-medium text-gray-500">File Name</dt>
-                                <dd class="mt-1 text-gray-900">{{ $resource->original_filename }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-sm font-medium text-gray-500">File Type</dt>
-                                <dd class="mt-1 text-gray-900 uppercase">{{ $resource->file_extension }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-sm font-medium text-gray-500">File Size</dt>
-                                <dd class="mt-1 text-gray-900">{{ $resource->file_size }} KB</dd>
-                            </div>
-                            <div>
-                                <a href="{{ route('admin.resources.download', $resource) }}" 
-                                   class="btn-primary inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700">
-                                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                    </svg>
-                                    Download File
-                                </a>
-                            </div>
-                        </dl>
-                    </div>
-
-                    @if($resource->description)
-                    <div class="md:col-span-2 bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-medium mb-4">Description</h3>
-                        <p class="text-gray-700 whitespace-pre-line">{{ $resource->description }}</p>
-                    </div>
-                    @endif
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Resource Information -->
+                <div class="bg-white/70 dark:bg-gray-700/70 rounded-xl shadow p-6 border border-blue-100 dark:border-blue-900/30">
+                    <h3 class="text-lg font-semibold text-blue-700 dark:text-blue-300 mb-4">Resource Information</h3>
+                    <dl class="space-y-4">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Title</dt>
+                            <dd class="mt-1 text-gray-900 dark:text-gray-100 font-semibold">{{ $resource->title }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Description</dt>
+                            <dd class="mt-1 text-gray-900 dark:text-gray-100 font-semibold">{{ $resource->description }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">File</dt>
+                            <dd class="mt-1 text-blue-700 dark:text-blue-300 font-semibold">
+                                @if($resource->file)
+                                    <a href="{{ asset('storage/' . $resource->file) }}" target="_blank" class="underline">View File</a>
+                                @else
+                                    -
+                                @endif
+                            </dd>
+                        </div>
+                    </dl>
                 </div>
             </div>
         </div>

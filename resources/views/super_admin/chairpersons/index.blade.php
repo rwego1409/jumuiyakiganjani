@@ -1,17 +1,17 @@
 @extends('layouts.super_admin')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
-    <div class="container mx-auto px-4 py-8">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 px-2 sm:px-4 py-4 sm:py-8">
+    <div class="container mx-auto px-0 sm:px-4 py-4 sm:py-8">
         <!-- Header Section -->
-        <div class="mb-8">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="mb-4 sm:mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Chairpersons</h1>
-                    <p class="text-gray-600">Manage and view all chairperson records</p>
+                    <h1 class="text-xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">Chairpersons</h1>
+                    <p class="text-xs sm:text-base text-gray-600">Manage and view all chairperson records</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div class="hidden sm:flex items-center text-sm text-gray-500 bg-white px-3 py-2 rounded-lg shadow-sm">
+                <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
+                    <div class="hidden sm:flex items-center text-xs sm:text-sm text-gray-500 bg-white px-3 py-2 rounded-lg shadow-sm">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                         </svg>
@@ -22,7 +22,7 @@
                         @endif
                     </div>
                     <a href="{{ route('super_admin.chairpersons.create') }}" 
-                       class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5">
+                       class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5 w-full sm:w-auto">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>

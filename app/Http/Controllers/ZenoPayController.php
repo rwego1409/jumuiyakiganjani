@@ -21,13 +21,17 @@ class ZenoPayController extends Controller
             'phone' => ['required', 'regex:/^255\d{9}$/'],
             'amount' => 'required|numeric|min:1000',
             'reference' => 'required|string|max:255',
+            'buyer_email' => 'nullable|email',
+            'buyer_name' => 'nullable|string|max:255',
         ]);
         $webhookUrl = route('zenopay.webhook');
         $response = $this->zenoPayService->initiatePayment(
             $validated['phone'],
             $validated['amount'],
             $validated['reference'],
-            $webhookUrl
+            $webhookUrl,
+            $validated['buyer_email'] ?? null,
+            $validated['buyer_name'] ?? null
         );
         return response()->json($response);
     }
@@ -46,5 +50,19 @@ class ZenoPayController extends Controller
                 'message' => $e->getMessage(),
             ], 422);
         }
+    }
+
+    public function webhook(Request $request)
+    {
+        $payload = $request->getContent();
+        $apiKey = $request->header('x-api-key');
+        if ($apiKey !== config('services.zenopay.api_key')) {
+            	\Log::warning('ZenoPay Webhook: Invalid API key', ['received' => $apiKey]);
+            return response('Invalid API key', 403);
+        }
+        // Log the raw payload
+        \Log::info('ZenoPay Webhook Payload', ['payload' => $payload]);
+        // Optionally, process the payload (update DB, send email, etc.)
+        return response('OK', 200);
     }
 }

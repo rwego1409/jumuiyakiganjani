@@ -16,18 +16,18 @@ class ZenoPayService
         $this->baseUrl = config('services.zenopay.base_url', 'https://zenoapi.com/api/payments');
     }
 
-    public function initiatePayment($phone, $amount, $reference, $webhookUrl = null)
+    public function initiatePayment($phone, $amount, $reference, $webhookUrl = null, $buyerEmail = null, $buyerName = null)
     {
         $orderData = [
             'order_id'    => $reference,
-            'buyer_email' => auth()->user()->email ?? 'customer@example.com',
-            'buyer_name'  => auth()->user()->name ?? 'Member',
+            'buyer_email' => $buyerEmail ?? (auth()->user()->email ?? 'customer@example.com'),
+            'buyer_name'  => $buyerName ?? (auth()->user()->name ?? 'Member'),
             'buyer_phone' => $phone,
             'amount'      => $amount,
             'webhook_url' => $webhookUrl ?? route('zenopay.webhook'),
         ];
 
-        $ch = curl_init($this->baseUrl . '/mobile_money_tanzania');
+        $ch = curl_init(rtrim($this->baseUrl, '/') . '/mobile_money_tanzania');
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST           => true,
@@ -57,7 +57,7 @@ class ZenoPayService
 
     public function checkStatus($orderId)
     {
-        $url = $this->baseUrl . '/order-status?order_id=' . urlencode($orderId);
+        $url = rtrim($this->baseUrl, '/') . '/order-status?order_id=' . urlencode($orderId);
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
@@ -67,13 +67,22 @@ class ZenoPayService
         ]);
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
         curl_close($ch);
-        if ($httpCode !== 200) {
+        if ($response === false || $httpCode !== 200) {
             return [
                 'status' => 'error',
-                'message' => $response,
+                'message' => $error ?: $response,
             ];
         }
-        return json_decode($response, true);
+        $responseData = json_decode($response, true);
+        if (!empty($responseData['data']) && ($responseData['result'] ?? '') === 'SUCCESS') {
+            return $responseData;
+        } else {
+            return [
+                'status' => 'error',
+                'message' => $responseData['message'] ?? 'Unknown error',
+            ];
+        }
     }
 }

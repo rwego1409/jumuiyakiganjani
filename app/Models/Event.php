@@ -13,11 +13,11 @@ class Event extends Model
         'end_time' => 'datetime',
     ];
 
-    protected $fillable = ['jumuiya_id', 'title', 'description', 'start_time', 'end_time', 'location', 'status'];
+    protected $fillable = ['title', 'description', 'start_time', 'end_time', 'location', 'status'];
 
-    public function jumuiya()
+    public function jumuiyas()
     {
-        return $this->belongsTo(Jumuiya::class);
+        return $this->belongsToMany(Jumuiya::class, 'event_jumuiya');
     }
 
     public function scopeUpcoming($query)
@@ -44,5 +44,10 @@ public function attendees()
     return $this->belongsToMany(User::class, 'event_attendees')
         ->withPivot('created_at')
         ->withTimestamps();
+}
+
+public function creator()
+{
+    return $this->belongsTo(User::class, 'created_by');
 }
 }

@@ -1,0 +1,40 @@
+Additional files to delete for full payment removal:
+
+Requests:
+- app/Http/Requests/PaymentRequest.php
+- app/Http/Requests/PalmPesaPaymentRequest.php
+
+Services:
+- app/Services/PaymentService.php
+
+Notifications:
+- app/Notifications/PaymentSuccessNotification.php
+- app/Notifications/PaymentReminder.php
+
+Models:
+- app/Models/Payment.php
+- app/Models/MobilePayment.php
+- app/Models/PaymentLog.php
+
+Events:
+- app/Events/PaymentProcessed.php
+
+Console/Commands:
+- app/Console/Commands/SendPaymentReminders.php
+
+Views:
+- resources/views/member/payment-success.blade.php
+- resources/views/components/payment-modal.blade.php
+
+Migrations:
+- database/migrations/2025_04_07_150351_create_payments_table.php
+- database/migrations/2025_05_23_190250_add_contact_fields_to_payments_table.php
+- database/migrations/2025_05_22_083324_create_payment_logs_table.php
+- database/migrations/2025_05_21_191046_create_mobile_payments_table.php
+- database/migrations/2025_04_07_212255_add_member_id_to_payments_table.php
+
+Configs:
+- config/mpesa.php
+- config/palmpesa.php
+
+This, together with TO_DELETE.txt, covers all payment-related code and config for removal.

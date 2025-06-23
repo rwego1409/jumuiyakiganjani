@@ -20,15 +20,29 @@ class ResourceController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Resource::whereNotNull('file_path');
-    
+        $user = auth()->user();
+        $query = Resource::query();
+
+        // Only show resources for the member's jumuiya or created by admin
+        if ($user->hasRole('member')) {
+            $member = $user->member;
+            if ($member && $member->jumuiya_id) {
+                $query->where(function($q) use ($member) {
+                    $q->where('jumuiya_id', $member->jumuiya_id)
+                      ->orWhereHas('creator', function($q2) {
+                          $q2->where('role', 'admin');
+                      });
+                });
+            }
+        }
+
         // Filter by type if provided and not 'all'
         if ($request->filled('type') && $request->type !== 'all') {
             $query->where('type', $request->type);
         }
-    
+
         $resources = $query->latest()->paginate(10);
-    
+
         return view('member.resources.index', compact('resources'));
     }
     

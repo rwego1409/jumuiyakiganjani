@@ -1,167 +1,409 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="py-8">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-            <div class="p-6">
-                <!-- Header Section with improved spacing and alignment -->
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-                    <div class="flex items-center mb-6 sm:mb-0">
-                        <svg class="h-8 w-8 text-primary-600 dark:text-primary-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Members Management</h2>
-                    </div>
-
-                    <a href="{{ route('admin.members.create') }}" 
-                       class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-200">
-                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        Add New Member
-                    </a>
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-blue-900 dark:via-gray-800 dark:to-blue-900">
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <!-- Header Section -->
+        <div class="mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                <div>
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent drop-shadow-lg md:text-5xl lg:text-6xl">
+                        <span class="inline-block align-middle">
+                            <svg class="w-10 h-10 mr-2 inline-block text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m13-6.13V7a4 4 0 00-3-3.87M6 4.13A4 4 0 019 4h6a4 4 0 013 3.87v2.13M12 14v6m0 0a2 2 0 01-2-2h4a2 2 0 01-2 2z"/>
+                            </svg>
+                        </span>
+                        Members
+                    </h1>
+                    <p class="mt-2 text-blue-700 dark:text-blue-200 text-lg font-semibold md:text-xl lg:text-2xl">
+                        Manage and oversee all member accounts
+                    </p>
                 </div>
+                <a href="{{ route('admin.members.create') }}"
+                   class="group relative inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 ease-out">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                    <svg class="relative w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span class="relative">Add Member</span>
+                </a>
+            </div>
+        </div>
 
-                <!-- Import Form with improved styling -->
-                <form action="{{ route('admin.members.import') }}" method="POST" enctype="multipart/form-data" class="mb-8">
-                    @csrf
-                    <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Import Members</h3>
-                        
-                        <div class="flex flex-col md:flex-row gap-4 items-end">
-                            <div class="flex-grow">
-                                <label for="file" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Choose a File (CSV/Excel)</label>
-                                <input type="file" name="file" id="file" 
-                                    class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-600 dark:text-white dark:border-gray-500 dark:focus:ring-primary-400 dark:focus:border-primary-400 py-2 px-3" 
-                                    required>
-                                <x-input-error :messages="$errors->get('file')" class="mt-2 text-sm text-red-600" />
-                            </div>
-                            
-                            <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+        <!-- Success Message -->
+        @if (session('success'))
+        <div class="mb-6 p-4 bg-green-100 rounded-lg border border-green-200 text-green-800">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2l4 -4m2 10a9 9 0 11-18 0a9 9 0 0118 0z" />
+                </svg>
+                <span class="font-medium">{{ session('success') }}</span>
+            </div>
+        </div>
+        @endif
+
+        <!-- Import Form -->
+        <form action="{{ route('admin.members.import') }}" method="POST" enctype="multipart/form-data" class="mb-8">
+            @csrf
+            <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Import Members</h3>
+                
+                <div class="flex flex-col md:flex-row gap-4 items-end">
+                    <div class="flex-grow">
+                        <label for="file" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Choose a File (CSV/Excel)</label>
+                        <input type="file" name="file" id="file" 
+                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-600 dark:text-white dark:border-gray-500 dark:focus:ring-primary-400 dark:focus:border-primary-400 py-2 px-3" 
+                            required>
+                        <x-input-error :messages="$errors->get('file')" class="mt-2 text-sm text-red-600" />
+                    </div>
+                    
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        Import Members
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Data Table Container -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <!-- Table Controls -->
+            <div class="p-4 border-b border-gray-200/50 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-700/30">
+                <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                    <!-- Search and Filters -->
+                    <div class="flex flex-col sm:flex-row gap-3 flex-1 w-full">
+                        <!-- Global Search -->
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
-                                Import Members
-                            </button>
+                            </div>
+                            <input type="text" 
+                                   id="members-search" 
+                                   class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white/80 dark:bg-gray-700/80 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                                   placeholder="Search members...">
+                        </div>
+
+                        <!-- Status Filter -->
+                        <div class="relative">
+                            <select id="status-filter" 
+                                    class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white/80 dark:bg-gray-700/80 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300">
+                                <option value="">All Statuses</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+
+                        <!-- Jumuiya Filter -->
+                        <div class="relative">
+                            <select id="jumuiya-filter" 
+                                    class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white/80 dark:bg-gray-700/80 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300">
+                                <option value="">All Jumuiyas</option>
+                                @foreach($jumuiyas as $jumuiya)
+                                    <option value="{{ $jumuiya->name }}">{{ $jumuiya->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                </form> 
+                </div>
 
-                <!-- Data Table with improved styling -->
-                <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                    <table id="members-table" class="stripe hover display nowrap w-full text-sm text-left">
-                        <thead class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                            <tr>
-                                <th class="px-6 py-4 font-semibold">Member Info</th>
-                                <th class="px-6 py-4 font-semibold">Jumuiya</th>
-                                <th class="px-6 py-4 font-semibold">Status</th>
-                                <th class="px-6 py-4 font-semibold">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                            @foreach($members as $member)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 {{ $member->status === 'inactive' ? 'opacity-60' : '' }}">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        @php
-                                            $user = $member->user;
-                                            $initials = collect(explode(' ', $user->name))->map(fn($n) => strtoupper($n[0]))->implode('');
-                                        @endphp
+                <!-- Active Filters Display -->
+                <div id="active-filters" class="mt-3 flex flex-wrap gap-2 hidden">
+                    <span class="text-sm text-gray-600 dark:text-gray-400 mr-2">Active filters:</span>
+                </div>
+            </div>
 
-                                        @if ($user->profile_photo_path)
-                                            <img class="h-10 w-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}">
-                                        @else
-                                            <div class="h-10 w-10 flex items-center justify-center rounded-full bg-primary-600 text-white font-bold">
-                                                {{ $initials }}
-                                            </div>
-                                        @endif
+            <!-- Data Table -->
+            <div class="overflow-x-auto">
+                <table id="members-table" class="min-w-full">
+                    <thead>
+                        <tr class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Member Info</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Jumuiya</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach($members as $member)
+                        <tr class="{{ $member->status === 'inactive' ? 'opacity-60' : '' }} hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+                            data-status="{{ $member->status }}"
+                            data-jumuiya="{{ $member->jumuiya->name }}"
+                            data-search="{{ strtolower($member->user->name . ' ' . $member->user->email) }}">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    @php
+                                        $user = $member->user;
+                                        $initials = collect(explode(' ', $user->name))->map(fn($n) => strtoupper($n[0]))->implode('');
+                                    @endphp
 
-                                        <div class="ml-4">
-                                            <div class="font-medium text-gray-900 dark:text-white">{{ $member->user->name }}</div>
-                                            <div class="text-gray-500 dark:text-gray-400 text-sm">{{ $member->user->email }}</div>
+                                    @if ($user->profile_photo_path)
+                                        <img class="h-10 w-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}">
+                                    @else
+                                        <div class="h-10 w-10 flex items-center justify-center rounded-full bg-primary-600 text-white font-bold">
+                                            {{ $initials }}
                                         </div>
+                                    @endif
+
+                                    <div class="ml-4">
+                                        <div class="font-medium text-gray-900 dark:text-white">{{ $member->user->name }}</div>
+                                        <div class="text-gray-500 dark:text-gray-400 text-sm">{{ $member->user->email }}</div>
                                     </div>
-                                </td>
-                                <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
-                                    <span class="px-3 py-1 bg-gray-100 dark:bg-gray-600 rounded-full text-sm">
-                                        {{ $member->jumuiya->name }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                        {{ $member->status === 'active' 
-                                            ? 'bg-green-100 text-green-800 dark:bg-green-200 dark:text-green-900' 
-                                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-200 dark:text-yellow-900' }}">
-                                        {{ ucfirst($member->status) }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex space-x-4">
-                                        <a href="{{ route('admin.members.edit', $member->id) }}" class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 flex items-center transition duration-200">
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 py-1 bg-gray-100 dark:bg-gray-600 rounded-full text-sm">
+                                    {{ $member->jumuiya->name }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {{ $member->status === 'active' 
+                                        ? 'bg-green-100 text-green-800 dark:bg-green-200 dark:text-green-900' 
+                                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-200 dark:text-yellow-900' }}">
+                                {{ ucfirst($member->status) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex space-x-4">
+                                    <a href="{{ route('admin.members.edit', $member->id) }}" class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 flex items-center transition duration-200">
+                                        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Edit
+                                    </a>
+                                    <form action="{{ route('admin.members.destroy', $member->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this member?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 flex items-center transition duration-200">
                                             <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
-                                            Edit
-                                        </a>
-                                        <form action="{{ route('admin.members.destroy', $member->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this member?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 flex items-center transition duration-200">
-                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table Footer -->
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200/50 dark:border-gray-700/50">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                        Showing <span id="showing-start">1</span> to <span id="showing-end">{{ min(10, $members->count()) }}</span> of <span id="total-records">{{ $members->count() }}</span> members
+                    </div>
+                    
+                    <div class="flex items-center space-x-2" id="pagination-controls">
+                        <button id="prev-page" class="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            Previous
+                        </button>
+                        <div id="page-numbers" class="flex items-center space-x-1"></div>
+                        <button id="next-page" class="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Next
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-@endsection
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white/20 dark:border-gray-700/50">
+        <div class="flex items-center space-x-3">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span class="text-gray-700 dark:text-gray-300 font-medium">Loading members...</span>
+        </div>
+    </div>
+</div>
 
 @push('scripts')
 <script>
-    $(document).ready(function () {
-        $('#members-table').DataTable({
-            pageLength: 10,
-            lengthMenu: [5, 10, 25, 50],
-            searching: true,
-            ordering: true,
-            info: true,
-            responsive: true,
-            language: {
-                search: "Search members:",
-                lengthMenu: "Show _MENU_ entries",
-                info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                paginate: {
-                    previous: "← Prev",
-                    next: "Next →"
-                }
-            },
-            // Custom styling for DataTables
-            initComplete: function() {
-                // Style the search input and selects
-                $('.dataTables_filter input').addClass('rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50');
-                $('.dataTables_length select').addClass('rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50');
-                
-                // Add spacing to controls
-                $('.dataTables_length, .dataTables_filter').addClass('mb-4');
-                $('.dataTables_info, .dataTables_paginate').addClass('mt-4 mb-2');
-                
-                // Style pagination buttons
-                $('.paginate_button').addClass('px-3 py-1 rounded-md mx-1 focus:outline-none');
-                $('.paginate_button.current').addClass('bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300');
-                $('.paginate_button:not(.current)').addClass('text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700');
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DataTable with custom configuration
+    const table = $('#members-table').DataTable({
+        paging: true,
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50, 100],
+        lengthChange: true,
+        searching: true,
+        ordering: true,
+        info: false,
+        autoWidth: false,
+        responsive: true,
+        dom: 'lrt<"flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4"ip>',
+        language: {
+            search: "",
+            searchPlaceholder: "Search members...",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: "←",
+                next: "→"
             }
-        });
+        },
+        initComplete: function() {
+            // Style the search input
+            $('.dataTables_filter input').addClass(
+                'block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white/80 dark:bg-gray-700/80 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300'
+            );
+            // Style the length select
+            $('.dataTables_length select').addClass(
+                'block w-24 pl-3 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white/80 dark:bg-gray-700/80 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300'
+            );
+            // Move search input to our custom search box
+            $('.dataTables_filter').appendTo('#members-search').parent().removeClass('hidden');
+            $('.dataTables_filter input').attr('id', 'datatable-search');
+            // Move length menu to top right
+            $('.dataTables_length').appendTo('.dataTables_length').parent().removeClass('hidden');
+            // Update counters on initialization
+            updateTableCounters();
+        },
+        drawCallback: function() {
+            updateTableCounters();
+        }
     });
+
+    // Custom search implementation
+    $('#members-search').on('keyup', function() {
+        table.search(this.value).draw();
+        updateActiveFilters();
+    });
+
+    // Status filter
+    $('#status-filter').on('change', function() {
+        const value = $(this).val();
+        if (value) {
+            table.column(2).search(value, true, false).draw();
+        } else {
+            table.column(2).search('').draw();
+        }
+        updateActiveFilters();
+    });
+
+    // Jumuiya filter
+    $('#jumuiya-filter').on('change', function() {
+        const value = $(this).val();
+        if (value) {
+            table.column(1).search(value, true, false).draw();
+        } else {
+            table.column(1).search('').draw();
+        }
+        updateActiveFilters();
+    });
+
+    // Clear all filters
+    $('#clear-filters').on('click', function() {
+        $('#members-search').val('');
+        $('#status-filter').val('');
+        $('#jumuiya-filter').val('');
+        table.search('').columns().search('').draw();
+        updateActiveFilters();
+    });
+
+    // Export button
+    $('#export-btn').on('click', function() {
+        // Implement export functionality here
+        // Could use DataTables Buttons extension or custom solution
+        alert('Export functionality would be implemented here');
+    });
+
+    // Update table counters
+    function updateTableCounters() {
+        const info = table.page.info();
+        $('#showing-start').text(info.start + 1);
+        $('#showing-end').text(info.end);
+        $('#total-records').text(info.recordsTotal);
+    }
+
+    // Update active filters display
+    function updateActiveFilters() {
+        const filters = [];
+        const searchValue = $('#members-search').val();
+        const statusValue = $('#status-filter').val();
+        const jumuiyaValue = $('#jumuiya-filter').val();
+
+        if (searchValue) {
+            filters.push(`Search: "${searchValue}"`);
+        }
+
+        if (statusValue) {
+            filters.push(`Status: ${statusValue.charAt(0).toUpperCase() + statusValue.slice(1)}`);
+        }
+
+        if (jumuiyaValue) {
+            filters.push(`Jumuiya: ${jumuiyaValue}`);
+        }
+
+        const activeFiltersContainer = $('#active-filters');
+        if (filters.length > 0) {
+            activeFiltersContainer.empty().append(
+                '<span class="text-sm text-gray-600 dark:text-gray-400 mr-2">Active filters:</span>'
+            );
+            
+            filters.forEach(filter => {
+                activeFiltersContainer.append(
+                    `<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 mr-2 mb-2">
+                        ${filter}
+                        <button class="ml-1 hover:text-blue-900 dark:hover:text-blue-100" onclick="removeFilter('${filter}')">×</button>
+                    </span>`
+                );
+            });
+            
+            activeFiltersContainer.removeClass('hidden');
+        } else {
+            activeFiltersContainer.addClass('hidden');
+        }
+    }
+
+    // Remove specific filter
+    window.removeFilter = function(filterText) {
+        if (filterText.startsWith('Search:')) {
+            $('#members-search').val('').trigger('keyup');
+        } else if (filterText.startsWith('Status:')) {
+            $('#status-filter').val('').trigger('change');
+        } else if (filterText.startsWith('Jumuiya:')) {
+            $('#jumuiya-filter').val('').trigger('change');
+        }
+    };
+
+    // Custom pagination controls
+    $('#prev-page').on('click', function() {
+        table.page('previous').draw('page');
+    });
+
+    $('#next-page').on('click', function() {
+        table.page('next').draw('page');
+    });
+
+    // Disable/enable pagination buttons based on current page
+    table.on('draw', function() {
+        const info = table.page.info();
+        $('#prev-page').prop('disabled', info.page === 0);
+        $('#next-page').prop('disabled', info.page + 1 === info.pages);
+        
+        // Generate page numbers
+        const pageNumbers = $('#page-numbers');
+        pageNumbers.empty();
+        
+        const startPage = Math.max(0, info.page - 2);
+        const endPage = Math.min(info.pages - 1, startPage + 4);
+        
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = $(`<button class="px-3 py-1.5 rounded-lg mx-1 ${info.page === i ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'}">${i + 1}</button>`);
+            pageBtn.on('click', function() {
+                table.page(i).draw('page');
+            });
+            pageNumbers.append(pageBtn);
+        }
+    });
+});
 </script>
 @endpush

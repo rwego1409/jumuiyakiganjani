@@ -19,36 +19,7 @@ class PaymentRequest extends FormRequest
                 'string',
                 'regex:/^255\d{9}$/'
             ],
-            'amount' => [
-                'required',
-                'numeric',
-                'min:1000',
-                'max:3000000'
-            ],
-            'payment_method' => [
-                'required',
-                'in:mtn,airtel,tigo,vodacom'
-            ],
-            'name' => [
-                'required',
-                'string',
-                'max:255'
-            ],
-            'email' => [
-                'nullable',
-                'email',
-                'max:255'
-            ]
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'phone.regex' => 'Phone number must be in format 255XXXXXXXXX',
-            'amount.min' => 'Minimum contribution is 1,000 TZS',
-            'amount.max' => 'Maximum contribution is 3,000,000 TZS',
-            'payment_method.in' => 'Invalid payment method selected'
+            // ...other rules...
         ];
     }
 }

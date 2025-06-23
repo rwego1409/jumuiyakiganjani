@@ -1,14 +1,18 @@
 @extends('layouts.chairperson')
 
 @section('content')
-<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 py-6">
-    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Notifications</h2>
-                <a href="{{ route('chairperson.notifications.create') }}" 
-                   class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors duration-200">
-                    Create Notification
+<div class="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-100 dark:from-pink-900 dark:via-gray-800 dark:to-purple-900 py-8 sm:py-12">
+    <div class="max-w-6xl mx-auto px-2 sm:px-4 lg:px-8">
+        <div class="bg-white/80 dark:bg-purple-900/80 backdrop-blur-md shadow-2xl rounded-2xl border border-pink-200/60 dark:border-purple-700/60 p-4 sm:p-8">
+            <div class="mb-6 flex flex-col sm:flex-row items-center gap-2 sm:gap-3 justify-between">
+                <h2 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent drop-shadow-lg text-center sm:text-left w-full">
+                    <svg class="w-8 h-8 text-pink-500 dark:text-pink-300 inline-block mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    Notifications
+                </h2>
+                <a href="{{ route('chairperson.notifications.create') }}" class="mt-2 sm:mt-0 inline-flex items-center px-4 py-2 bg-red-100 text-red-700 border border-red-200 rounded-xl font-semibold text-xs sm:text-sm uppercase tracking-widest shadow hover:bg-red-200 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                    <i class="fas fa-plus mr-2 text-red-500"></i> {{ __('Add Notification') }}
                 </a>
             </div>
 
@@ -18,46 +22,76 @@
             </div>
             @endif
 
-            <div class="space-y-4">
-                @forelse($notifications as $notification)
-                    <div class="p-4 bg-white dark:bg-gray-700 rounded-lg shadow border border-gray-200 dark:border-gray-600">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                                        {{ $notification->data['title'] ?? 'Notification' }}
-                                    </h3>
-                                    <span class="px-2 py-0.5 text-xs rounded-full {{ $notification->type === 'sent' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
-                                        {{ $notification->type === 'sent' ? 'Sent' : 'Received' }}
-                                    </span>
-                                </div>
-                                <p class="mt-1 text-gray-600 dark:text-gray-300">
-                                    {{ $notification->data['message'] ?? 'No message content' }}
-                                </p>
-                                <div class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400">
-                                    <span class="mr-3">{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</span>
-                                    <span class="mr-3">•</span>
-                                    <span class="capitalize">{{ $notification->data['type'] ?? 'general' }}</span>
-                                    @if(isset($notification->data['recipient_type']))
-                                        <span class="mr-3">•</span>
-                                        <span>
-                                            {{ $notification->data['recipient_type'] === 'all' ? 'All Members' : 
-                                               (isset($notification->data['member_ids']) ? count($notification->data['member_ids']) . ' Members' : '0 Members') }}
-                                        </span>
-                                    @endif
-                                </div>
-                            </div>
-                            <a href="{{ route('chairperson.notifications.show', $notification->id) }}"
-                               class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
-                                View Details →
-                            </a>
-                        </div>
-                    </div>
-                @empty
-                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-                        No notifications sent yet.
-                    </div>
-                @endforelse
+            <div class="overflow-x-auto rounded-lg">
+                <table class="min-w-full divide-y divide-pink-200 dark:divide-purple-700">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                {{ __('Title') }}
+                            </th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                {{ __('Message') }}
+                            </th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                {{ __('Type') }}
+                            </th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                {{ __('Recipients') }}
+                            </th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                {{ __('Date') }}
+                            </th>
+                            <th class="px-4 py-2"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-pink-200 dark:divide-purple-700">
+                        @forelse($notifications as $notification)
+                        <tr>
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">
+                                {{ $notification->data['title'] ?? 'Notification' }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">
+                                {{ $notification->data['message'] ?? 'No message content' }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">
+                                <span class="px-2 py-0.5 text-xs rounded-full {{ $notification->type === 'sent' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
+                                    {{ $notification->type === 'sent' ? 'Sent' : 'Received' }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">
+                                @if(isset($notification->data['recipient_type']))
+                                    {{ $notification->data['recipient_type'] === 'all' ? 'All Members' : 
+                                       (isset($notification->data['member_ids']) ? count($notification->data['member_ids']) . ' Members' : '0 Members') }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">
+                                {{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}
+                            </td>
+                            <td class="px-4 py-3 text-sm">
+                                <a href="{{ route('chairperson.notifications.show', $notification->id) }}" class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
+                                    <i class="fas fa-eye text-red-500"></i>
+                                </a>
+                                <a href="{{ route('chairperson.notifications.edit', $notification->id) }}" class="bg-red-100 text-red-700 hover:bg-red-200 hover:text-red-900 px-3 py-1 rounded font-semibold shadow focus:outline-none focus:ring-2 focus:ring-red-400 transition mr-2">
+                                    <i class="fas fa-edit text-red-500"></i>
+                                </a>
+                                <form action="{{ route('chairperson.notifications.destroy', $notification->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this notification?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="bg-red-100 text-red-700 hover:bg-red-200 hover:text-red-900 px-3 py-1 rounded font-semibold shadow focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                                        <i class="fas fa-trash text-red-500"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-gray-500 dark:text-gray-400">
+                                No notifications sent yet.
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
 
             <div class="mt-6">

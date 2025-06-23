@@ -22,7 +22,8 @@ class MembersController extends Controller
             ->whereHas('user')
             ->whereHas('jumuiya')
             ->get();
-        return view('admin.members.index', compact('members'));
+        $jumuiyas = Jumuiya::all(); // Add this line
+        return view('admin.members.index', compact('members', 'jumuiyas'));
     }
 
     public function create()
@@ -115,6 +116,7 @@ class MembersController extends Controller
             'email' => $request->email,
             'dob' => $request->dob,
             'gender' => $request->gender,
+            'role' => $request->role ?? $member->user->role,
         ]);
 
         // Update member details

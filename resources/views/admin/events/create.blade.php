@@ -74,16 +74,17 @@
 
                         <!-- Jumuiya Selection -->
                         <div class="md:col-span-2">
-                            <x-input-label for="jumuiya_id" :value="__('Jumuiya')" />
-                            <select id="jumuiya_id" name="jumuiya_id" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                <option value="">Select Jumuiya</option>
+                            <x-input-label for="jumuiya_ids" :value="__('Jumuiya(s)')" />
+                            <select id="jumuiya_ids" name="jumuiya_ids[]" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" multiple required>
+                                <option value="all" {{ (collect(old('jumuiya_ids'))->contains('all')) ? 'selected' : '' }}>All Jumuiyas</option>
                                 @foreach($jumuiyas as $jumuiya)
-                                    <option value="{{ $jumuiya->id }}" {{ old('jumuiya_id') == $jumuiya->id ? 'selected' : '' }}>
+                                    <option value="{{ $jumuiya->id }}" {{ (collect(old('jumuiya_ids'))->contains($jumuiya->id)) ? 'selected' : '' }}>
                                         {{ $jumuiya->name }}
                                     </option>
                                 @endforeach
                             </select>
-                            <x-input-error :messages="$errors->get('jumuiya_id')" class="mt-2" />
+                            <x-input-error :messages="$errors->get('jumuiya_ids')" class="mt-2" />
+                            <p class="text-xs text-gray-500 mt-1">Hold Ctrl (Windows) or Cmd (Mac) to select multiple. Select "All Jumuiyas" to target everyone.</p>
                         </div>
 
                         <!-- Description -->

@@ -56,10 +56,11 @@ return [
     ],
 
     'clickpesa' => [
-        'vendor_id' => env('CLICKPESA_VENDOR_ID'),
+        'client_id' => env('CLICKPESA_CLIENT_ID'),
         'api_key' => env('CLICKPESA_API_KEY'),
-        'api_secret' => env('CLICKPESA_API_SECRET'),
-        'base_url' => env('CLICKPESA_BASE_URL', 'https://api.selcommobile.com'),
+        'email' => env('CLICKPESA_EMAIL'),
+        'expire_date' => env('CLICKPESA_EXPIRE_DATE'),
+        'base_url' => env('CLICKPESA_BASE_URL', 'https://api.clickpesa.com'),
     ],
 
     'vodacom' => [

@@ -87,17 +87,15 @@ class MemberController extends Controller
     // Events
     public function indexEvents()
     {
-        // Fetch all events with related jumuiya, ordered by start_time descending, paginated
-        $events = Event::with('jumuiya')
-                    ->orderBy('start_time', 'desc')
-                    ->paginate(10);
+        // Fetch all events, ordered by start_time descending, paginated
+        $events = Event::orderBy('start_time', 'desc')->paginate(10);
 
         return view('member.events.index', compact('events'));
     }
 
     public function showEvent($event)
     {
-        $event = Event::with('jumuiya')->findOrFail($event); // Eager load jumuiya here too
+        $event = Event::findOrFail($event); // No eager load of jumuiya
         return view('member.events.show', compact('event'));
     }
 

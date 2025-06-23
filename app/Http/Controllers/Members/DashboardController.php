@@ -28,12 +28,8 @@ class DashboardController extends Controller
         $recentPayments = Payment::where('member_id', $member->id)->orderByDesc('created_at')->limit(5)->get();
         $recentContributions = $member->contributions()->latest()->limit(5)->get();
 
-        $events = Event::with('jumuiya')
-            ->where(function ($query) use ($member) {
-                $query->where('jumuiya_id', $member->jumuiya_id)
-                      ->orWhereNull('jumuiya_id');
-            })
-            ->where('start_time', '>=', now())
+        $events = Event::where('start_time', '>=', now())
+            ->where('jumuiya_id', $member->jumuiya_id)
             ->orderBy('start_time')
             ->get();
 
@@ -81,10 +77,12 @@ class DashboardController extends Controller
         $key = 'community_data_' . $user->id . '_' . $member->jumuiya_id;
 
         return Cache::remember($key, 3600, function () use ($member) {
+            // Only count members in the same jumuiya as the current member
+            $totalMembers = $member->jumuiya ? $member->jumuiya->members()->count() : 0;
             return [
-                'total_members' => Member::count(),
+                'total_members' => $totalMembers,
                 'total_jumuiyas' => Jumuiya::count(),
-                'total_community_contributions' => Contribution::sum('amount'),
+                'total_community_contributions' => Contribution::where('jumuiya_id', $member->jumuiya_id)->sum('amount'),
                 'jumuiya_rank' => $this->getJumuiyaRank($member),
             ];
         });
@@ -140,23 +138,18 @@ class DashboardController extends Controller
 
     private function getCalendarEvents($member)
     {
-        return Event::with('jumuiya')
-            ->where(function ($query) use ($member) {
-                $query->where('jumuiya_id', $member->jumuiya_id)
-                      ->orWhereNull('jumuiya_id');
-            })
-            ->get()
+        return Event::all()
             ->map(function ($event) {
                 return [
                     'title' => $event->title,
                     'start' => $event->start_time->toIso8601String(),
                     'end' => optional($event->end_time)->toIso8601String(),
-                    'color' => $event->jumuiya_id ? '#3B82F6' : '#10B981',
+                    'color' => '#3B82F6',
                     'url' => route('member.events.show', $event->id),
                     'extendedProps' => [
                         'description' => $event->description,
                         'location' => $event->location,
-                        'jumuiya' => $event->jumuiya?->name ?? 'Community'
+                        'jumuiya' => 'Your Jumuiya'
                     ]
                 ];
             });
@@ -167,5 +160,24 @@ class DashboardController extends Controller
         $member = Member::findOrFail($id);
         // Optional: Authorize access if needed
         return view('member.dashboard.show', compact('member'));
+    }
+
+    // Add this method to update the member's cashbook and trigger dashboard update after payment
+    public function updateCashbookAndDashboard($memberId)
+    {
+        // Update the member's cashbook (contributions)
+        $cashbook = Contribution::where('member_id', $memberId)
+            ->orderBy('contribution_date')
+            ->get();
+        // Optionally, you can broadcast an event or use Laravel Echo for real-time dashboard updates
+        // event(new \App\Events\MemberDashboardUpdated($memberId));
+        // For now, just return the latest cashbook and stats
+        $completedPayments = Payment::where('member_id', $memberId)->where('status', 'completed')->count();
+        $totalContributions = Contribution::where('member_id', $memberId)->sum('amount');
+        return [
+            'cashbook' => $cashbook,
+            'completed_payments' => $completedPayments,
+            'total_contributions' => $totalContributions,
+        ];
     }
 }

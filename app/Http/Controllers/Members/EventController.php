@@ -23,11 +23,23 @@ class EventController extends Controller
 
      public function index()
      {
-         // Ensure no filters are applied, and fetch all events
-         $events = Event::with('jumuiya')->latest()->paginate(10);  // Pagination enabled
-         // If you want all events without pagination, use ->get() instead
-         // $events = Event::with('jumuiya')->latest()->get();
-     
+         $user = auth()->user();
+         $query = Event::query();
+
+         // Only show events for the member's jumuiya or created by admin
+         if ($user->hasRole('member')) {
+             $member = $user->member;
+             if ($member && $member->jumuiya_id) {
+                 $query->where(function($q) use ($member) {
+                     $q->where('jumuiya_id', $member->jumuiya_id)
+                       ->orWhereHas('creator', function($q2) {
+                           $q2->where('role', 'admin');
+                       });
+                 });
+             }
+         }
+
+         $events = $query->with('jumuiya')->latest()->paginate(10);
          return view('member.events.index', compact('events'));
      }
      

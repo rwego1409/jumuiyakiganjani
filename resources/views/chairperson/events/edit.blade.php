@@ -1,19 +1,15 @@
 @extends('layouts.chairperson')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="mb-6">
-        <a href="{{ route('chairperson.events.index') }}" class="text-primary-500 hover:text-primary-700">
-            <i class="fas fa-arrow-left mr-2"></i>{{ __('Back to Events') }}
-        </a>
-    </div>
+<div class="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-100 dark:from-pink-900 dark:via-gray-800 dark:to-purple-900 py-12">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white/80 dark:bg-purple-900/80 backdrop-blur-md shadow-2xl rounded-2xl border border-pink-200/60 dark:border-purple-700/60 p-8">
+            <div class="mb-6 flex items-center gap-3">
+                <svg class="w-8 h-8 text-pink-500 dark:text-pink-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0 10c-4.418 0-8-1.79-8-4V7a2 2 0 012-2h12a2 2 0 012 2v7c0 2.21-3.582 4-8 4z"/></svg>
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent drop-shadow-lg">{{ __('Edit Event') }}</h2>
+            </div>
 
-    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-        <div class="p-6">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-                    {{ __('Edit Event') }}
-                </h2>
                 <!-- Status Badge -->
                 <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full
                     @if($event->status === 'upcoming') bg-blue-100 text-blue-800

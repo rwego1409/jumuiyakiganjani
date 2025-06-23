@@ -103,7 +103,7 @@ class DashboardController extends Controller
             'completedEvents',
             'totalResources',
             'totalEvents',
-        ));
+        ))->with('recentActivities', $activities);
     }
     
     private function calculateGrowthPercentage($model)

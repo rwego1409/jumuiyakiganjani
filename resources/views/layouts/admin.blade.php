@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ darkMode: false }" :class="{ 'dark': darkMode }">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ darkMode: (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) }" :class="{ 'dark': darkMode }" x-init="document.documentElement.classList.toggle('dark', darkMode)">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,6 +30,11 @@
                     this.darkMode = !this.darkMode;
                 }
             }));
+        });
+        // Ensure dark mode persists on refresh
+        document.addEventListener('DOMContentLoaded', function() {
+            const dark = localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('dark', dark);
         });
     </script>
 
@@ -81,29 +86,26 @@
 </head>
 <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
     <div class="min-h-screen">
-        @include('admin.partials.navigation', ['showDarkModeToggle' => true])
-
+        <div class="fixed w-full z-30 top-0 left-0">
+            @include('admin.partials.navigation', ['showDarkModeToggle' => true])
+        </div>
         <!-- Page Content -->
-        <main class="pt-2">
+        <main class="pt-16">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                
                 @if (session('success'))
                     <div class="mb-3 px-3 py-2 bg-green-100 border border-green-200 text-green-700 rounded text-sm">
                         {{ session('success') }}
                     </div>
                 @endif
-
                 @if (session('error'))
                     <div class="mb-3 px-3 py-2 bg-red-100 border border-red-200 text-red-700 rounded text-sm">
                         {{ session('error') }}
                     </div>
                 @endif
-
                 @yield('content')
             </div>
         </main>
     </div>
-
     @stack('scripts')
 </body>
 </html>

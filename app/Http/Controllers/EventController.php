@@ -39,7 +39,8 @@ class EventController extends Controller
             'date' => $request->date,
             'location' => $request->location,
             'description' => $request->description,
-            'status' => $request->status
+            'status' => $request->status,
+            'created_by' => auth()->id(),
         ]);
 
         return redirect()->route('admin.events.index')

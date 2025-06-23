@@ -20,9 +20,16 @@
 
             <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="<?php echo e(route('subscription.create')); ?>" 
+                   class="inline-flex items-center justify-center px-8 py-3 text-base font-medium rounded-lg text-white bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+                    <i class="fas fa-users-cog mr-2"></i> Get Started
+                    <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
                 <a href="<?php echo e(route('register')); ?>" 
                    class="inline-flex items-center justify-center px-8 py-3 text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-all duration-200 shadow-lg hover:shadow-xl">
-                    Get Started Free
+                    Register
                     <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>
@@ -298,7 +305,7 @@
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">John Doe</h3>
+                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Magdalena</h3>
                             <p class="text-xs text-gray-500 dark:text-gray-400">Community Member</p>
                         </div>
                     </div>
@@ -316,7 +323,7 @@
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Jane Smith</h3>
+                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Modimo Mendoza</h3>
                             <p class="text-xs text-gray-500 dark:text-gray-400">Group Leader</p>
                         </div>
                     </div>
@@ -334,7 +341,7 @@
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Mark Johnson</h3>
+                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Sarah Mwaifuge</h3>
                             <p class="text-xs text-gray-500 dark:text-gray-400">Administrator</p>
                         </div>
                     </div>
@@ -345,6 +352,53 @@
             </div>
         </div>
     </section>
+
+    <!-- Team Section -->
+    <section id="team-section" class="py-16 bg-white dark:bg-gray-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    Meet the Developers
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400">
+                    The team behind Jumuiya Kiganjani
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Ludovick Bakera -->
+                <div class="transition hover:scale-105 hover:shadow-lg bg-indigo-50 dark:bg-indigo-900/30 rounded-lg p-8 shadow-md text-center">
+                    <div class="flex items-center justify-center mb-4">
+                        <div class="h-14 w-14 rounded-full bg-indigo-200 dark:bg-indigo-800 flex items-center justify-center">
+                            <i class="fas fa-user-tie text-indigo-700 dark:text-indigo-300 text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Ludovick Bakera</h3>
+                    <p class="text-indigo-700 dark:text-indigo-300 font-medium mb-1">Full Stack Developer</p>
+                </div>
+                <!-- Dickson Boniphace -->
+                <div class="transition hover:scale-105 hover:shadow-lg bg-indigo-50 dark:bg-indigo-900/30 rounded-lg p-8 shadow-md text-center">
+                    <div class="flex items-center justify-center mb-4">
+                        <div class="h-14 w-14 rounded-full bg-indigo-200 dark:bg-indigo-800 flex items-center justify-center">
+                            <i class="fas fa-user-cog text-indigo-700 dark:text-indigo-300 text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Dickson Boniphace</h3>
+                    <p class="text-indigo-700 dark:text-indigo-300 font-medium mb-1">Front End Developer & Project Manager</p>
+                </div>
+                <!-- Magdalena Munisi -->
+                <div class="transition hover:scale-105 hover:shadow-lg bg-indigo-50 dark:bg-indigo-900/30 rounded-lg p-8 shadow-md text-center">
+                    <div class="flex items-center justify-center mb-4">
+                        <div class="h-14 w-14 rounded-full bg-indigo-200 dark:bg-indigo-800 flex items-center justify-center">
+                            <i class="fas fa-user-edit text-indigo-700 dark:text-indigo-300 text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Magdalena Munisi</h3>
+                    <p class="text-indigo-700 dark:text-indigo-300 font-medium mb-1">Web Designer & Database Development</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Team Section -->
 
     <!-- Final CTA -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">

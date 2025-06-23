@@ -1,99 +1,36 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="py-8">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-            <div class="p-6">
-                <div class="flex items-center mb-8">
-                    <svg class="h-8 w-8 text-primary-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    <h2 class="text-2xl font-semibold text-gray-900">Edit Resource</h2>
-                </div>
-
-                <form method="POST" action="{{ route('admin.resources.update', $resource) }}" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-                    
-                    <div class="space-y-6">
-                        <!-- Title Field -->
-                        <div>
-                            <x-input-label for="title" :value="__('Title')" />
-                            <x-text-input id="title" class="block mt-1 w-full" 
-                                type="text" 
-                                name="title" 
-                                :value="old('title', $resource->title)" 
-                                required />
-                        </div>
-
-                        <!-- Description Field (Fixed) -->
-                        <div>
-                            <x-input-label for="description" :value="__('Description')" />
-                            <textarea 
-                                id="description"
-                                name="description"
-                                rows="4"
-                                class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                            >{{ old('description', $resource->description ?? '') }}</textarea>
-                        </div>
-
-                        <!-- Type Field -->
-                        <div>
-                            <x-input-label for="type" :value="__('Type')" />
-                            <x-select-input id="type" name="type" class="block mt-1 w-full" 
-                                :options="[
-                                    'document' => 'Document',
-                                    'pdf' => 'PDF',
-                                    'image' => 'Image',
-                                    'video' => 'Video',
-                                    'audio' => 'Audio'
-                                ]" 
-                                :selected="old('type', $resource->type)" 
-                                required />
-                        </div>
-
-                        <!-- File Upload Field -->
-                        <div>
-                            <x-input-label for="file" :value="__('File (Leave empty to keep current file)')" />
-                            <div class="mt-1 flex items-center">
-                                <input type="file" name="file" id="file"
-                                    class="block w-full text-sm text-gray-500
-                                        file:mr-4 file:py-2 file:px-4
-                                        file:rounded-md file:border-0
-                                        file:text-sm file:font-semibold
-                                        file:bg-gray-100 file:text-gray-700
-                                        hover:file:bg-gray-200">
-                            </div>
-                            @if($resource->file_path)
-                            <p class="mt-2 text-sm text-gray-600">
-                                Current file: 
-                                <a href="{{ asset('storage/' . $resource->file_path) }}" 
-                                   class="text-primary-600 hover:underline" 
-                                   download>
-                                    {{ basename($resource->file_path) }}
-                                </a>
-                                ({{ round($resource->file_size / 1024) }} KB)
-                            </p>
-                            @endif
-                        </div>
-
-                        <!-- Form Actions -->
-                        <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
-                            <a href="{{ route('admin.resources.index') }}" 
-                               class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150">
-                                Cancel
-                            </a>
-                            <x-primary-button>
-                                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                                </svg>
-                                Update Resource
-                            </x-primary-button>
-                        </div>
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-blue-900 dark:via-gray-800 dark:to-blue-900 py-12">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-2xl rounded-2xl border border-blue-200/50 dark:border-blue-900/50 p-8">
+            <h1 class="text-3xl font-bold text-blue-700 dark:text-blue-300 mb-6">Edit Resource</h1>
+            <form method="POST" action="{{ route('admin.resources.update', $resource->id) }}" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="space-y-6">
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-blue-700 dark:text-blue-300">Title</label>
+                        <input type="text" name="title" id="title" value="{{ old('title', $resource->title) }}" class="mt-1 block w-full rounded-lg border border-blue-200 dark:border-blue-700 bg-white/80 dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
                     </div>
-                </form>
-            </div>
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-blue-700 dark:text-blue-300">Description</label>
+                        <textarea name="description" id="description" rows="3" class="mt-1 block w-full rounded-lg border border-blue-200 dark:border-blue-700 bg-white/80 dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>{{ old('description', $resource->description) }}</textarea>
+                    </div>
+                    <div>
+                        <label for="file" class="block text-sm font-medium text-blue-700 dark:text-blue-300">File</label>
+                        <input type="file" name="file" id="file" class="mt-1 block w-full rounded-lg border border-blue-200 dark:border-blue-700 bg-white/80 dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        @if($resource->file)
+                            <p class="mt-2 text-xs text-blue-600 dark:text-blue-300">Current: <a href="{{ asset('storage/' . $resource->file) }}" target="_blank" class="underline">View File</a></p>
+                        @endif
+                    </div>
+                    <div class="pt-4">
+                        <button type="submit" class="inline-flex justify-center py-2 px-6 rounded-xl shadow font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                            Update Resource
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>

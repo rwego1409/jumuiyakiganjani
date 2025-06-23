@@ -1,29 +1,39 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="py-8">
+<div class="py-8 bg-gradient-to-br from-green-50 via-white to-green-100 dark:from-green-900 dark:via-gray-800 dark:to-green-900 min-h-screen">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="p-6">
-                <!-- Header Section with improved spacing and alignment -->
+                <!-- Header Section -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
                     <div class="flex items-center mb-6 sm:mb-0">
-                        <svg class="h-8 w-8 text-primary-600 dark:text-primary-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="h-8 w-8 text-green-500 dark:text-green-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Contributions Management</h2>
+                        <h2 class="text-2xl font-bold text-green-900 dark:text-green-100">Contributions Management</h2>
                     </div>
 
-                    <a href="{{ route('admin.contributions.create') }}" 
-                       class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-200">
-                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        Add New Contribution
-                    </a>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="{{ route('admin.contributions.create') }}" 
+                           class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200">
+                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Add New Contribution
+                        </a>
+                        
+                        <!-- Export Button -->
+                        <button id="export-btn" class="inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200">
+                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Export
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Import Form with improved styling -->
+                <!-- Import Form -->
                 <form action="{{ route('admin.contributions.import') }}" method="POST" enctype="multipart/form-data" class="mb-8">
                     @csrf
                     <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
@@ -67,250 +77,388 @@
                     </div>
                 @endif
 
-                <!-- Data Table with improved styling -->
-                <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                    <table id="contributions-table" class="stripe hover display nowrap w-full text-sm text-left">
-                        <thead class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                            <tr>
-                                <th class="px-6 py-4 font-semibold">Member</th>
-                                <th class="px-6 py-4 font-semibold">Amount</th>
-                                <th class="px-6 py-4 font-semibold">Date</th>
-                                <th class="px-6 py-4 font-semibold">Purpose</th>
-                                <th class="px-6 py-4 font-semibold">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                            @foreach($contributions as $contribution)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        @php
-                                            $user = optional(optional($contribution->member)->user);
-                                            $name = optional($user)->name ?? 'Unknown';
-                                            $initials = $name != 'Unknown' ? collect(explode(' ', $name))->map(fn($n) => strtoupper($n[0]))->implode('') : 'UK';
-                                        @endphp
-
-                                        @if(optional($user)->profile_photo_url)
-                                            <img class="h-10 w-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600" 
-                                                src="{{ $user->profile_photo_url }}" 
-                                                alt="{{ $name }}">
-                                        @else
-                                            <div class="h-10 w-10 flex items-center justify-center rounded-full bg-primary-600 text-white font-bold">
-                                                {{ $initials }}
-                                            </div>
-                                        @endif
-
-                                        <div class="ml-4">
-                                            <div class="font-medium text-gray-900 dark:text-white">{{ $name }}</div>
-                                            <div class="text-gray-500 dark:text-gray-400 text-sm">{{ optional($user)->email ?? 'No email' }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="font-medium text-gray-900 dark:text-white">
-                                        TSh {{ number_format($contribution->amount, 2) }}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
-                                    {{ $contribution->created_at->format('M j, Y') }}
-                                </td>
-                                <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
-                                    <div class="max-w-xs truncate">{{ $contribution->purpose }}</div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex space-x-4">
-                                        <a href="{{ route('admin.contributions.show', $contribution->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 flex items-center transition duration-200">
-                                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                            View
-                                        </a>
-                                        <a href="{{ route('admin.contributions.edit', $contribution->id) }}" class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 flex items-center transition duration-200">
-                                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                            Edit
-                                        </a>
-                                        <!-- <a href="{{ route('admin.contributions.scheduleReminder', $contribution) }}" class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300 flex items-center transition duration-200">
-                                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            Reminder
-                                        </a> -->
-                                        <form action="{{ route('admin.contributions.destroy', $contribution->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this contribution?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 flex items-center transition duration-200">
-                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-
-                            @if(count($contributions) === 0)
-                            <tr>
-                                <td colspan="5" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
-                                    <div class="flex flex-col items-center justify-center">
-                                        <svg class="h-10 w-10 text-gray-400 dark:text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                <!-- Data Table Container -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <!-- Table Controls -->
+                    <div class="p-4 border-b border-gray-200/50 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-700/30">
+                        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                            <!-- Search and Filters -->
+                            <div class="flex flex-col sm:flex-row gap-3 flex-1 w-full">
+                                <!-- Global Search -->
+                                <div class="relative flex-1">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                         </svg>
-                                        <p class="font-medium text-gray-700 dark:text-gray-300">No contributions found</p>
-                                        <p class="mt-1">Create a new contribution to get started.</p>
                                     </div>
-                                </td>
-                            </tr>
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
+                                    <input type="text" 
+                                           id="contributions-search" 
+                                           class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white/80 dark:bg-gray-700/80 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                                           placeholder="Search contributions...">
+                                </div>
 
-                @if(method_exists($contributions, 'links') && $contributions->hasPages())
-                <div class="mt-6">
-                    {{ $contributions->links() }}
+                                <!-- Date Range Filter -->
+                                <div class="relative flex-1">
+                                    <input type="text" 
+                                           id="date-range-filter" 
+                                           class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white/80 dark:bg-gray-700/80 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                                           placeholder="Date range">
+                                </div>
+
+                                <!-- Amount Range Filter -->
+                                <div class="relative flex-1">
+                                    <input type="text" 
+                                           id="amount-range-filter" 
+                                           class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white/80 dark:bg-gray-700/80 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                                           placeholder="Amount range">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Filters Display -->
+                        <div id="active-filters" class="mt-3 flex flex-wrap gap-2 hidden">
+                            <span class="text-sm text-gray-600 dark:text-gray-400 mr-2">Active filters:</span>
+                        </div>
+                    </div>
+
+                    <!-- Data Table -->
+                    <div class="overflow-x-auto">
+                        <table id="contributions-table" class="min-w-full">
+                            <thead>
+                                <tr class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Member</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Purpose</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                @foreach($contributions as $contribution)
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+                                    data-member="{{ strtolower(optional(optional($contribution->member)->user)->name ?? 'unknown') }}"
+                                    data-amount="{{ $contribution->amount }}"
+                                    data-date="{{ $contribution->created_at->format('Y-m-d') }}"
+                                    data-purpose="{{ strtolower($contribution->purpose) }}">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            @php
+                                                $user = optional(optional($contribution->member)->user);
+                                                $name = optional($user)->name ?? 'Unknown';
+                                                $initials = $name != 'Unknown' ? collect(explode(' ', $name))->map(fn($n) => strtoupper($n[0]))->implode('') : 'UK';
+                                            @endphp
+
+                                            @if(optional($user)->profile_photo_url)
+                                                <img class="h-10 w-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600" 
+                                                    src="{{ $user->profile_photo_url }}" 
+                                                    alt="{{ $name }}">
+                                            @else
+                                                <div class="h-10 w-10 flex items-center justify-center rounded-full bg-primary-600 text-white font-bold">
+                                                    {{ $initials }}
+                                                </div>
+                                            @endif
+
+                                            <div class="ml-4">
+                                                <div class="font-medium text-gray-900 dark:text-white">{{ $name }}</div>
+                                                <div class="text-gray-500 dark:text-gray-400 text-sm">{{ optional($user)->email ?? 'No email' }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-medium text-gray-900 dark:text-white">
+                                            TSh {{ number_format($contribution->amount, 2) }}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">
+                                        {{ $contribution->created_at->format('M j, Y') }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">
+                                        <div class="max-w-xs truncate">{{ $contribution->purpose }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex space-x-4">
+                                            <a href="{{ route('admin.contributions.show', $contribution->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 flex items-center transition duration-200">
+                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                                View
+                                            </a>
+                                            <a href="{{ route('admin.contributions.edit', $contribution->id) }}" class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 flex items-center transition duration-200">
+                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                                Edit
+                                            </a>
+                                            <form action="{{ route('admin.contributions.destroy', $contribution->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this contribution?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 flex items-center transition duration-200">
+                                                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Table Footer -->
+                    <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200/50 dark:border-gray-700/50">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                                Showing <span id="showing-start">1</span> to <span id="showing-end">{{ min(10, $contributions->count()) }}</span> of <span id="total-records">{{ $contributions->count() }}</span> contributions
+                            </div>
+                            
+                            <div class="flex items-center space-x-2" id="pagination-controls">
+                                <button id="prev-page" class="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                    Previous
+                                </button>
+                                <div id="page-numbers" class="flex items-center space-x-1"></div>
+                                <button id="next-page" class="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                @endif
             </div>
         </div>
     </div>
 </div>
-@endsection
 
-@push('styles')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<style>
-    /* Custom DataTables Styling */
-    .dataTables_wrapper .dataTables_length, 
-    .dataTables_wrapper .dataTables_filter {
-        margin-bottom: 1rem;
-    }
-    
-    .dataTables_wrapper .dataTables_length select {
-        background-color: white;
-        border: 1px solid #d1d5db;
-        border-radius: 0.375rem;
-        padding: 0.25rem 0.5rem;
-    }
-    
-    .dark .dataTables_wrapper .dataTables_length select {
-        background-color: #374151;
-        border-color: #4b5563;
-        color: #e5e7eb;
-    }
-    
-    .dataTables_wrapper .dataTables_filter input {
-        background-color: white;
-        border: 1px solid #d1d5db;
-        border-radius: 0.375rem;
-        padding: 0.375rem 0.75rem;
-        margin-left: 0.5rem;
-    }
-    
-    .dark .dataTables_wrapper .dataTables_filter input {
-        background-color: #374151;
-        border-color: #4b5563;
-        color: #e5e7eb;
-    }
-    
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 0.375rem 0.75rem;
-        margin-left: 0.25rem;
-        border-radius: 0.375rem;
-        border: 1px solid #d1d5db;
-        background-color: white;
-    }
-    
-    .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
-        background-color: #374151;
-        border-color: #4b5563;
-        color: #e5e7eb !important;
-    }
-    
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background-color: #4f46e5 !important;
-        color: white !important;
-        border-color: #4f46e5;
-    }
-    
-    .dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background-color: #6366f1 !important;
-        border-color: #6366f1;
-    }
-    
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        background-color: #f3f4f6 !important;
-        color: #111827 !important;
-        border-color: #d1d5db;
-    }
-    
-    .dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        background-color: #4b5563 !important;
-        color: #e5e7eb !important;
-        border-color: #6b7280;
-    }
-    
-    .dataTables_wrapper .dataTables_info {
-        color: #6b7280;
-    }
-    
-    .dark .dataTables_wrapper .dataTables_info {
-        color: #9ca3af;
-    }
-</style>
-@endpush
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white/20 dark:border-gray-700/50">
+        <div class="flex items-center space-x-3">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span class="text-gray-700 dark:text-gray-300 font-medium">Loading contributions...</span>
+        </div>
+    </div>
+</div>
 
 @push('scripts')
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+<script src="https://cdn.datatables.net/datetime/1.5.1/js/dataTables.dateTime.min.js"></script>
 <script>
-    $(document).ready(function () {
-        $('#contributions-table').DataTable({
-            pageLength: 10,
-            lengthMenu: [5, 10, 25, 50],
-            searching: true,
-            ordering: true,
-            info: true,
-            responsive: true,
-            language: {
-                search: "Search contributions:",
-                lengthMenu: "Show _MENU_ entries",
-                info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                paginate: {
-                    previous: "← Prev",
-                    next: "Next →"
-                },
-                emptyTable: "No contributions found",
-                zeroRecords: "No matching contributions found"
-            },
-            // Custom styling for DataTables
-            initComplete: function() {
-                // Style the search input and selects
-                $('.dataTables_filter input').addClass('rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50');
-                $('.dataTables_length select').addClass('rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50');
-                
-                // Add spacing to controls
-                $('.dataTables_length, .dataTables_filter').addClass('mb-4');
-                $('.dataTables_info, .dataTables_paginate').addClass('mt-4 mb-2');
-                
-                // Style pagination buttons
-                $('.paginate_button').addClass('px-3 py-1 rounded-md mx-1 focus:outline-none');
-                $('.paginate_button.current').addClass('bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300');
-                $('.paginate_button:not(.current)').addClass('text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700');
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DataTable with custom configuration
+    const table = $('#contributions-table').DataTable({
+        paging: true,
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50, 100],
+        lengthChange: true,
+        searching: true,
+        ordering: true,
+        info: false,
+        autoWidth: false,
+        responsive: true,
+        dom: 'rt<"flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4"ip>',
+        language: {
+            search: "",
+            searchPlaceholder: "Search contributions...",
+            paginate: {
+                previous: "←",
+                next: "→"
             }
-        });
-        
-        // Add responsive behavior to file input
-        $('input[type="file"]').on('change', function() {
-            const fileName = $(this).val().split('\\').pop();
-            if (fileName) {
-                $(this).addClass('border-primary-500');
-            } else {
-                $(this).removeClass('border-primary-500');
+        },
+        initComplete: function() {
+            // Move search input to our custom search box
+            $('.dataTables_filter').appendTo('#contributions-search').parent().removeClass('hidden');
+            $('.dataTables_filter input').attr('id', 'datatable-search');
+            
+            // Update counters on initialization
+            updateTableCounters();
+        },
+        drawCallback: function() {
+            updateTableCounters();
+        },
+        columnDefs: [
+            { targets: [1], type: 'num-fmt' }, // Amount column
+            { targets: [2], type: 'date' },    // Date column
+            { 
+                targets: [4],                  // Actions column
+                orderable: false,
+                searchable: false
             }
-        });
+        ]
     });
+
+    // Custom search implementation
+    $('#contributions-search').on('keyup', function() {
+        table.search(this.value).draw();
+        updateActiveFilters();
+    });
+
+    // Initialize date range filter
+    const dateRangeFilter = $('#date-range-filter');
+    const minDateFilter = new DateTime($('#contributions-table'), {
+        format: 'MMMM D, YYYY',
+        i18n: {
+            previous: '←',
+            next: '→'
+        }
+    });
+    const maxDateFilter = new DateTime($('#contributions-table'), {
+        format: 'MMMM D, YYYY',
+        i18n: {
+            previous: '←',
+            next: '→'
+        }
+    });
+
+    // Apply date range filter
+    dateRangeFilter.on('apply.daterangepicker', function(ev, picker) {
+        minDateFilter.val(picker.startDate.format('YYYY-MM-DD'));
+        maxDateFilter.val(picker.endDate.format('YYYY-MM-DD'));
+        
+        table.draw();
+        updateActiveFilters();
+    });
+
+    // Initialize amount range filter
+    $('#amount-range-filter').on('change', function() {
+        const range = this.value.split('-');
+        if (range.length === 2) {
+            const min = parseFloat(range[0].trim());
+            const max = parseFloat(range[1].trim());
+            
+            $.fn.dataTable.ext.search.push(
+                function(settings, data, dataIndex) {
+                    const amount = parseFloat(data[1].replace(/[^\d.]/g, ''));
+                    return (isNaN(min) || amount >= min) && 
+                           (isNaN(max) || amount <= max);
+                }
+            );
+            
+            table.draw();
+            $.fn.dataTable.ext.search.pop();
+            updateActiveFilters();
+        }
+    });
+
+    // Clear all filters
+    $('#clear-filters').on('click', function() {
+        $('#contributions-search').val('');
+        $('#date-range-filter').val('');
+        $('#amount-range-filter').val('');
+        minDateFilter.val('');
+        maxDateFilter.val('');
+        table.search('').columns().search('').draw();
+        updateActiveFilters();
+    });
+
+    // Export button
+    $('#export-btn').on('click', function() {
+        // Get current filters
+        const params = {
+            search: table.search(),
+            dateRange: $('#date-range-filter').val(),
+            amountRange: $('#amount-range-filter').val()
+        };
+        
+        // Convert to query string
+        const queryString = $.param(params);
+        
+        // Trigger download
+        window.location.href = "{{ route('admin.contributions.export') }}?" + queryString;
+    });
+
+    // Update table counters
+    function updateTableCounters() {
+        const info = table.page.info();
+        $('#showing-start').text(info.start + 1);
+        $('#showing-end').text(info.end);
+        $('#total-records').text(info.recordsTotal);
+    }
+
+    // Update active filters display
+    function updateActiveFilters() {
+        const filters = [];
+        const searchValue = $('#contributions-search').val();
+        const dateRangeValue = $('#date-range-filter').val();
+        const amountRangeValue = $('#amount-range-filter').val();
+
+        if (searchValue) {
+            filters.push(`Search: "${searchValue}"`);
+        }
+
+        if (dateRangeValue) {
+            filters.push(`Date: ${dateRangeValue}`);
+        }
+
+        if (amountRangeValue) {
+            filters.push(`Amount: ${amountRangeValue}`);
+        }
+
+        const activeFiltersContainer = $('#active-filters');
+        if (filters.length > 0) {
+            activeFiltersContainer.empty().append(
+                '<span class="text-sm text-gray-600 dark:text-gray-400 mr-2">Active filters:</span>'
+            );
+            
+            filters.forEach(filter => {
+                activeFiltersContainer.append(
+                    `<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 mr-2 mb-2">
+                        ${filter}
+                        <button class="ml-1 hover:text-blue-900 dark:hover:text-blue-100" onclick="removeFilter('${filter}')">×</button>
+                    </span>`
+                );
+            });
+            
+            activeFiltersContainer.removeClass('hidden');
+        } else {
+            activeFiltersContainer.addClass('hidden');
+        }
+    }
+
+    // Remove specific filter
+    window.removeFilter = function(filterText) {
+        if (filterText.startsWith('Search:')) {
+            $('#contributions-search').val('').trigger('keyup');
+        } else if (filterText.startsWith('Date:')) {
+            $('#date-range-filter').val('').trigger('change');
+        } else if (filterText.startsWith('Amount:')) {
+            $('#amount-range-filter').val('').trigger('change');
+        }
+    };
+
+    // Custom pagination controls
+    $('#prev-page').on('click', function() {
+        table.page('previous').draw('page');
+    });
+
+    $('#next-page').on('click', function() {
+        table.page('next').draw('page');
+    });
+
+    // Disable/enable pagination buttons based on current page
+    table.on('draw', function() {
+        const info = table.page.info();
+        $('#prev-page').prop('disabled', info.page === 0);
+        $('#next-page').prop('disabled', info.page + 1 === info.pages);
+        
+        // Generate page numbers
+        const pageNumbers = $('#page-numbers');
+        pageNumbers.empty();
+        
+        const startPage = Math.max(0, info.page - 2);
+        const endPage = Math.min(info.pages - 1, startPage + 4);
+        
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = $(`<button class="px-3 py-1.5 rounded-lg mx-1 ${info.page === i ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'}">${i + 1}</button>`);
+            pageBtn.on('click', function() {
+                table.page(i).draw('page');
+            });
+            pageNumbers.append(pageBtn);
+        }
+    });
+});
 </script>
 @endpush

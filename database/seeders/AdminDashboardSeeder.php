@@ -73,7 +73,7 @@ $jumuiyas = Jumuiya::factory()->count(5)->create();
         ]);
 
         // Create other entities
-        Event::factory()->count(15)->create();
+        Event::factory()->count(15)->create(); // Remove jumuiya_id from seeding
         Resource::factory()->count(25)->create();
         Activity::factory()->count(100)->create();
     }

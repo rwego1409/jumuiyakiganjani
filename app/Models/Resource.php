@@ -15,4 +15,9 @@ class Resource extends Model
     {
         return $this->belongsTo(Jumuiya::class);
     }
+    
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

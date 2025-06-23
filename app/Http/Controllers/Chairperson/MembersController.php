@@ -53,4 +53,10 @@ class MembersController extends Controller
 
         return view('chairperson.members.show', compact('member', 'recentContributions'));
     }
+
+    public function create()
+    {
+        // If you need to pass data (e.g., dropdowns), fetch here
+        return view('chairperson.members.create');
+    }
 }

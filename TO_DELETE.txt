@@ -1,0 +1,22 @@
+The following files should be deleted as part of payment method removal:
+
+Controllers:
+- app/Http/Controllers/PaymentController.php
+- app/Http/Controllers/Members/PaymentController.php
+- app/Http/Controllers/MpesaController.php
+- app/Http/Controllers/Api/MpesaController.php
+- app/Http/Controllers/PalmPesaController.php
+- app/Http/Controllers/ZenoPayController.php
+- app/Http/Controllers/PalmPesaDebugController.php
+
+Services:
+- app/Services/MpesaService.php
+- app/Services/VodacomMpesaService.php
+- app/Services/PalmPesaService.php
+
+Configs:
+- config/mpesa.php
+- config/palmpesa.php
+
+
+Please ensure to remove any references to these files in other parts of the codebase (middleware, jobs, etc.).

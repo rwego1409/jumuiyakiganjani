@@ -10,43 +10,40 @@
 </div>
 @endif
 
-<div class="py-8">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+<div class="py-4 sm:py-8 bg-gradient-to-br from-yellow-50 via-white to-yellow-100 dark:from-yellow-900 dark:via-gray-800 dark:to-yellow-900 min-h-screen">
+    <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-            <div class="p-6">
+            <div class="p-4 sm:p-6">
                 <!-- Header Section -->
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-8 gap-2 sm:gap-4">
                     <div class="flex items-center">
-                        <svg class="h-8 w-8 text-primary-600 dark:text-primary-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="h-8 w-8 text-yellow-500 dark:text-yellow-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Resources Management</h2>
+                        <h2 class="text-xl sm:text-2xl font-semibold text-yellow-900 dark:text-yellow-100">Resources Management</h2>
                     </div>
-                    
                     <!-- Controls Section -->
-                    <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto">
                         <!-- View Toggle -->
                         <div class="flex items-center">
                             <div class="relative inline-block w-10 mr-2 align-middle select-none">
                                 <input type="checkbox" name="viewToggle" id="viewToggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer dark:bg-gray-600"/>
                                 <label for="viewToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer dark:bg-gray-500"></label>
                             </div>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Card/Table</span>
+                            <span class="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Card/Table</span>
                         </div>
-                        
                         <!-- Search Input -->
-                        <div class="relative flex-grow">
+                        <div class="relative flex-grow w-full sm:w-auto">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
                                 </svg>
                             </div>
-                            <input type="text" id="searchInput" class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-400 dark:focus:border-primary-400" placeholder="Search resources...">
+                            <input type="text" id="searchInput" class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-400 dark:focus:border-primary-400 text-xs sm:text-sm" placeholder="Search resources...">
                         </div>
-                        
                         <!-- Upload Button -->
                         <a href="{{ route('admin.resources.create') }}" 
-                           class="btn-jumuiya inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-primary-500 dark:hover:bg-primary-600">
+                           class="btn-jumuiya inline-flex items-center px-4 py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-primary-500 dark:hover:bg-primary-600 w-full sm:w-auto">
                             <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
@@ -75,33 +72,34 @@
                     <!-- Resources Grid -->
                     <div id="cardContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($resources as $resource)
-                        <div class="resource-card bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow duration-200">
-                            <div class="p-6">
+                        <div class="resource-card bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-2xl shadow-xl border border-yellow-100 dark:border-yellow-900 hover:shadow-2xl hover:scale-105 transition-all duration-200 ease-out relative overflow-hidden">
+                            <div class="absolute inset-0 pointer-events-none bg-gradient-to-br from-yellow-100/40 to-yellow-200/20 dark:from-yellow-900/30 dark:to-yellow-900/10"></div>
+                            <div class="relative p-6">
                                 <!-- Card Header -->
                                 <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center">
                                         @switch($resource->type)
                                             @case('document')
-                                                <svg class="h-6 w-6 text-gray-500 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <svg class="h-8 w-8 text-yellow-500 dark:text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                 </svg>
                                                 @break
                                             @case('video')
-                                                <svg class="h-6 w-6 text-gray-500 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <svg class="h-8 w-8 text-yellow-500 dark:text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                                 </svg>
                                                 @break
                                             @case('audio')
-                                                <svg class="h-6 w-6 text-gray-500 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <svg class="h-8 w-8 text-yellow-500 dark:text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                                                 </svg>
                                                 @break
                                             @default
-                                                <svg class="h-6 w-6 text-gray-500 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <svg class="h-8 w-8 text-yellow-500 dark:text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                                 </svg>
                                         @endswitch
-                                        <span class="text-xs font-medium text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 px-2 py-1 rounded">
+                                        <span class="text-xs font-medium text-yellow-700 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-700/40 px-2 py-1 rounded">
                                             {{ strtoupper($resource->type) }}
                                         </span>
                                     </div>
@@ -109,43 +107,26 @@
                                         {{ $resource->created_at->format('M d, Y') }}
                                     </span>
                                 </div>
-                                
                                 <!-- Card Content -->
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{{ $resource->title }}</h3>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{{ $resource->title }}</h3>
                                 <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
                                     {{ Str::limit($resource->description, 100) }}
                                 </p>
-                                
                                 <!-- Card Footer -->
-                                <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-600">
+                                <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-yellow-900/30">
                                     <a href="{{ asset('storage/' . $resource->file_path) }}" 
-                                       class="inline-flex items-center text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 font-medium text-sm"
+                                       class="inline-flex items-center text-yellow-700 hover:text-yellow-900 dark:text-yellow-300 dark:hover:text-yellow-100 font-semibold text-sm"
                                        download>
-                                        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                         </svg>
                                         Download
                                     </a>
-                                    
-                                    <div class="flex space-x-3">
-                                        <a href="{{ route('admin.resources.edit', $resource->id) }}" 
-                                           class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300 flex items-center text-sm">
-                                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                            Edit
-                                        </a>
-                                        <form action="{{ route('admin.resources.destroy', $resource->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" 
-                                                    class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 flex items-center text-sm"
-                                                    onclick="return confirm('Are you sure?')">
-                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                                Delete
-                                            </button>
+                                    <div class="space-x-2">
+                                        <a href="{{ route('admin.resources.edit', $resource->id) }}" class="text-yellow-700 hover:text-yellow-900 dark:text-yellow-300 dark:hover:text-yellow-100 font-semibold">Edit</a>
+                                        <form action="{{ route('admin.resources.destroy', $resource->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Delete this resource?')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 font-semibold">Delete</button>
                                         </form>
                                     </div>
                                 </div>

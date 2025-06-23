@@ -20,16 +20,14 @@ class EventFactory extends Factory
      */
     public function definition(): array
     {
-        
-            return [
-                'title' => $this->faker->sentence(3),
-                'description' => $this->faker->paragraph,
-                'jumuiya_id' => Jumuiya::factory(),
-                'location' => $this->faker->address,
-                'start_time' => $this->faker->dateTimeBetween('now', '+2 months'),
-                'end_time' => fn(array $attributes) => Carbon::parse($attributes['start_time'])->addHours(2),
-                'status' => 'upcoming',
-            ];
-        }
+        return [
+            'title' => $this->faker->sentence(3),
+            'description' => $this->faker->paragraph,
+            'location' => $this->faker->address,
+            'start_time' => $this->faker->dateTimeBetween('now', '+2 months'),
+            'end_time' => fn(array $attributes) => Carbon::parse($attributes['start_time'])->addHours(2),
+            'status' => 'upcoming',
+        ];
     }
+}
 

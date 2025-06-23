@@ -22,12 +22,9 @@ use App\Http\Controllers\Members\{
 use App\Http\Controllers\{
     HomeController,
     ProfileController,
-    MpesaController,
     ProfileSetupController,
-    PaymentController,
     NotificationController,
-    ClickPesaController,
-    PalmPesaController
+    ClickPesaController
 };
 use App\Http\Controllers\SuperAdmin\{
     SuperAdminController,
@@ -36,7 +33,6 @@ use App\Http\Controllers\SuperAdmin\{
     MembersController as SuperAdminMembersController,
     NotificationController as SuperAdminNotificationController
 };
-use App\Http\Controllers\ZenoPayController;
 use App\Models\User;
 use App\Notifications\TestNotification;
 
@@ -93,6 +89,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // System Settings
             Route::get('/settings', [App\Http\Controllers\Admin\SuperAdminSettingsController::class, 'index'])->name('settings');
             Route::put('/settings', [App\Http\Controllers\Admin\SuperAdminSettingsController::class, 'update'])->name('settings.update');
+
+            // Activities (Super Admin)
+            Route::get('activities', [App\Http\Controllers\SuperAdmin\ActivityController::class, 'index'])->name('activities.index');
+            Route::get('activities/{activity}', [App\Http\Controllers\SuperAdmin\ActivityController::class, 'show'])->name('activities.show');
         });
 
     // Chairperson routes
@@ -147,6 +147,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::post('/download', [App\Http\Controllers\Chairperson\ReportsController::class, 'download'])->name('download');
                 Route::get('/export/{id}/{format}', [App\Http\Controllers\Chairperson\ReportsController::class, 'export'])->name('export');
             });
+
+            // Activities management
+            Route::get('activities', [\App\Http\Controllers\Chairperson\ActivityController::class, 'index'])->name('activities.index');
         });
 
     // Admin routes
@@ -177,12 +180,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/contributions/{contribution}/send-notification', [ContributionsController::class, 'sendNotification'])->name('contributions.sendNotification');
             Route::get('/contributions/export/pdf', [ContributionsController::class, 'exportPdf'])->name('contributions.export.pdf');
             Route::get('/contributions/export/excel', [ContributionsController::class, 'exportExcel'])->name('contributions.export.excel');
+            // Export (generic, for filtered export)
+            Route::get('/contributions/export', [ContributionsController::class, 'export'])->name('contributions.export');
 
             // Events
             Route::resource('events', EventsController::class);
 
             // Activities
             Route::get('/activities', [ActivityController::class, 'index'])->name('activities');
+            Route::get('activities/{activity}', [ActivityController::class, 'show'])->name('activities.show');
 
             // Reports
             Route::prefix('reports')->name('reports.')->group(function () {
@@ -272,19 +278,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('/', [\App\Http\Controllers\Members\NotificationController::class, 'index'])->name('index');
                 Route::get('/{notification}', [\App\Http\Controllers\Members\NotificationController::class, 'show'])->name('show');
             });
-        });
+    });
 
     // Notifications (general for all users)
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
         Route::get('/{notification}', [NotificationController::class, 'show'])->name('show');
         Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
-    });
-
-    // Payment gateways
-    Route::prefix('mpesa')->name('mpesa.')->group(function () {
-        Route::post('/payment', [PaymentController::class, 'initiatePayment'])->name('payment');
-        Route::post('/callback', [MpesaController::class, 'callback'])->name('callback');
     });
 
     // Test Routes (for development)
@@ -384,16 +384,11 @@ Route::get('/test-mobile-payment', function() {
         'logs' => 'Check storage/logs/palmpesa.log for details'
     ]);
 });
-// routes/web.php
-Route::prefix('palmpesa')->group(function() {
-    Route::get('/debug', [\App\Http\Controllers\PalmPesaDebugController::class, 'testStkPush']);
-    Route::post('/debug', [\App\Http\Controllers\PalmPesaDebugController::class, 'testStkPush']);
-});
+
 // Check payment status
 Route::get('/payment/status/{reference}', function($reference) {
     // Implement status check with PalmPesa API
     return response()->json([
-        'status' => 'pending', // or 'completed'/'failed'
         'reference' => $reference
     ]);
 });
@@ -406,34 +401,22 @@ Route::prefix('superuser')
         Route::resource('whatsapp_reminders', App\Http\Controllers\Superuser\WhatsAppRemindersController::class);
     });
 
-Route::get('/test-notification', function() {
-    $admin = \App\Models\User::where('role', 'admin')->first();
-    
-    if (!$admin) {
-        return 'No admin user found!';
-    }
-    
-    $notification = \App\Models\AdminNotification::create([
-        'title' => 'Test Notification for Chairperson',
-        'message' => 'This is a test notification to verify chairperson notifications are working.',
-        'type' => 'general',
-        'recipients' => ['all'],
-        'created_by' => $admin->id
-    ]);
 
-    \App\Jobs\DispatchNotifications::dispatch($notification);
-    
-    return 'Test notification sent!';
-});
-
-// ZenoPay routes
-Route::prefix('zenopay')->name('zenopay.')->group(function () {
-    Route::post('/initiate', [ZenoPayController::class, 'initiate'])->name('initiate');
-    Route::get('/status', [ZenoPayController::class, 'status'])->name('status');
-});
+// ClickPesa manual integration routes
+Route::post('/clickpesa/ussd', [App\Http\Controllers\ClickPesaController::class, 'ussdCheckout']);
+Route::get('/clickpesa/status/{transactionId}', [App\Http\Controllers\ClickPesaController::class, 'queryStatus']);
+Route::post('/clickpesa/webhook', [App\Http\Controllers\ClickPesaController::class, 'webhook'])->name('clickpesa.webhook');
 
 // Fallback route for 404s
     Route::fallback(function () {
         return view('errors.404');
     });
+
+    // Subscription (Jumuiya registration)
+    Route::get('/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'create'])->name('subscription.create');
+    Route::post('/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'store'])->name('subscription.store');
+});
+
+Route::middleware(['web', 'auth', 'verified', 'admin'])->group(function () {
+    Route::get('/admin/activities', [App\Http\Controllers\Admin\ActivitiesController::class, 'index'])->name('admin.activities.index');
 });

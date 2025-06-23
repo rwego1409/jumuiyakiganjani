@@ -9,20 +9,25 @@ use App\Models\Member;
 class MembersExport implements FromCollection, WithHeadings
 {
     private $dateRange;
+    private $jumuiyaIds;
 
-    public function __construct($dateRange)
+    public function __construct($dateRange, $jumuiyaIds = null)
     {
         $this->dateRange = $dateRange;
+        $this->jumuiyaIds = $jumuiyaIds;
     }
 
     public function collection()
     {
-        return Member::with(['user', 'jumuiya'])
+        $query = Member::with(['user', 'jumuiya'])
             ->whereBetween('created_at', [
                 $this->dateRange['start_date'],
                 $this->dateRange['end_date']
-            ])
-            ->get()
+            ]);
+        if ($this->jumuiyaIds) {
+            $query->whereIn('jumuiya_id', (array)$this->jumuiyaIds);
+        }
+        return $query->get()
             ->map(function ($member) {
                 return [
                     'Name' => $member->user->name,

@@ -14,7 +14,31 @@ class EventsController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
         $query = Event::query();
+
+        // Only show events for the user's jumuiya or created by admin
+        if ($user->hasRole('chairperson')) {
+            $jumuiya = $user->jumuiyas()->first();
+            if ($jumuiya) {
+                $query->where(function($q) use ($jumuiya) {
+                    $q->where('jumuiya_id', $jumuiya->id)
+                      ->orWhereHas('creator', function($q2) {
+                          $q2->where('role', 'admin');
+                      });
+                });
+            }
+        } elseif ($user->hasRole('member')) {
+            $member = $user->member;
+            if ($member && $member->jumuiya_id) {
+                $query->where(function($q) use ($member) {
+                    $q->where('jumuiya_id', $member->jumuiya_id)
+                      ->orWhereHas('creator', function($q2) {
+                          $q2->where('role', 'admin');
+                      });
+                });
+            }
+        }
 
         // Apply search filter
         if ($request->filled('search')) {
@@ -66,6 +90,13 @@ class EventsController extends Controller
             'description' => 'nullable|string',
             'status' => 'required|in:upcoming,ongoing,completed'
         ]);
+
+        $jumuiya = auth()->user()->jumuiyas()->first();
+        if (!$jumuiya) {
+            return redirect()->route('chairperson.events.index')->with('error', 'No jumuiya assigned to your account.');
+        }
+        $validated['jumuiya_id'] = $jumuiya->id;
+        $validated['created_by'] = auth()->id();
 
         $event = Event::create($validated);
 

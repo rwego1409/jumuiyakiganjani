@@ -28,13 +28,19 @@ class SuperAdminController extends Controller
         $totalJumuiyas = Jumuiya::count();
         $totalChairpersons = User::where('role', 'chairperson')->count();
         $totalMembers = Member::count();
+        $totalAdmins = User::where('role', 'admin')->count();
         $recentJumuiyas = Jumuiya::with('chairperson')->latest()->take(5)->get();
+
+        // Fetch recent activities for super admin dashboard
+        $recentActivities = \App\Models\Activity::with('user')->latest()->take(5)->get();
 
         return view('super_admin.dashboard', compact(
             'totalJumuiyas',
             'totalChairpersons',
             'totalMembers',
-            'recentJumuiyas'
+            'totalAdmins',
+            'recentJumuiyas',
+            'recentActivities'
         ));
     }
 
@@ -93,7 +99,7 @@ class SuperAdminController extends Controller
     public function updateJumuiya(Request $request, Jumuiya $jumuiya)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('jumuiyas')->ignore($jumuiya)],
+            'name' => ['required', 'string', 'max:255', Rule::unique('jumuias')->ignore($jumuiya)],
             'location' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);

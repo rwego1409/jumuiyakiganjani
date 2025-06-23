@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Http\Livewire\Admin;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use App\Models\Jumuiya;
@@ -41,5 +41,5 @@ class Dashboard extends Component
         return view('livewire.admin.dashboard')
             ->layout('layouts.admin');
     }
-} 
+}
 

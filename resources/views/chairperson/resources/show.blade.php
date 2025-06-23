@@ -1,22 +1,22 @@
 @extends('layouts.chairperson')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="mb-6">
-        <a href="{{ route('chairperson.resources.index') }}" class="text-primary-500 hover:text-primary-700">
-            <i class="fas fa-arrow-left mr-2"></i>{{ __('Back to Resources') }}
-        </a>
-    </div>
-
-    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-        <div class="p-6">
+<div class="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-100 dark:from-pink-900 dark:via-gray-800 dark:to-purple-900 py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-6">
+            <a href="{{ route('chairperson.resources.index') }}" class="inline-flex items-center px-4 py-2 rounded-xl shadow font-semibold text-white bg-gradient-to-r from-pink-600 to-purple-500 hover:from-pink-700 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-all">
+                <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                {{ __('Back to Resources') }}
+            </a>
+        </div>
+        <div class="bg-white/80 dark:bg-purple-900/80 backdrop-blur-md shadow-2xl rounded-2xl border border-pink-200/60 dark:border-purple-700/60 p-8">
             <!-- Resource Header -->
             <div class="flex justify-between items-start mb-6">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    <h2 class="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent drop-shadow-lg">
                         {{ $resource->name }}
                     </h2>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    <p class="mt-1 text-sm text-pink-500 dark:text-pink-300">
                         {{ __('Uploaded') }} {{ $resource->created_at->diffForHumans() }}
                     </p>
                 </div>

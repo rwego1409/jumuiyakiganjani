@@ -41,8 +41,7 @@ class DashboardController extends Controller
             });
 
             // Get event participation stats
-            $eventStats = Event::where('jumuiya_id', $jumuiya->id)
-                ->where('start_time', '<=', now())
+            $eventStats = Event::where('start_time', '<=', now())
                 ->orderBy('start_time', 'desc')
                 ->take(6)
                 ->get()
@@ -69,8 +68,7 @@ class DashboardController extends Controller
                     ->latest()
                     ->take(5)
                     ->get(),
-                'upcoming_events' => Event::where('jumuiya_id', $jumuiya->id)
-                    ->where('start_time', '>', now())
+                'upcoming_events' => Event::where('start_time', '>', now())
                     ->take(5)
                     ->get(),
                 'contribution_trends' => [
@@ -81,6 +79,14 @@ class DashboardController extends Controller
                     'labels' => $eventStats->pluck('name'),
                     'data' => $eventStats->pluck('attendance'),
                 ],
+                'recent_activities' => \App\Models\Activity::whereHas('user', function($q) use ($jumuiya) {
+                    $q->whereHas('member', function($q2) use ($jumuiya) {
+                        $q2->where('jumuiya_id', $jumuiya->id);
+                    });
+                })
+                ->latest()
+                ->take(5)
+                ->get(),
             ];
         });
         return view('chairperson.dashboard', compact('stats', 'jumuiya'));

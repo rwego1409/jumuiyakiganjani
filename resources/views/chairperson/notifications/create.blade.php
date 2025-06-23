@@ -1,10 +1,14 @@
 @extends('layouts.chairperson')
 
 @section('content')
-<div class="max-w-4xl mx-auto sm:px-6 lg:px-8 py-6">
-    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-        <div class="p-6">
-            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Create Notification</h2>
+<div class="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-100 dark:from-pink-900 dark:via-gray-800 dark:to-purple-900 py-12">
+    <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 py-6">
+        <div class="bg-white/80 dark:bg-purple-900/80 backdrop-blur-md shadow-2xl rounded-2xl border border-pink-200/60 dark:border-purple-700/60 p-8">
+            <h2 class="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent drop-shadow-lg flex items-center gap-3">
+                <svg class="w-8 h-8 text-pink-500 dark:text-pink-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                Create Notification
+            </h2>
 
             @if(session('success'))
             <div class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700">

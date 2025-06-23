@@ -41,6 +41,7 @@
     </div>
 
     @stack('scripts')
+    @yield('js-vars')
 
     <script>
         document.addEventListener('alpine:init', () => {

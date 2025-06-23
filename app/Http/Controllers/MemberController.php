@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreMemberRequest;
 use App\Models\Member;
 use App\Models\User;
 use App\Models\Jumuiya;
+use Illuminate\Http\Request;
 
-class MembersController extends Controller
+class MemberController extends Controller
 {
     public function index()
     {
@@ -76,5 +77,21 @@ class MembersController extends Controller
         
         return redirect()->route('admin.members.index')
             ->with('success', 'Member deleted successfully');
+    }
+
+    /**
+     * Update the role of a member's user account.
+     */
+    public function updateRole(Request $request, Member $member)
+    {
+        $request->validate([
+            'role' => 'required|in:member,chairperson,admin',
+        ]);
+
+        $user = $member->user;
+        $user->role = $request->input('role');
+        $user->save();
+
+        return back()->with('success', __('Role updated successfully.'));
     }
 }

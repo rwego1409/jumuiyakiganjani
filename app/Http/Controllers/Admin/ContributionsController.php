@@ -27,9 +27,8 @@ class ContributionsController extends Controller
      */
     public function index()
     {
-        // Paginate the contributions (adjust the number to your preference, e.g., 10)
-        $contributions = Contribution::with('member')->get();
-    
+        // Paginate the contributions (10 per page)
+        $contributions = Contribution::with('member')->paginate(10);
         return view('admin.contributions.index', compact('contributions'));
     }
     
@@ -230,17 +229,21 @@ class ContributionsController extends Controller
         }
     }
 
-    public function exportPdf(Request $request)
+    /**
+     * Export contributions in the requested format (pdf or excel).
+     */
+    public function export(Request $request)
     {
-        $contributions = $this->getFilteredContributions($request);
-        $pdf = PDF::loadView('admin.contributions.pdf', compact('contributions'));
-        return $pdf->download('contributions-' . now()->format('Y-m-d') . '.pdf');
-    }
+        $format = $request->get('format', 'excel'); // default to excel
+        $contributions = $this->getFilteredContributions($request)->get();
 
-    public function exportExcel(Request $request)
-    {
-        $contributions = $this->getFilteredContributions($request);
-        return Excel::download(new ContributionsExport($contributions), 'contributions-' . now()->format('Y-m-d') . '.xlsx');
+        if ($format === 'pdf') {
+            $pdf = \PDF::loadView('admin.contributions.pdf', compact('contributions'));
+            return $pdf->download('contributions-' . now()->format('Y-m-d') . '.pdf');
+        }
+
+        // Default to Excel
+        return \Excel::download(new \App\Exports\ContributionsExport($contributions), 'contributions-' . now()->format('Y-m-d') . '.xlsx');
     }
 
     protected function getFilteredContributions($request)

@@ -92,7 +92,6 @@
                         <div class="bg-gradient-to-br from-amber-500 to-amber-700 p-3 rounded-lg shadow-md">
                             <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
                         </div>
                         <div class="ml-4">
                             <h3 class="text-sm font-medium text-gray-500">Events</h3>
@@ -173,6 +172,12 @@
                                         </svg>
                                         <span class="truncate">{{ $member->created_at->diffForHumans() }}</span>
                                     </div>
+                                </div>
+                                <div class="flex items-center gap-1 mt-2 text-sm text-gray-600">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="truncate">{{ $member->phone ?? 'N/A' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -474,6 +479,36 @@
                             CSV Export
                         </button>
                     </div>
+
+                    <!-- Members Preview Table -->
+                    @if(isset($membersPreview) && count($membersPreview))
+                    <div class="mt-8 overflow-x-auto rounded-lg border border-gray-200">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase bg-gray-50">Name</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase bg-gray-50">Phone</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase bg-gray-50">Email</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase bg-gray-50">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-100">
+                                @foreach($membersPreview as $member)
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-900">{{ $member->name }}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">{{ $member->phone ?? 'N/A' }}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-700">{{ $member->email }}</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <span class="px-2 py-1 text-xs rounded-full {{ $member->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600' }}">
+                                            {{ ucfirst($member->status) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -553,7 +588,7 @@
                     <div class="flex items-center space-x-3">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
+                        </div>
                         <h2 class="text-xl font-semibold text-gray-800">Events Report</h2>
                     </div>
                 </div>
@@ -591,7 +626,7 @@
                     <!-- Export Buttons -->
                     <div class="flex flex-wrap gap-3">
                         <button onclick="generateReport('events', 'pdf')"
-                                class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-md flex items-center">
+                                class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
                             </svg>
@@ -599,7 +634,7 @@
                         </button>
 
                         <button onclick="generateReport('events', 'excel')"
-                                class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center">
+                                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md flex items-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
@@ -607,7 +642,7 @@
                         </button>
 
                         <button onclick="generateReport('events', 'csv')"
-                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center">
+                                class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md flex items-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>

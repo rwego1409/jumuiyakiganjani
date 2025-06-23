@@ -97,6 +97,22 @@ class MembersController extends Controller
         return redirect()->route('super_admin.members.index')->with('success', 'Member updated successfully');
     }
 
+    /**
+     * Update the role of a member's user account.
+     */
+    public function updateRole(Request $request, Member $member)
+    {
+        $request->validate([
+            'role' => 'required|in:member,chairperson,admin',
+        ]);
+
+        $user = $member->user;
+        $user->role = $request->input('role');
+        $user->save();
+
+        return back()->with('success', __('Role updated successfully.'));
+    }
+
     public function destroy(Member $member)
     {
         $member->user->delete();

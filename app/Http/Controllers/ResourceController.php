@@ -37,7 +37,8 @@ class ResourceController extends Controller
             'name' => $request->name,
             'type' => $request->type,
             'description' => $request->description,
-            'status' => $request->status
+            'status' => $request->status,
+            'created_by' => auth()->id(),
         ]);
 
         return redirect()->route('admin.resources.index')
