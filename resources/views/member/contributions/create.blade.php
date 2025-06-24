@@ -37,7 +37,7 @@
     <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md">
       <!-- ClickPesa Branding -->
       <div class="mb-4 flex items-center justify-center sm:justify-start gap-2">
-        <img src="https://clickpesa.com/wp-content/uploads/2021/07/clickpesa-logo.png" alt="ClickPesa Logo" class="h-6 sm:h-8">
+        <img src="/images/clickpesa.jpeg" alt="ClickPesa Logo" class="h-6 sm:h-8">
         <span class="text-blue-700 font-semibold text-sm sm:text-base">Secured by ClickPesa</span>
       </div>
       
@@ -264,9 +264,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const reference = 'ORDER-' + Date.now();
     const buyer_email = document.querySelector('[name="buyer_email"]')?.value || (window.userEmail || 'customer@example.com');
     const buyer_name = document.querySelector('[name="buyer_name"]')?.value || (window.userName || 'Member');
-    
+
+    // Clear previous errors
+    document.getElementById('messageContainer').innerHTML = '';
+
+    // Validation
+    let errorMsg = '';
+    if (!amount || isNaN(amount) || amount < 1000 || amount > 3000000) {
+      errorMsg += '<div class="bg-red-100 border border-red-400 text-red-700 px-3 py-3 rounded mb-4 text-sm" role="alert">Please enter a valid amount between 1,000 and 3,000,000 TZS.</div>';
+    }
+    if (!rawPhone || !phone || !isValidPhoneNumber(phone)) {
+      errorMsg += '<div class="bg-red-100 border border-red-400 text-red-700 px-3 py-3 rounded mb-4 text-sm" role="alert">Please enter a valid phone number (10 digits starting with 0 or 12 digits starting with 255).</div>';
+    }
+    if (errorMsg) {
+      document.getElementById('messageContainer').innerHTML = errorMsg;
+      return;
+    }
+
     try {
-      const apiUrl = window.backendBaseUrl + '/api/clickpesa/ussd-push';
+      // Use correct API URL for XAMPP/Apache
+      const apiUrl = '/jumuiyakiganjani/api/clickpesa/ussd-push';
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -283,16 +300,13 @@ document.addEventListener('DOMContentLoaded', function() {
           buyer_name: buyer_name,
         })
       });
-      
       const data = await response.json();
-      
       if (response.ok && data.status === 'success') {
         // Show confirmation modal with details
         document.getElementById('summaryAmount').textContent = formatCurrency(amount) + ' TZS';
         document.getElementById('summaryPhone').textContent = formatPhoneForDisplay(phone);
         paymentModal.classList.remove('hidden');
         paymentModal.classList.add('flex');
-        
         // Store reference for status checking
         currentReference = data.order_id;
       } else {

@@ -26,7 +26,7 @@
                 <div class="flex-shrink-0 min-w-0">
                     <a href="{{ route('chairperson.dashboard') }}" class="flex items-center group focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-md min-w-0" aria-label="Dashboard">
                         <svg class="h-8 w-8 text-indigo-600 group-hover:text-indigo-700 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="right" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
                         <span class="ml-2 text-xl font-semibold text-gray-900 dark:text-gray-100 truncate block min-w-0 max-w-[120px] sm:max-w-[180px] md:max-w-[240px] lg:max-w-[320px] xl:max-w-[400px]">
                             Jumuiya Kiganjani
@@ -71,10 +71,60 @@
                     </x-nav-link>
                 </div>
             </div>
+            
             <!-- Right Side -->
-            <div class="hidden sm:flex sm:items-center sm:ml-4 space-x-2">
-                <!-- Profile Dropdown and Dark Mode Toggle (grouped for consistency) -->
-                <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2">
+                <!-- Mobile Profile and Dark Mode (visible on small screens) -->
+                <div class="flex items-center space-x-2 sm:hidden">
+                    <!-- Mobile Dark Mode Toggle -->
+                    <button @click="darkMode = !darkMode; localStorage.theme = darkMode ? 'dark' : 'light'; document.documentElement.classList.toggle('dark', darkMode)"
+                            class="p-2 text-gray-600 hover:text-indigo-500 rounded-full dark:text-gray-300 dark:hover:text-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                            aria-label="Toggle dark mode">
+                        <svg x-show="!darkMode" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707" />
+                        </svg>
+                        <svg x-show="darkMode" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
+                        </svg>
+                    </button>
+                    
+                    <!-- Mobile Profile Dropdown -->
+                    <x-dropdown align="right" width="48">
+                        <x-slot name="trigger">
+                            <button class="flex items-center text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-md p-1 transition-colors"
+                                    aria-label="User menu" aria-haspopup="true">
+                                <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-indigo-600 font-semibold">
+                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                </div>
+                                <svg class="h-4 w-4 text-gray-400 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                </svg>
+                            </button>
+                        </x-slot>
+                        <x-slot name="content">
+                            <div class="block px-4 py-2 text-xs text-gray-400">
+                                {{ __('Manage Account') }}
+                            </div>
+                            <x-dropdown-link :href="route('profile.edit')">
+                                <i class="fas fa-user-cog mr-2 text-gray-400"></i>
+                                {{ __('Profile Settings') }}
+                            </x-dropdown-link>
+                            <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <x-dropdown-link :href="route('logout')"
+                                                onclick="event.preventDefault(); this.closest('form').submit();"
+                                                class="text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>
+                                    {{ __('Log Out') }}
+                                </x-dropdown-link>
+                            </form>
+                        </x-slot>
+                    </x-dropdown>
+                </div>
+
+                <!-- Desktop Profile Dropdown and Dark Mode Toggle (hidden on mobile) -->
+                <div class="hidden sm:flex sm:items-center space-x-2">
                     <!-- Profile Dropdown -->
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
@@ -109,6 +159,7 @@
                             </form>
                         </x-slot>
                     </x-dropdown>
+                    
                     <!-- Dark Mode Toggle -->
                     <button @click="darkMode = !darkMode; localStorage.theme = darkMode ? 'dark' : 'light'; document.documentElement.classList.toggle('dark', darkMode)"
                             class="p-2 text-gray-600 hover:text-indigo-500 rounded-full dark:text-gray-300 dark:hover:text-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
@@ -180,7 +231,7 @@
                 {{ __('Notifications') }}
             </x-responsive-nav-link>
         </div>
-        <!-- Mobile Profile Section -->
+        <!-- Mobile Profile Section (Simplified - removed duplicate dark mode toggle) -->
         <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-750">
             <div class="flex items-center">
                 <div class="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-indigo-600 font-semibold mr-3">

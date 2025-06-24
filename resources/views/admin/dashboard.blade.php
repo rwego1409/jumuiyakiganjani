@@ -1,8 +1,6 @@
 @extends('layouts.admin')
 
 @section('content')
-
-
 <div class="py-12 bg-gray-50">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8 px-4">
         @if(session('success'))
@@ -278,8 +276,9 @@
                 </div>
             </div>
         </div>
-<!-- Analytics Charts Section -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        
+        <!-- Analytics Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <!-- Sessions Chart -->
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
                 <div class="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-sky-50 px-6 py-4">
@@ -324,330 +323,313 @@
         </div>
 
         <!-- Mini Charts Grid -->
-        <!-- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            @foreach([
-                ['Members Growth', 'members-trend', '#6366f1', '+24%', 325],
-                ['Contributions', 'contributions-trend', '#10b981', '+38%', 'TZS 1,248,000'],
-                ['Events', 'events-trend', '#f59e0b', '+12%', 14],
-                ['Resources', 'resources-trend', '#ef4444', '+8%', 32]
-            ] as $chart)
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Members Growth Chart -->
             <div class="bg-white p-6 rounded-lg shadow-md">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold text-gray-700">{{ $chart[0] }}</h3>
-                    <span class="text-sm" style="color: {{ $chart[2] }}">{{ $chart[3] }}</span>
+                    <h3 class="text-lg font-semibold text-gray-700">Members Growth</h3>
+                    <span class="text-sm" style="color: #6366f1">+{{ $memberIncreasePercentage }}%</span>
                 </div>
-                <div id="{{ $chart[1] }}" class="h-20"></div>
-                <div class="text-2xl font-bold text-gray-900 mt-2">{{ $chart[4] }}</div>
+                <div id="members-trend" class="h-20"></div>
+                <div class="text-2xl font-bold text-gray-900 mt-2">{{ $totalMembers }}</div>
             </div>
-            @endforeach
-        </div> -->
-
-        <!-- Mini Charts Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <!-- Members Growth Chart -->
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-700">Members Growth</h3>
-            <span class="text-sm" style="color: #6366f1">+{{ $memberIncreasePercentage }}%</span>
-        </div>
-        <div id="members-trend" class="h-20"></div>
-        <div class="text-2xl font-bold text-gray-900 mt-2">{{ $totalMembers }}</div>
-    </div>
-    
-    <!-- Contributions Chart -->
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-700">Contributions</h3>
-            <span class="text-sm" style="color: #10b981">+{{ $contributionIncreasePercentage }}%</span>
-        </div>
-        <div id="contributions-trend" class="h-20"></div>
-        <div class="text-2xl font-bold text-gray-900 mt-2">TZS {{ number_format($totalContributions) }}</div>
-    </div>
-    
-    <!-- Events Chart -->
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-700">Events</h3>
-            <span class="text-sm" style="color: #f59e0b">
-                @php
-                    $previousMonthEvents = \App\Models\Event::whereMonth('created_at', now()->subMonth()->month)->count();
-                    $currentMonthEvents = \App\Models\Event::whereMonth('created_at', now()->month)->count();
-                    $eventsGrowth = $previousMonthEvents > 0 ? 
-                        round(($currentMonthEvents - $previousMonthEvents) / $previousMonthEvents * 100) : 0;
-                @endphp
-                +{{ $eventsGrowth }}%
-            </span>
-        </div>
-        <div id="events-trend" class="h-20"></div>
-        <div class="text-2xl font-bold text-gray-900 mt-2">{{ $totalEvents }}</div>
-    </div>
-    
-    <!-- Resources Chart -->
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-700">Resources</h3>
-            <span class="text-sm" style="color: #ef4444">
-                @php
-                    $previousMonthResources = \App\Models\Resource::whereMonth('created_at', now()->subMonth()->month)->count();
-                    $currentMonthResources = \App\Models\Resource::whereMonth('created_at', now()->month)->count();
-                    $resourcesGrowth = $previousMonthResources > 0 ? 
-                        round(($currentMonthResources - $previousMonthResources) / $previousMonthResources * 100) : 0;
-                @endphp
-                +{{ $resourcesGrowth }}%
-            </span>
-        </div>
-        <div id="resources-trend" class="h-20"></div>
-        <div class="text-2xl font-bold text-gray-900 mt-2">{{ $totalResources }}</div>
-    </div>
-</div>
-
-<!-- Reports Center -->
-<!-- Reports Center -->
-<div class="bg-white shadow-md rounded-lg overflow-hidden mb-8">
-    <div class="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-sky-50 px-6 py-4">
-        <h2 class="text-xl font-semibold text-gray-800 flex items-center">
-            <svg class="h-6 w-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            Reports Center
-        </h2>
-    </div>
-    <div class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" style="grid-auto-rows: minmax(300px, auto)">
-            <!-- Members Report -->
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="bg-gradient-to-r from-blue-50 to-sky-50 px-6 py-4 border-b">
-                    <div class="flex items-center space-x-3">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <h2 class="text-xl font-semibold text-gray-800">Members Report</h2>
-                    </div>
+            
+            <!-- Contributions Chart -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-700">Contributions</h3>
+                    <span class="text-sm" style="color: #10b981">+{{ $contributionIncreasePercentage }}%</span>
                 </div>
-                <div class="p-6">
-                    <p class="text-sm text-gray-600 mb-6">
-                        Generate detailed member reports including personal information and membership history.
-                    </p>
-
-                    <!-- Date Filter -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
-                            <input type="date" id="membersStartDate" 
-                                  class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
-                            <input type="date" id="membersEndDate" 
-                                  class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                    </div>
-
-                    <!-- Status Filter -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Member Status</label>
-                        <select id="membersStatus" class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="all">All Members</option>
-                            <option value="active">Active Only</option>
-                            <option value="inactive">Inactive Only</option>
-                        </select>
-                    </div>
-
-                    <!-- Export Buttons -->
-                    <div class="flex flex-wrap gap-3">
-                        <button onclick="generateReport('members', 'pdf')"
-                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                            </svg>
-                            PDF Export
-                        </button>
-
-                        <button onclick="generateReport('members', 'excel')"
-                                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Excel Export
-                        </button>
-
-                        <button onclick="generateReport('members', 'csv')"
-                                class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            CSV Export
-                        </button>
-                    </div>
-
-                    <!-- Members Preview Table -->
-                    @if(isset($membersPreview) && count($membersPreview))
-                    <div class="mt-8 overflow-x-auto rounded-lg border border-gray-200">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead>
-                                <tr>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase bg-gray-50">Name</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase bg-gray-50">Phone</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase bg-gray-50">Email</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase bg-gray-50">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-100">
-                                @foreach($membersPreview as $member)
-                                <tr>
-                                    <td class="px-4 py-2 text-sm text-gray-900">{{ $member->name }}</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">{{ $member->phone ?? 'N/A' }}</td>
-                                    <td class="px-4 py-2 text-sm text-gray-700">{{ $member->email }}</td>
-                                    <td class="px-4 py-2 text-sm">
-                                        <span class="px-2 py-1 text-xs rounded-full {{ $member->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600' }}">
-                                            {{ ucfirst($member->status) }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    @endif
-                </div>
+                <div id="contributions-trend" class="h-20"></div>
+                <div class="text-2xl font-bold text-gray-900 mt-2">TZS {{ number_format($totalContributions) }}</div>
             </div>
-
-            <!-- Contributions Report -->
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b">
-                    <div class="flex items-center space-x-3">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <h2 class="text-xl font-semibold text-gray-800">Contributions Report</h2>
-                    </div>
+            
+            <!-- Events Chart -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-700">Events</h3>
+                    <span class="text-sm" style="color: #f59e0b">
+                        @php
+                            $previousMonthEvents = \App\Models\Event::whereMonth('created_at', now()->subMonth()->month)->count();
+                            $currentMonthEvents = \App\Models\Event::whereMonth('created_at', now()->month)->count();
+                            $eventsGrowth = $previousMonthEvents > 0 ? 
+                                round(($currentMonthEvents - $previousMonthEvents) / $previousMonthEvents * 100) : 0;
+                        @endphp
+                        +{{ $eventsGrowth }}%
+                    </span>
                 </div>
-                <div class="p-6">
-                    <p class="text-sm text-gray-600 mb-6">
-                        Generate detailed reports of all contributions with filtering options.
-                    </p>
-
-                    <!-- Date Filter -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
-                            <input type="date" id="contributionsStartDate" 
-                                  class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
-                            <input type="date" id="contributionsEndDate" 
-                                  class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500">
-                        </div>
-                    </div>
-
-                    <!-- Contribution Type Filter -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Contribution Type</label>
-                        <select id="contributionsType" class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500">
-                            <option value="all">All Types</option>
-                            <option value="monthly">Monthly</option>
-                            <option value="special">Special</option>
-                            <option value="donation">Donation</option>
-                            <option value="event">Event</option>
-                        </select>
-                    </div>
-
-                    <!-- Export Buttons -->
-                    <div class="flex flex-wrap gap-3">
-                        <button onclick="generateReport('contributions', 'pdf')"
-                                class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                            </svg>
-                            PDF Export
-                        </button>
-
-                        <button onclick="generateReport('contributions', 'excel')"
-                                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Excel Export
-                        </button>
-
-                        <button onclick="generateReport('contributions', 'csv')"
-                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            CSV Export
-                        </button>
-                    </div>
-                </div>
+                <div id="events-trend" class="h-20"></div>
+                <div class="text-2xl font-bold text-gray-900 mt-2">{{ $totalEvents }}</div>
             </div>
-
-            <!-- Events Report -->
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="bg-gradient-to-r from-amber-50 to-yellow-50 px-6 py-4 border-b">
-                    <div class="flex items-center space-x-3">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </div>
-                        <h2 class="text-xl font-semibold text-gray-800">Events Report</h2>
-                    </div>
+            
+            <!-- Resources Chart -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-700">Resources</h3>
+                    <span class="text-sm" style="color: #ef4444">
+                        @php
+                            $previousMonthResources = \App\Models\Resource::whereMonth('created_at', now()->subMonth()->month)->count();
+                            $currentMonthResources = \App\Models\Resource::whereMonth('created_at', now()->month)->count();
+                            $resourcesGrowth = $previousMonthResources > 0 ? 
+                                round(($currentMonthResources - $previousMonthResources) / $previousMonthResources * 100) : 0;
+                        @endphp
+                        +{{ $resourcesGrowth }}%
+                    </span>
                 </div>
-                <div class="p-6">
-                    <p class="text-sm text-gray-600 mb-6">
-                        Generate comprehensive reports of all events with attendance details.
-                    </p>
+                <div id="resources-trend" class="h-20"></div>
+                <div class="text-2xl font-bold text-gray-900 mt-2">{{ $totalResources }}</div>
+            </div>
+        </div>
 
-                    <!-- Date Filter -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
-                            <input type="date" id="eventsStartDate" 
-                                  class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500">
+        <!-- Reports Center - FIXED SECTION -->
+        <div class="bg-white shadow-md rounded-lg overflow-hidden mb-8">
+            <div class="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-sky-50 px-6 py-4">
+                <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                    <svg class="h-6 w-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Reports Center
+                </h2>
+            </div>
+            <div class="p-6">
+                <!-- FIX: Removed problematic inline style -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Members Report -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-50 to-sky-50 px-6 py-4 border-b">
+                            <div class="flex items-center space-x-3">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <h2 class="text-xl font-semibold text-gray-800">Members Report</h2>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
-                            <input type="date" id="eventsEndDate" 
-                                  class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500">
+                        <div class="p-6">
+                            <p class="text-sm text-gray-600 mb-6">
+                                Generate detailed member reports including personal information and membership history.
+                            </p>
+
+                            <!-- Date Filter -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                                    <input type="date" id="membersStartDate" 
+                                          class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                                    <input type="date" id="membersEndDate" 
+                                          class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Member Status</label>
+                                <select id="membersStatus" class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="all">All Members</option>
+                                    <option value="active">Active Only</option>
+                                    <option value="inactive">Inactive Only</option>
+                                </select>
+                            </div>
+
+                            <!-- Export Buttons -->
+                            <div class="flex flex-wrap gap-3">
+                                <button onclick="generateReport('members', 'pdf')"
+                                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                    </svg>
+                                    PDF Export
+                                </button>
+
+                                <button onclick="generateReport('members', 'excel')"
+                                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Excel Export
+                                </button>
+
+                                <button onclick="generateReport('members', 'csv')"
+                                        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    CSV Export
+                                </button>
+                            </div>
+
+                            <!-- Members Preview Table -->
+                            @if(isset($membersPreview) && count($membersPreview))
+                            <div class="mt-8 overflow-x-auto rounded-lg border border-gray-200">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase bg-gray-50">Name</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase bg-gray-50">Phone</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase bg-gray-50">Email</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase bg-gray-50">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-100">
+                                        @foreach($membersPreview as $member)
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ $member->name }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-700">{{ $member->phone ?? 'N/A' }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-700">{{ $member->email }}</td>
+                                            <td class="px-4 py-2 text-sm">
+                                                <span class="px-2 py-1 text-xs rounded-full {{ $member->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600' }}">
+                                                    {{ ucfirst($member->status) }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            @endif
                         </div>
                     </div>
 
-                    <!-- Event Type Filter -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Event Type</label>
-                        <select id="eventsType" class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500">
-                            <option value="all">All Events</option>
-                            <option value="meeting">Meeting</option>
-                            <option value="workshop">Workshop</option>
-                            <option value="seminar">Seminar</option>
-                            <option value="social">Social Gathering</option>
-                        </select>
+                    <!-- Contributions Report -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b">
+                            <div class="flex items-center space-x-3">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <h2 class="text-xl font-semibold text-gray-800">Contributions Report</h2>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-sm text-gray-600 mb-6">
+                                Generate detailed reports of all contributions with filtering options.
+                            </p>
+
+                            <!-- Date Filter -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                                    <input type="date" id="contributionsStartDate" 
+                                          class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                                    <input type="date" id="contributionsEndDate" 
+                                          class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500">
+                                </div>
+                            </div>
+
+                            <!-- Contribution Type Filter -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Contribution Type</label>
+                                <select id="contributionsType" class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500">
+                                    <option value="all">All Types</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="special">Special</option>
+                                    <option value="donation">Donation</option>
+                                    <option value="event">Event</option>
+                                </select>
+                            </div>
+
+                            <!-- Export Buttons -->
+                            <div class="flex flex-wrap gap-3">
+                                <button onclick="generateReport('contributions', 'pdf')"
+                                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                    </svg>
+                                    PDF Export
+                                </button>
+
+                                <button onclick="generateReport('contributions', 'excel')"
+                                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Excel Export
+                                </button>
+
+                                <button onclick="generateReport('contributions', 'csv')"
+                                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    CSV Export
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Export Buttons -->
-                    <div class="flex flex-wrap gap-3">
-                        <button onclick="generateReport('events', 'pdf')"
-                                class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                            </svg>
-                            PDF Export
-                        </button>
+                    <!-- Events Report -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="bg-gradient-to-r from-amber-50 to-yellow-50 px-6 py-4 border-b">
+                            <div class="flex items-center space-x-3">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <h2 class="text-xl font-semibold text-gray-800">Events Report</h2>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-sm text-gray-600 mb-6">
+                                Generate comprehensive reports of all events with attendance details.
+                            </p>
 
-                        <button onclick="generateReport('events', 'excel')"
-                                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Excel Export
-                        </button>
+                            <!-- Date Filter -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                                    <input type="date" id="eventsStartDate" 
+                                          class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                                    <input type="date" id="eventsEndDate" 
+                                          class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500">
+                                </div>
+                            </div>
 
-                        <button onclick="generateReport('events', 'csv')"
-                                class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            CSV Export
-                        </button>
+                            <!-- Event Type Filter -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Event Type</label>
+                                <select id="eventsType" class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="all">All Events</option>
+                                    <option value="meeting">Meeting</option>
+                                    <option value="workshop">Workshop</option>
+                                    <option value="seminar">Seminar</option>
+                                    <option value="social">Social Gathering</option>
+                                </select>
+                            </div>
+
+                            <!-- Export Buttons -->
+                            <div class="flex flex-wrap gap-3">
+                                <button onclick="generateReport('events', 'pdf')"
+                                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                    </svg>
+                                    PDF Export
+                                </button>
+
+                                <button onclick="generateReport('events', 'excel')"
+                                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Excel Export
+                                </button>
+
+                                <button onclick="generateReport('events', 'csv')"
+                                        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    CSV Export
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -657,8 +639,6 @@
 @endsection
 
 @push('scripts')
-<!-- Load ApexCharts from CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.41.0/apexcharts.min.js"></script>
 <script>
 function generateReport(type, format) {
     const startDate = document.getElementById(`${type}StartDate`).value;
@@ -674,8 +654,6 @@ function generateReport(type, format) {
 
     window.location.href = url.toString();
 }
-
-
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.41.0/apexcharts.min.js"></script>
 <script>

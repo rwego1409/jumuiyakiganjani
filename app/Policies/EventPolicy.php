@@ -13,7 +13,8 @@ class EventPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        // Allow admin, chairperson, and member to view events
+        return in_array($user->role, ['admin', 'chairperson', 'member']);
     }
 
     /**
@@ -21,7 +22,22 @@ class EventPolicy
      */
     public function view(User $user, Event $event): bool
     {
-        //
+        // Admin can view all
+        if ($user->role === 'admin') return true;
+        // Chairperson: can view if event is for their jumuiya or created by admin
+        if ($user->role === 'chairperson') {
+            $jumuiya = $user->jumuiyas()->first();
+            // Event is for their jumuiya (many-to-many)
+            $eventJumuiyaIds = $event->jumuiyas->pluck('id')->toArray();
+            return in_array(optional($jumuiya)->id, $eventJumuiyaIds) || optional($event->creator)->role === 'admin';
+        }
+        // Member: can view if event is for their jumuiya or created by admin
+        if ($user->role === 'member') {
+            $member = $user->member;
+            $eventJumuiyaIds = $event->jumuiyas->pluck('id')->toArray();
+            return in_array(optional($member)->jumuiya_id, $eventJumuiyaIds) || optional($event->creator)->role === 'admin';
+        }
+        return false;
     }
 
     /**
@@ -29,7 +45,7 @@ class EventPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -37,7 +53,7 @@ class EventPolicy
      */
     public function update(User $user, Event $event): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -45,7 +61,7 @@ class EventPolicy
      */
     public function delete(User $user, Event $event): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -53,7 +69,7 @@ class EventPolicy
      */
     public function restore(User $user, Event $event): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -61,6 +77,6 @@ class EventPolicy
      */
     public function forceDelete(User $user, Event $event): bool
     {
-        //
+        return false;
     }
 }

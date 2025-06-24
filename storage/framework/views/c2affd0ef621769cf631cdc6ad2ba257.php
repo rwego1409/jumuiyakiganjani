@@ -15,6 +15,7 @@
     <!-- Styles & Scripts -->
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900" x-init="document.documentElement.classList.toggle('dark', darkMode)">
     <div class="min-h-screen">

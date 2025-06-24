@@ -35,6 +35,10 @@ use App\Http\Controllers\SuperAdmin\{
 };
 use App\Models\User;
 use App\Notifications\TestNotification;
+use Illuminate\Http\Request;
+use App\Models\Payment;
+use App\Http\Controllers\Members\PaymentController as MemberPaymentController;
+use App\Http\Controllers\PaymentController;
 
 // Public route
 Route::get('/', function () {
@@ -278,7 +282,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('/', [\App\Http\Controllers\Members\NotificationController::class, 'index'])->name('index');
                 Route::get('/{notification}', [\App\Http\Controllers\Members\NotificationController::class, 'show'])->name('show');
             });
-    });
+        });
 
     // Notifications (general for all users)
     Route::prefix('notifications')->name('notifications.')->group(function () {
@@ -315,83 +319,101 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ]
         ]);
     });
-    // Route::post('/pay', [PaymentController::class, 'payViaMobile']);
 
-Route::get('/payment', function () {
-    return view('payment.form');
-})->name('payment.form');
+    Route::get('/payment', function () {
+        return view('payment.form');
+    })->name('payment.form');
 
-Route::post('/process-payment', [PaymentController::class, 'initiatePayment'])
-     ->name('payment.process');
+    Route::post('/process-payment', [PaymentController::class, 'initiatePayment'])
+         ->name('payment.process');
 
-// Add this with your other routes
-Route::get('/payment/success', function () {
-    return view('member.payment-success');
-})->name('payment.success');
+    // Add this with your other routes
+    Route::get('/payment/success', function () {
+        return view('member.payment-success');
+    })->name('payment.success');
 
-Route::post('/payment/callback', [PaymentController::class, 'paymentCallback']);
-Route::get('/payment/callback', function () {
-    return view('payment.callback');
-})->name('payment.callback');
+    Route::post('/payment/callback', [PaymentController::class, 'paymentCallback']);
+    Route::get('/payment/callback', function () {
+        return view('payment.callback');
+    })->name('payment.callback');
 
-// routes/web.php
-// routes/web.php
-Route::get('/test-stk-push', function() {
-    $phone = request('phone', '255625369871');
-    $amount = request('amount', 1000);
-    
-    $service = app()->make(App\Services\PalmPesaService::class);
-    $response = $service->processPayment(
-        $phone,
-        $amount,
-        'TEST-' . time()
-    );
-    
-    return response()->json([
-        'diagnostic' => [
-            'input_phone' => $phone,
-            'environment' => app()->environment(),
-            'timestamp' => now()->toDateTimeString()
-        ],
-        'api_response' => $response
-    ]);
-});
-Route::prefix('payments')->group(function() {
-    Route::post('/stk-push', [PaymentController::class, 'stkPush']); // Existing
-    Route::post('/mobile', [PaymentController::class, 'mobilePayment']); // New
-});
+    // Test STK Push route
+    Route::get('/test-stk-push', function() {
+        $phone = request('phone', '255625369871');
+        $amount = request('amount', 1000);
+        
+        $service = app()->make(App\Services\PalmPesaService::class);
+        $response = $service->processPayment(
+            $phone,
+            $amount,
+            'TEST-' . time()
+        );
+        
+        return response()->json([
+            'diagnostic' => [
+                'input_phone' => $phone,
+                'environment' => app()->environment(),
+                'timestamp' => now()->toDateTimeString()
+            ],
+            'api_response' => $response
+        ]);
+    });
 
-Route::get('/test-mobile-payment', function() {
-    $service = app()->make(App\Services\PalmPesaService::class);
-    
-    $testData = [
-        'user_id' => 2,
-        'name' => 'Test User',
-        'email' => 'test@example.com',
-        'phone' => '255625369871', // Test with your number
-        'amount' => 1000,
-        'transaction_id' => 'TXN-' . time(),
-        'address' => 'Dar es Salaam',
-        'postcode' => '12345',
-        'buyer_uuid' => 123456
-    ];
+    Route::prefix('payments')->group(function() {
+        Route::post('/stk-push', [PaymentController::class, 'stkPush']); // Existing
+        Route::post('/mobile', [PaymentController::class, 'mobilePayment']); // New
+    });
 
-    $result = $service->processMobilePayment($testData);
-    
-    return response()->json([
-        'test_data' => $testData,
-        'result' => $result,
-        'logs' => 'Check storage/logs/palmpesa.log for details'
-    ]);
-});
+    Route::match(['get', 'post'], '/test-mobile-payment', function(Request $request) {
+        $tailwind = '<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">';
+        $container = 'max-w-md mx-auto mt-12 p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800';
+        $title = '<h2 class="text-2xl font-bold mb-4 text-center bg-gradient-to-r from-pink-500 to-indigo-500 bg-clip-text text-transparent">Mock STK Push Payment</h2>';
+        if ($request->isMethod('get')) {
+            // Step 1: Payment data entry
+            return response($tailwind.'<div class="'.$container.'">'.$title.'<form method="POST" class="space-y-4">'
+                . csrf_field()
+                . '<div><label class="block text-sm font-medium text-gray-700">Phone</label><input name="phone" value="255700000001" required class="mt-1 block w-full rounded-xl border-gray-300 bg-slate-50 text-gray-900 focus:ring-violet-500 focus:border-violet-500"></div>'
+                . '<div><label class="block text-sm font-medium text-gray-700">Amount</label><input name="amount" value="1000" required class="mt-1 block w-full rounded-xl border-gray-300 bg-slate-50 text-gray-900 focus:ring-violet-500 focus:border-violet-500"></div>'
+                . '<div><label class="block text-sm font-medium text-gray-700">Name</label><input name="name" value="Test User" class="mt-1 block w-full rounded-xl border-gray-300 bg-slate-50 text-gray-900 focus:ring-violet-500 focus:border-violet-500"></div>'
+                . '<div><label class="block text-sm font-medium text-gray-700">Email</label><input name="email" value="test@example.com" class="mt-1 block w-full rounded-xl border-gray-300 bg-slate-50 text-gray-900 focus:ring-violet-500 focus:border-violet-500"></div>'
+                . '<button type="submit" class="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-2xl shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-400">Start Payment</button>'
+                . '</form></div>', 200);
+        }
+        $data = $request->only(['phone', 'amount', 'name', 'email']);
+        if (!$request->has('secret_key')) {
+            // Step 2: Mock STK Push menu
+            return response($tailwind.'<div class="'.$container.'">'.$title.'<div class="mb-4 text-center text-gray-700">A mock STK Push has been sent to <span class="font-bold">'.e($data['phone']).'</span> for <span class="font-bold">'.e($data['amount']).' TZS</span>.<br>Enter your secret key to complete the payment.</div>'
+                . '<form method="POST" class="space-y-4">'
+                . csrf_field()
+                . '<input type="hidden" name="phone" value="' . e($data['phone']) . '">' 
+                . '<input type="hidden" name="amount" value="' . e($data['amount']) . '">' 
+                . '<input type="hidden" name="name" value="' . e($data['name']) . '">' 
+                . '<input type="hidden" name="email" value="' . e($data['email']) . '">' 
+                . '<div><label class="block text-sm font-medium text-gray-700">Secret Key</label><input name="secret_key" type="password" required class="mt-1 block w-full rounded-xl border-gray-300 bg-slate-50 text-gray-900 focus:ring-violet-500 focus:border-violet-500"></div>'
+                . '<button type="submit" class="w-full py-3 bg-gradient-to-r from-pink-500 via-violet-600 to-indigo-600 hover:from-pink-600 hover:via-violet-700 hover:to-indigo-700 text-white font-bold rounded-2xl shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400">Submit Secret Key</button>'
+                . '</form></div>', 200);
+        }
+        // Step 3: Process payment as successful mock
+        $payment = Payment::create([
+            'transaction_id' => 'MOCK-' . uniqid(),
+            'amount' => $data['amount'],
+            'currency' => 'TZS',
+            'phone_number' => $data['phone'],
+            'buyer_email' => $data['email'],
+            'buyer_name' => $data['name'],
+            'status' => 'completed',
+            'payment_method' => 'mock_stk',
+            'user_id' => auth()->id(),
+            'clickpesa_reference' => 'MOCK-REF-' . rand(100000, 999999),
+            'gateway_response' => ['mock' => true, 'secret_key' => $request->input('secret_key')],
+            'completed_at' => now(),
+        ]);
+        return response($tailwind.'<div class="'.$container.'">'.$title.'<div class="text-green-600 font-bold text-center mb-4">Payment processed and recorded as successful!</div>'
+            . '<div class="bg-slate-100 rounded-xl p-4 text-sm text-gray-700"><b>Payment ID:</b> '.$payment->id.'<br><b>Phone:</b> '.e($data['phone']).'<br><b>Amount:</b> '.e($data['amount']).' TZS<br><b>Status:</b> completed</div>'
+            . '<div class="mt-6 text-center"><a href="/test-mobile-payment" class="inline-block px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-2xl font-bold shadow hover:from-blue-600 hover:to-indigo-600 transition">Make Another Payment</a></div></div>', 200);
+    });
 
-// Check payment status
-Route::get('/payment/status/{reference}', function($reference) {
-    // Implement status check with PalmPesa API
-    return response()->json([
-        'reference' => $reference
-    ]);
-});
+}); // This closes the main middleware group
 
 // Superuser WhatsApp Reminders Management
 Route::prefix('superuser')
@@ -401,22 +423,24 @@ Route::prefix('superuser')
         Route::resource('whatsapp_reminders', App\Http\Controllers\Superuser\WhatsAppRemindersController::class);
     });
 
-
 // ClickPesa manual integration routes
 Route::post('/clickpesa/ussd', [App\Http\Controllers\ClickPesaController::class, 'ussdCheckout']);
 Route::get('/clickpesa/status/{transactionId}', [App\Http\Controllers\ClickPesaController::class, 'queryStatus']);
 Route::post('/clickpesa/webhook', [App\Http\Controllers\ClickPesaController::class, 'webhook'])->name('clickpesa.webhook');
 
-// Fallback route for 404s
-    Route::fallback(function () {
-        return view('errors.404');
-    });
+// ClickPesa payment endpoint for member payment flow
+Route::post('/clickpesa/payment', [App\Http\Controllers\ClickPesaController::class, 'ussdCheckout']);
 
-    // Subscription (Jumuiya registration)
-    Route::get('/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'create'])->name('subscription.create');
-    Route::post('/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'store'])->name('subscription.store');
+// Public subscription routes
+Route::get('/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'create'])->name('subscription.create');
+Route::post('/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'store'])->name('subscription.store');
+
+// Fallback route for 404s
+Route::fallback(function () {
+    return view('errors.404');
 });
 
+// Admin-only routes
 Route::middleware(['web', 'auth', 'verified', 'admin'])->group(function () {
     Route::get('/admin/activities', [App\Http\Controllers\Admin\ActivitiesController::class, 'index'])->name('admin.activities.index');
 });

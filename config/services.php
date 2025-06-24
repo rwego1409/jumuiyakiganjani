@@ -57,10 +57,12 @@ return [
 
     'clickpesa' => [
         'client_id' => env('CLICKPESA_CLIENT_ID'),
+        'client_secret' => env('CLICKPESA_CLIENT_SECRET'),
         'api_key' => env('CLICKPESA_API_KEY'),
         'email' => env('CLICKPESA_EMAIL'),
         'expire_date' => env('CLICKPESA_EXPIRE_DATE'),
         'base_url' => env('CLICKPESA_BASE_URL', 'https://api.clickpesa.com'),
+        'mock' => env('CLICKPESA_MOCK', false),
     ],
 
     'vodacom' => [

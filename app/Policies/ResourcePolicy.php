@@ -13,7 +13,8 @@ class ResourcePolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        // Allow admin, chairperson, and member to view resources
+        return in_array($user->role, ['admin', 'chairperson', 'member']);
     }
 
     /**
@@ -21,7 +22,19 @@ class ResourcePolicy
      */
     public function view(User $user, Resource $resource): bool
     {
-        //
+        // Admin can view all
+        if ($user->role === 'admin') return true;
+        // Chairperson: can view if resource is for their jumuiya or created by admin
+        if ($user->role === 'chairperson') {
+            $jumuiya = $user->jumuiyas()->first();
+            return $resource->jumuiya_id === optional($jumuiya)->id || optional($resource->creator)->role === 'admin';
+        }
+        // Member: can view if resource is for their jumuiya or created by admin
+        if ($user->role === 'member') {
+            $member = $user->member;
+            return $resource->jumuiya_id === optional($member)->jumuiya_id || optional($resource->creator)->role === 'admin';
+        }
+        return false;
     }
 
     /**
@@ -29,7 +42,7 @@ class ResourcePolicy
      */
     public function create(User $user): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -37,7 +50,7 @@ class ResourcePolicy
      */
     public function update(User $user, Resource $resource): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -45,7 +58,7 @@ class ResourcePolicy
      */
     public function delete(User $user, Resource $resource): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -53,7 +66,7 @@ class ResourcePolicy
      */
     public function restore(User $user, Resource $resource): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -61,6 +74,6 @@ class ResourcePolicy
      */
     public function forceDelete(User $user, Resource $resource): bool
     {
-        //
+        return false;
     }
 }

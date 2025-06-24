@@ -73,8 +73,29 @@ $jumuiyas = Jumuiya::factory()->count(5)->create();
         ]);
 
         // Create other entities
-        Event::factory()->count(15)->create(); // Remove jumuiya_id from seeding
-        Resource::factory()->count(25)->create();
+        // Seed events with created_by and jumuiya association for policy visibility
+        foreach (range(1, 15) as $i) {
+            $event = Event::factory()->make();
+            $event->created_by = $admin->id;
+            $event->save();
+            // Attach to a random jumuiya (if using many-to-many)
+            if (method_exists($event, 'jumuiyas')) {
+                $event->jumuiyas()->attach($jumuiyas->random()->id);
+            } else if (isset($event->jumuiya_id)) {
+                $event->jumuiya_id = $jumuiyas->random()->id;
+                $event->save();
+            }
+        }
+
+        // Seed resources with jumuiya_id and created_by for policy visibility
+        foreach (range(1, 25) as $i) {
+            $resource = Resource::factory()->make([
+                'jumuiya_id' => $jumuiyas->random()->id
+            ]);
+            $resource->created_by = $admin->id;
+            $resource->save();
+        }
+        
         Activity::factory()->count(100)->create();
     }
 }

@@ -106,14 +106,14 @@
             <!-- Submit Button -->
             <div class="pt-4">
                 <div class="flex justify-end space-x-3">
-                    <a href="{{ route('super_admin.admins.index') }}" class="inline-flex justify-center items-center py-2.5 px-4 rounded-lg font-bold text-gray-700 dark:text-white bg-gradient-to-r from-gray-100 to-gray-300 dark:from-gray-800 dark:to-gray-700 shadow hover:from-gray-200 hover:to-gray-400 dark:hover:from-gray-700 dark:hover:to-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-400 transition-all">
+                    <a href="{{ route('super_admin.admins.index') }}" class="inline-flex justify-center items-center py-2.5 px-4 rounded-2xl font-bold text-gray-700 dark:text-white bg-gradient-to-r from-gray-100 to-gray-300 dark:from-gray-800 dark:to-gray-700 shadow-xl hover:from-gray-200 hover:to-gray-400 dark:hover:from-gray-700 dark:hover:to-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-400 transition-all duration-300">
                         <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                         </svg>
                         Cancel
                     </a>
-                    <button type="submit" class="inline-flex justify-center items-center py-2.5 px-4 rounded-lg font-bold text-white bg-gradient-to-r from-pink-500 to-indigo-500 shadow-lg hover:from-pink-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-pink-400 transition-all">
-                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button type="submit" class="inline-flex justify-center items-center py-2.5 px-4 rounded-2xl font-bold text-white bg-gradient-to-r from-pink-500 via-violet-600 to-indigo-600 shadow-xl shadow-pink-500/10 dark:shadow-violet-500/20 hover:from-pink-600 hover:via-violet-700 hover:to-indigo-700 dark:from-pink-400 dark:via-violet-500 dark:to-indigo-500 dark:hover:from-pink-500 dark:hover:via-violet-600 dark:hover:to-indigo-600 transition-all duration-300 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-pink-400">
+                        <svg class="-ml-1 mr-2 h-5 w-5 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
                         Update Admin

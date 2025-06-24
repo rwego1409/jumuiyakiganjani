@@ -271,6 +271,30 @@ The system will:
 - Queue WhatsApp messages for delivery
 - Track delivery status
 - Handle any failures automatically
+
+## Mock STK Push Payment UI Testing
+
+A special test route is available for simulating and recording payments using a modern, user-friendly UI. This is useful for manual testing and development.
+
+### How to Use
+
+1. **Visit the test payment page:**
+   - Go to `/test-mobile-payment` in your browser (e.g., `http://localhost:8000/test-mobile-payment` or your local domain).
+
+2. **Step 1: Enter Payment Data**
+   - Fill in the phone number, amount, name, and email fields with any values you want to test.
+   - Click **Start Payment**.
+
+3. **Step 2: Mock STK Push Menu**
+   - You will see a prompt to enter a secret key (simulating a real STK Push prompt on a phone).
+   - Enter any value as the secret key and submit.
+
+4. **Step 3: Success**
+   - The payment will be processed and recorded as successful in the database.
+   - A confirmation message and payment details will be shown.
+   - You can click **Make Another Payment** to repeat the process.
+
+This flow is styled with Tailwind CSS and is intended for local development and QA only.
 ```
 
 ### .dockerignore

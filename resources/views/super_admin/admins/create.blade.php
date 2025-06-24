@@ -91,8 +91,8 @@
             <!-- Submit Button -->
             <div class="pt-2">
                 <button type="submit" 
-                    class="w-full flex justify-center items-center py-2.5 px-4 rounded-lg font-bold text-white bg-gradient-to-r from-pink-500 to-indigo-500 shadow-lg hover:from-pink-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-pink-400 transition-all">
-                    <svg class="mr-2 w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    class="w-full flex justify-center items-center py-2.5 px-4 rounded-2xl font-bold text-white bg-gradient-to-r from-pink-500 via-violet-600 to-indigo-600 shadow-xl shadow-pink-500/10 dark:shadow-violet-500/20 hover:from-pink-600 hover:via-violet-700 hover:to-indigo-700 dark:from-pink-400 dark:via-violet-500 dark:to-indigo-500 dark:hover:from-pink-500 dark:hover:via-violet-600 dark:hover:to-indigo-600 transition-all duration-300 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-pink-400">
+                    <svg class="mr-2 w-5 h-5 transition-transform group-hover:rotate-90" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                     Create Admin

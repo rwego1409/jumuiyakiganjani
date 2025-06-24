@@ -25,6 +25,7 @@
             document.documentElement.classList.add('dark');
         }
     </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
     <div class="min-h-screen flex flex-col sm:justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
