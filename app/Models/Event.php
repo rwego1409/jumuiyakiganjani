@@ -20,6 +20,15 @@ class Event extends Model
         return $this->belongsToMany(Jumuiya::class, 'event_jumuiya');
     }
 
+    /**
+     * Single jumuiya relationship for compatibility with Event::with('jumuiya')
+     */
+    public function jumuiya()
+    {
+        // If your event belongs to one jumuiya (foreign key: jumuiya_id)
+        return $this->belongsTo(Jumuiya::class);
+    }
+
     public function scopeUpcoming($query)
 {
     return $query->where('status', 'upcoming')

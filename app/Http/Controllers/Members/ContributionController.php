@@ -3,18 +3,23 @@
 namespace App\Http\Controllers\Members;
 
 use App\Http\Controllers\Controller;
-use App\Models\Member;
-use App\Models\Jumuiya;
 use App\Models\Contribution;
+use App\Models\Jumuiya;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreContributionRequest;
 use App\Http\Requests\UpdateContributionRequest;
-use App\Services\PaymentService;
-use App\Models\Course;
-use App\Models\Event;
+use App\Services\ClickPesaService;  // Updated to use ClickPesaService
+use Illuminate\Http\Request;
 
 class ContributionController extends Controller
 {
+    protected ClickPesaService $clickPesaService;
+
+    public function __construct(ClickPesaService $clickPesaService)
+    {
+        $this->clickPesaService = $clickPesaService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -46,38 +51,34 @@ class ContributionController extends Controller
     public function store(StoreContributionRequest $request)
     {
         $member = Auth::user()->member;
-    
+
         Contribution::create([
-            'user_id' => Auth::id(), 
+            'user_id' => Auth::id(),
             'member_id' => $member->id,
             'jumuiya_id' => $request->jumuiya_id,
             'amount' => $request->amount,
             'contribution_date' => $request->contribution_date,
             'status' => 'pending', // default status
-             'recorded_by' => Auth::id(),
+            'recorded_by' => Auth::id(),
         ]);
-    
+
         return redirect()->route('member.contributions.index')
             ->with('success', 'Contribution created successfully.');
     }
-    
 
     /**
      * Display the specified resource.
      */
     public function show(Contribution $contribution)
-{
-    // $contribution->load('course');
-    return view('member.contributions.show', compact('contribution'));
-}
-
+    {
+        return view('member.contributions.show', compact('contribution'));
+    }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Contribution $contribution)
     {
-        // Optional: Authorize edit access
         $this->authorize('update', $contribution);
 
         $jumuiyas = Jumuiya::all();
@@ -90,14 +91,13 @@ class ContributionController extends Controller
      */
     public function update(UpdateContributionRequest $request, Contribution $contribution)
     {
-        // Optional: Authorize update access
         $this->authorize('update', $contribution);
 
         $contribution->update([
             'jumuiya_id' => $request->jumuiya_id,
             'amount' => $request->amount,
             'contribution_date' => $request->contribution_date,
-            'status' => $request->status ?? 'pending'
+            'status' => $request->status ?? 'pending',
         ]);
 
         return redirect()->route('member.contributions.index')
@@ -109,7 +109,6 @@ class ContributionController extends Controller
      */
     public function destroy(Contribution $contribution)
     {
-        // Optional: Authorize delete access
         $this->authorize('delete', $contribution);
 
         $contribution->delete();
@@ -119,30 +118,33 @@ class ContributionController extends Controller
     }
 
     /**
-     * Handle the payment of a contribution.
+     * Handle the payment of a contribution using ClickPesaService.
      */
-    public function payContribution($id, PaymentService $paymentService)
+    public function payContribution($id)
     {
         $contribution = Contribution::where('id', $id)
             ->where('member_id', auth()->user()->member->id)
             ->firstOrFail();
 
-        // Simulate payment process or call actual payment service
-        $paymentStatus = $paymentService->processPayment($contribution);
+        // Use ClickPesaService to initiate payment
+        $response = $this->clickPesaService->initiatePayment(
+            auth()->user()->phone,  // Assuming user model has phone number
+            $contribution->amount,
+            'contrib_' . $contribution->id  // Unique reference
+        );
 
-        if ($paymentStatus['status'] == 'success') {
-            // Update the contribution status after successful payment
+        if ($response['success']) {
+            // Optionally update contribution with payment initiation info
             $contribution->update([
-                'status' => 'paid',
-                'payment_date' => now(),
-                'payment_method' => $paymentStatus['method'],
+                'status' => 'payment_initiated',
+                'payment_reference' => $response['transaction_id'] ?? null,
             ]);
 
-            return redirect()->route('member.contributions.index')
-                ->with('success', 'Payment successful. Thank you!');
+            // Redirect user to payment gateway to complete payment
+            return redirect()->away($response['gateway_url']);
         } else {
             return redirect()->route('member.contributions.index')
-                ->with('error', 'Payment failed. Please try again later.');
+                ->with('error', $response['error'] ?? 'Payment initiation failed. Please try again.');
         }
     }
 
@@ -188,11 +190,10 @@ class ContributionController extends Controller
         return view('member.contributions.payment_receipt', compact('contribution'));
     }
 
-    
-public function course()
-{
-    return $this->belongsTo(Course::class);
-}
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
 
     public function history($id)
     {

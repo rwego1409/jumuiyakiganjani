@@ -27,12 +27,16 @@ class ResourcePolicy
         // Chairperson: can view if resource is for their jumuiya or created by admin
         if ($user->role === 'chairperson') {
             $jumuiya = $user->jumuiyas()->first();
-            return $resource->jumuiya_id === optional($jumuiya)->id || optional($resource->creator)->role === 'admin';
+            $isForJumuiya = $resource->jumuiya_id === optional($jumuiya)->id;
+            $isAdminCreated = optional($resource->creator)->role === 'admin';
+            return $isForJumuiya || $isAdminCreated;
         }
         // Member: can view if resource is for their jumuiya or created by admin
         if ($user->role === 'member') {
             $member = $user->member;
-            return $resource->jumuiya_id === optional($member)->jumuiya_id || optional($resource->creator)->role === 'admin';
+            $isForJumuiya = $resource->jumuiya_id === optional($member)->jumuiya_id;
+            $isAdminCreated = optional($resource->creator)->role === 'admin';
+            return $isForJumuiya || $isAdminCreated;
         }
         return false;
     }

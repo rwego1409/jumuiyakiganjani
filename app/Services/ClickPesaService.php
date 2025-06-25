@@ -10,36 +10,83 @@ class ClickPesaService
 {
     public function __construct(
         protected string $vendorId,
+        protected string $clientId,
         protected string $apiKey,
-        protected string $apiSecret,
         protected string $baseUrl
     ) {}
 
+    protected function getJwtToken()
+    {
+        $url = $this->baseUrl . '/third-parties/generate-token';
+        try {
+            $response = Http::withHeaders([
+                'api-key' => $this->apiKey,
+                'client-id' => $this->clientId,
+            ])->post($url);
+            Log::info('ClickPesa getJwtToken request', ['url' => $url, 'headers' => ['api-key' => $this->apiKey, 'client-id' => $this->clientId]]);
+            if ($response->successful()) {
+                Log::info('ClickPesa getJwtToken success', ['response' => $response->json()]);
+                return $response->json('token');
+            }
+            Log::error('ClickPesa JWT Token Error', ['response' => $response->body()]);
+        } catch (\Throwable $e) {
+            Log::error('ClickPesa JWT Token Exception', ['exception' => $e->getMessage()]);
+        }
+        return null;
+    }
+
+    /**
+     * Generate checksum for ClickPesa payment request.
+     * Adjust the logic as per ClickPesa documentation if a specific formula is required.
+     */
+    protected function generateChecksum(string $amount, string $currency, string $orderReference, string $phoneNumber): string
+    {
+        // Example: concatenate and hash (replace with ClickPesa's required logic if different)
+        $data = $amount . $currency . $orderReference . $phoneNumber . $this->apiKey;
+        return hash('sha256', $data);
+    }
+
     public function initiatePayment(string $phone, float $amount, string $reference): array
     {
+        Log::info('ClickPesa ENV DEBUG', [
+            'vendorId' => $this->vendorId,
+            'clientId' => $this->clientId,
+            'apiKey' => $this->apiKey,
+            'baseUrl' => $this->baseUrl,
+        ]);
         Log::info('ClickPesa initiatePayment called', [
             'phone' => $phone,
             'amount' => $amount,
             'reference' => $reference
         ]);
 
+        $jwt = $this->getJwtToken();
+        if (!$jwt) {
+            return [
+                'success' => false,
+                'error' => 'Could not authenticate with payment service'
+            ];
+        }
+
+        $amountStr = (string) $amount;
+        $currency = 'TZS';
+        $checksum = $this->generateChecksum($amountStr, $currency, $reference, $phone);
+
         $payload = [
-            'vendor' => $this->vendorId,
-            'order_id' => Str::uuid(),
-            'buyer_phone' => $phone,
-            'payment_method' => 'CLICKPESA',
-            'amount' => $amount,
-            'currency' => 'TZS',
-            'redirect_url' => route('payment.clickpesa-callback'),
-            'webhook' => route('payment.webhook'),
-            'timestamp' => now()->toISOString(),
+            'amount' => $amountStr,
+            'currency' => $currency,
+            'orderReference' => $reference,
+            'phoneNumber' => $phone,
+            'checksum' => $checksum
         ];
 
+        $url = $this->baseUrl . '/third-parties/payments/initiate-ussd-push-request';
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . base64_encode("{$this->apiKey}:{$this->apiSecret}"),
-                'Signature' => $this->generateSignature($payload),
-            ])->post("{$this->baseUrl}/v1/payments", $payload);
+                'Authorization' => 'Bearer ' . $jwt,
+                'Content-Type' => 'application/json',
+            ])->post($url, $payload);
+            Log::info('ClickPesa initiatePayment request', ['url' => $url, 'payload' => $payload, 'headers' => ['Authorization' => 'Bearer ' . $jwt]]);
         } catch (\Throwable $e) {
             Log::error('ClickPesa HTTP Exception', ['exception' => $e->getMessage(), 'payload' => $payload]);
             return [
@@ -51,20 +98,12 @@ class ClickPesaService
         return $this->parseResponse($response, $payload);
     }
 
-    private function generateSignature(array $payload): string
-    {
-        ksort($payload);
-        $signatureData = implode('', array_values($payload));
-        return hash_hmac('sha256', $signatureData, $this->apiSecret);
-    }
-
     private function parseResponse($response, $payload = []): array
     {
         if ($response->successful()) {
             return [
                 'success' => true,
-                'transaction_id' => $response->json('data.transaction_id'),
-                'gateway_url' => $response->json('data.gateway_url')
+                'data' => $response->json()
             ];
         }
 
@@ -73,6 +112,50 @@ class ClickPesaService
             'status' => $response->status(),
             'body' => $response->body(),
             'payload' => $payload
+        ]);
+        return [
+            'success' => false,
+            'error' => $errorMsg
+        ];
+    }
+
+    /**
+     * Check payment status by orderReference.
+     */
+    public function checkPaymentStatus(string $orderReference): array
+    {
+        $jwt = $this->getJwtToken();
+        if (!$jwt) {
+            return [
+                'success' => false,
+                'error' => 'Could not authenticate with payment service'
+            ];
+        }
+        $url = $this->baseUrl . '/third-parties/payments/' . $orderReference;
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $jwt,
+                'Content-Type' => 'application/json',
+            ])->get($url);
+            Log::info('ClickPesa checkPaymentStatus request', ['url' => $url, 'headers' => ['Authorization' => 'Bearer ' . $jwt]]);
+        } catch (\Throwable $e) {
+            Log::error('ClickPesa checkPaymentStatus Exception', ['exception' => $e->getMessage(), 'orderReference' => $orderReference]);
+            return [
+                'success' => false,
+                'error' => 'Payment status check failed: ' . $e->getMessage()
+            ];
+        }
+        if ($response->successful()) {
+            return [
+                'success' => true,
+                'data' => $response->json()
+            ];
+        }
+        $errorMsg = $response->json('message') ?? $response->json('error') ?? 'Payment status check failed';
+        Log::error('ClickPesa Payment Status Error', [
+            'status' => $response->status(),
+            'body' => $response->body(),
+            'orderReference' => $orderReference
         ]);
         return [
             'success' => false,

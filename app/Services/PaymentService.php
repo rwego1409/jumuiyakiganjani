@@ -2,76 +2,99 @@
 
 namespace App\Services;
 
-use App\Services\DarajaService;
-use App\Services\ClickPesaService;
-use App\Services\MpesaService;
-use App\Services\ZenoPayService;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
-class PaymentService
+class ClickPesaService
 {
-    public function __construct(
-        protected DarajaService $daraja,
-        protected ClickPesaService $clickPesa,
-        protected MpesaService $vodacom,
-        protected ZenoPayService $zenopay
-    ) {}
+    protected string $baseUrl;
+    protected bool $mock;
 
-    public function initiateMobilePayment(string $phone, float $amount, string $reference): array
+    public function __construct()
     {
-        $countryCode = Str::substr($phone, 0, 3);
-        $amount = round($amount, 2);
+        $this->baseUrl = config('services.clickpesa.base_url', 'https://api.clickpesa.com');
+        $this->mock = filter_var(env('CLICKPESA_MOCK', false), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    public function initiateUssdPushPayment(string $phone, float $amount, string $reference): array
+    {
+        if ($this->mock) {
+            Log::info('ClickPesaService: Running in MOCK mode.');
+            return [
+                'success' => true,
+                'method' => 'clickpesa_mock',
+                'reference' => 'MOCK-' . rand(100000, 999999),
+                'phone' => $phone,
+                'amount' => $amount,
+                'message' => 'Mocked payment initiated'
+            ];
+        }
+
+        $token = $this->getToken();
+        if (!$token) {
+            return [
+                'success' => false,
+                'error' => 'Unable to authenticate with ClickPesa.'
+            ];
+        }
 
         try {
-            if ($countryCode === '254') {
-                return $this->handleKenya($phone, $amount, $reference);
-            } elseif ($countryCode === '255') {
-                return $this->handleTanzania($phone, $amount, $reference);
+            $response = Http::timeout(30)
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . $token,
+                    'Content-Type' => 'application/json',
+                ])
+                ->post($this->baseUrl . '/third-parties/payments/initiate-ussd-push-request', [
+                    'amount' => $amount,
+                    'currency' => 'TZS',
+                    'orderReference' => $reference,
+                    'phoneNumber' => $phone,
+                    'callbackUrl' => route('clickpesa.webhook'),
+                ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                return [
+                    'success' => true,
+                    'method' => 'clickpesa',
+                    'reference' => $data['reference'] ?? $reference,
+                    'phone' => $phone,
+                    'amount' => $amount,
+                    'gateway_response' => $data
+                ];
             } else {
-                throw new \InvalidArgumentException('Unsupported country code');
+                return [
+                    'success' => false,
+                    'error' => $response->json()['message'] ?? 'Payment request failed'
+                ];
             }
         } catch (\Exception $e) {
-            return $this->handlePaymentError($e, $phone, $countryCode);
+            Log::error('ClickPesaService Exception:', ['message' => $e->getMessage()]);
+            return [
+                'success' => false,
+                'error' => 'Payment request failed: ' . $e->getMessage()
+            ];
         }
     }
 
-    protected function handleKenya(string $phone, float $amount, string $reference): array
+    protected function getToken(): ?string
     {
-        return $this->daraja->stkPush(
-            phone: $this->formatPhone($phone, '254'),
-            amount: $amount,
-            reference: $reference,
-            callback: route('payment.daraja-callback')
-        );
-    }
+        try {
+            $response = Http::timeout(30)->post($this->baseUrl . '/oauth/token', [
+                'client_id' => env('CLICKPESA_CLIENT_ID'),
+                'client_secret' => env('CLICKPESA_CLIENT_SECRET'),
+                'grant_type' => 'client_credentials',
+            ]);
 
-    protected function handleTanzania(string $phone, float $amount, string $reference): array
-    {
-        // Use ZenoPay for Tanzania
-        $response = $this->zenopay->initiatePayment(
-            $this->formatPhone($phone, '255'),
-            $amount,
-            $reference
-        );
-        return $response;
-    }
+            if ($response->successful()) {
+                return $response->json()['access_token'] ?? null;
+            }
 
-    private function formatPhone(string $phone, string $prefix): string
-    {
-        return $prefix . substr(preg_replace('/[^0-9]/', '', $phone), -9);
-    }
-
-    private function handlePaymentError(\Exception $e, string $phone, string $countryCode): array
-    {
-        logger()->error('Payment failed', [
-            'phone' => $phone,
-            'country' => $countryCode,
-            'error' => $e->getMessage()
-        ]);
-
-        return [
-            'success' => false,
-            'error' => config('app.debug') ? $e->getMessage() : 'Payment processing failed'
-        ];
+            Log::error('ClickPesaService Token Error:', $response->json());
+            return null;
+        } catch (\Exception $e) {
+            Log::error('ClickPesaService Token Exception:', ['message' => $e->getMessage()]);
+            return null;
+        }
     }
 }

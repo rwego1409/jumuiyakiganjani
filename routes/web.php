@@ -431,6 +431,12 @@ Route::post('/clickpesa/webhook', [App\Http\Controllers\ClickPesaController::cla
 // ClickPesa payment endpoint for member payment flow
 Route::post('/clickpesa/payment', [App\Http\Controllers\ClickPesaController::class, 'ussdCheckout']);
 
+// ClickPesa USSD-PUSH web endpoint for form POST
+Route::match(['get', 'post'], '/clickpesa/ussd-push', [ClickPesaController::class, 'initiateUssdPush'])->name('clickpesa.ussd-push');
+
+// ClickPesa payment status check (by orderReference)
+Route::get('/clickpesa/payment-status/{orderReference}', [App\Http\Controllers\ClickPesaController::class, 'paymentStatusByOrderReference'])->name('clickpesa.payment-status');
+
 // Public subscription routes
 Route::get('/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'create'])->name('subscription.create');
 Route::post('/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'store'])->name('subscription.store');
@@ -443,4 +449,10 @@ Route::fallback(function () {
 // Admin-only routes
 Route::middleware(['web', 'auth', 'verified', 'admin'])->group(function () {
     Route::get('/admin/activities', [App\Http\Controllers\Admin\ActivitiesController::class, 'index'])->name('admin.activities.index');
+});
+
+// Simple test POST route to verify Laravel is working
+Route::post('/test-post', function (\Illuminate\Http\Request $request) {
+    \Log::info('Test POST route hit', ['data' => $request->all()]);
+    return response()->json(['success' => true, 'data' => $request->all()]);
 });
