@@ -30,11 +30,11 @@ class MembersExport implements FromCollection, WithHeadings
         return $query->get()
             ->map(function ($member) {
                 return [
-                    'Name' => $member->user->name,
-                    'Email' => $member->user->email,
+                    'Name' => $member->user ? $member->user->name : '',
+                    'Email' => $member->user ? $member->user->email : '',
                     'Phone' => $member->phone,
-                    'Jumuiya' => $member->jumuiya->name,
-                    'Joined Date' => $member->created_at->format('Y-m-d'),
+                    'Jumuiya' => $member->jumuiya ? $member->jumuiya->name : '',
+                    'Joined Date' => $member->created_at ? $member->created_at->format('Y-m-d') : '',
                     'Status' => $member->status,
                 ];
             });

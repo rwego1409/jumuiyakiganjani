@@ -19,10 +19,10 @@ class ResourcesExport implements FromCollection, WithHeadings
     {
         return $this->query->with('jumuiya')->get()->map(function ($resource) {
             return [
-                'Title' => $resource->title,
-                'Type' => $resource->type,
+                'Title' => $resource->title ?? '',
+                'Type' => $resource->type ?? '',
                 'Jumuiya' => $resource->jumuiya ? $resource->jumuiya->name : '',
-                'Description' => $resource->description,
+                'Description' => $resource->description ?? '',
             ];
         });
     }

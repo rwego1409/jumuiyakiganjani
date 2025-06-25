@@ -35,10 +35,10 @@ class EventsExport implements FromCollection, WithHeadings, WithMapping
     {
         return [
             $event->title,
-            $event->start_time->format('Y-m-d H:i:s'),
+            $event->start_time ? $event->start_time->format('Y-m-d H:i:s') : '',
             $event->location,
-            $event->organizer->name,
-            $event->attendees->count(),
+            $event->organizer ? $event->organizer->name : '',
+            $event->attendees ? $event->attendees->count() : 0,
             $event->status,
             $event->description
         ];
