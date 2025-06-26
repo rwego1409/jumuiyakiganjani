@@ -52,7 +52,7 @@ class EventsController extends Controller
         $event = Event::create($validated);
         $event->jumuiyas()->sync($jumuiyaIds);
 
-        return redirect()->route('admin.events.show', $event->id)
+        return redirect()->route('admin.events.index')
             ->with('success', 'Event created successfully!');
     }
 
@@ -89,10 +89,18 @@ class EventsController extends Controller
             'end_time' => 'required|date|after:start_time',
             'location' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'jumuiya_id' => 'required|exists:jumuiyas,id',
+            'jumuiya_ids' => 'required|array|min:1',
+            'jumuiya_ids.*' => 'exists:jumuiyas,id|distinct',
         ]);
 
+        $jumuiyaIds = $validated['jumuiya_ids'];
+        if (in_array('all', $jumuiyaIds)) {
+            $jumuiyaIds = Jumuiya::pluck('id')->toArray();
+        }
+        unset($validated['jumuiya_ids']);
+
         $event->update($validated);
+        $event->jumuiyas()->sync($jumuiyaIds);
 
         return redirect()->route('admin.events.show', $event->id)
             ->with('success', 'Event updated successfully!');

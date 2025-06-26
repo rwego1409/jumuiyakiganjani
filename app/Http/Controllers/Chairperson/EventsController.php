@@ -15,47 +15,62 @@ class EventsController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
+        \Log::info('EventsController@index user', [
+            'id' => $user->id,
+            'role' => $user->role,
+            'jumuiya_ids' => $user->jumuiyas->pluck('id'),
+            'member_jumuiya_id' => optional($user->member)->jumuiya_id
+        ]);
+
         $query = Event::query();
 
-        // Only show events for the user's jumuiya or created by admin
         if ($user->hasRole('chairperson')) {
             $jumuiya = $user->jumuiyas()->first();
+            \Log::info('Chairperson jumuiya', ['jumuiya' => $jumuiya]);
+
             if ($jumuiya) {
-                $query->where(function($q) use ($jumuiya) {
-                    $q->where('jumuiya_id', $jumuiya->id)
-                      ->orWhereHas('creator', function($q2) {
-                          $q2->where('role', 'admin');
-                      });
+                $query->where(function ($q) use ($jumuiya, $user) {
+                    $q->whereHas('jumuiyas', function ($q2) use ($jumuiya) {
+                        $q2->where('jumuiya_id', $jumuiya->id);
+                    })
+                    ->orWhere('created_by', $user->id)
+                    ->orWhereHas('creator', function ($q2) {
+                        $q2->where('role', 'admin');
+                    });
                 });
             }
         } elseif ($user->hasRole('member')) {
             $member = $user->member;
+            \Log::info('Member info', ['member' => $member]);
+
             if ($member && $member->jumuiya_id) {
-                $query->where(function($q) use ($member) {
-                    $q->where('jumuiya_id', $member->jumuiya_id)
-                      ->orWhereHas('creator', function($q2) {
-                          $q2->where('role', 'admin');
-                      });
+                $query->where(function ($q) use ($member) {
+                    $q->whereHas('jumuiyas', function ($q2) use ($member) {
+                        $q2->where('jumuiya_id', $member->jumuiya_id);
+                    })
+                    ->orWhereHas('creator', function ($q2) {
+                        $q2->where('role', 'admin');
+                    });
                 });
             }
         }
 
-        // Apply search filter
+        // Search filter
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('location', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%");
             });
         }
 
-        // Apply status filter
+        // Status filter
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Apply date range filter
+        // Date range filter
         if ($request->filled('start_date')) {
             $query->whereDate('start_time', '>=', $request->start_date);
         }
@@ -63,8 +78,9 @@ class EventsController extends Controller
             $query->whereDate('end_time', '<=', $request->end_date);
         }
 
-        // Get the filtered events with pagination
         $events = $query->latest()->paginate(10);
+
+        \Log::info('EventsController@index events count', ['count' => $events->count(), 'event_ids' => $events->pluck('id')]);
 
         return view('chairperson.events.index', compact('events'));
     }
@@ -93,12 +109,16 @@ class EventsController extends Controller
 
         $jumuiya = auth()->user()->jumuiyas()->first();
         if (!$jumuiya) {
-            return redirect()->route('chairperson.events.index')->with('error', 'No jumuiya assigned to your account.');
+            return redirect()->route('chairperson.events.index')
+                ->with('error', 'No jumuiya assigned to your account.');
         }
-        $validated['jumuiya_id'] = $jumuiya->id;
+
         $validated['created_by'] = auth()->id();
+        $validated['title'] = $validated['name'];
+        unset($validated['name']);
 
         $event = Event::create($validated);
+        $event->jumuiyas()->attach($jumuiya->id);
 
         return redirect()->route('chairperson.events.show', $event)
             ->with('success', __('Event created successfully.'));
@@ -117,6 +137,13 @@ class EventsController extends Controller
      */
     public function edit(Event $event)
     {
+        $user = auth()->user();
+
+        if ($event->created_by !== $user->id) {
+            return redirect()->route('chairperson.events.index')
+                ->with('error', 'You are not authorized to edit this event.');
+        }
+
         return view('chairperson.events.edit', compact('event'));
     }
 
@@ -125,6 +152,13 @@ class EventsController extends Controller
      */
     public function update(Request $request, Event $event)
     {
+        $user = auth()->user();
+
+        if ($event->created_by !== $user->id) {
+            return redirect()->route('chairperson.events.index')
+                ->with('error', 'You are not authorized to update this event.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'start_time' => 'required|date',
@@ -133,6 +167,9 @@ class EventsController extends Controller
             'description' => 'nullable|string',
             'status' => 'required|in:upcoming,ongoing,completed'
         ]);
+
+        $validated['title'] = $validated['name'];
+        unset($validated['name']);
 
         $event->update($validated);
 
@@ -145,6 +182,13 @@ class EventsController extends Controller
      */
     public function destroy(Event $event)
     {
+        $user = auth()->user();
+
+        if ($event->created_by !== $user->id) {
+            return redirect()->route('chairperson.events.index')
+                ->with('error', 'You are not authorized to delete this event.');
+        }
+
         $event->delete();
 
         return redirect()->route('chairperson.events.index')

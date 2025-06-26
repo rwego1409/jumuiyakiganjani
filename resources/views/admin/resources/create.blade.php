@@ -5,7 +5,10 @@
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white shadow-sm sm:rounded-lg">
             <div class="p-6 bg-white border-b border-gray-200">
-                <h2 class="text-2xl font-semibold mb-6">Upload New Resource</h2>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-semibold">Upload New Resource</h2>
+                    <a href="{{ route('admin.resources.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 focus:outline-none focus:border-gray-300 focus:ring focus:ring-gray-200 active:bg-gray-400 transition">Back</a>
+                </div>
                 
                 <form method="POST" action="{{ route('admin.resources.store') }}" enctype="multipart/form-data">
                     @csrf

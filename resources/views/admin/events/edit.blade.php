@@ -4,7 +4,10 @@
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-blue-900 dark:via-gray-800 dark:to-blue-900 py-12">
     <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-2xl rounded-2xl border border-blue-200/50 dark:border-blue-900/50 p-8">
-            <h1 class="text-3xl font-bold text-blue-700 dark:text-blue-300 mb-6">Edit Event</h1>
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-3xl font-bold text-blue-700 dark:text-blue-300">Edit Event</h1>
+                <a href="{{ route('admin.events.index') }}" class="inline-flex items-center px-4 py-2 rounded-xl shadow font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-all">Back</a>
+            </div>
             <form method="POST" action="{{ route('admin.events.update', $event->id) }}">
                 @csrf
                 @method('PUT')

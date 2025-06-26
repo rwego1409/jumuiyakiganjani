@@ -23,13 +23,13 @@ class ResourceController extends Controller
         $user = auth()->user();
         $query = Resource::query();
 
-        // Only show resources for the member's jumuiya or created by admin
+        // Members can see resources from their jumuiya and those created by admin
         if ($user->hasRole('member')) {
             $member = $user->member;
             if ($member && $member->jumuiya_id) {
-                $query->where(function($q) use ($member) {
+                $query->where(function ($q) use ($member) {
                     $q->where('jumuiya_id', $member->jumuiya_id)
-                      ->orWhereHas('creator', function($q2) {
+                      ->orWhereHas('creator', function ($q2) {
                           $q2->where('role', 'admin');
                       });
                 });
@@ -45,15 +45,15 @@ class ResourceController extends Controller
 
         return view('member.resources.index', compact('resources'));
     }
-    
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
+        if (auth()->user()->hasRole('member')) abort(403);
         return view('admin.resources.create', [
-            'jumuiyas' => Jumuiya::all() // Fetch all jumuiyas
+            'jumuiyas' => Jumuiya::all()
         ]);
     }
 
@@ -62,12 +62,13 @@ class ResourceController extends Controller
      */
     public function store(StoreResourceRequest $request)
     {
+        if (auth()->user()->hasRole('member')) abort(403);
         $data = $request->only(['jumuiya_id', 'name', 'type', 'description', 'status']);
+        $data['created_by'] = auth()->id();
 
-        // Handle file upload
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $path = $file->store('resources', 'public'); // stores in storage/app/public/resources
+            $path = $file->store('resources', 'public');
             $data['file_path'] = $path;
             $data['original_filename'] = $file->getClientOriginalName();
         }
@@ -93,9 +94,10 @@ class ResourceController extends Controller
      */
     public function edit(Resource $resource)
     {
+        if (auth()->user()->hasRole('member')) abort(403);
         return view('admin.resources.edit', [
             'resource' => $resource->load(['jumuiya']),
-            'jumuiyas' => Jumuiya::all() // Fetch all jumuiyas for editing
+            'jumuiyas' => Jumuiya::all()
         ]);
     }
 
@@ -104,7 +106,24 @@ class ResourceController extends Controller
      */
     public function update(UpdateResourceRequest $request, Resource $resource)
     {
-        // Update logic (if needed)
+        if (auth()->user()->hasRole('member')) abort(403);
+        $data = $request->only(['jumuiya_id', 'name', 'type', 'description', 'status']);
+
+        if ($request->hasFile('file')) {
+            if ($resource->file_path && Storage::disk('public')->exists($resource->file_path)) {
+                Storage::disk('public')->delete($resource->file_path);
+            }
+
+            $file = $request->file('file');
+            $path = $file->store('resources', 'public');
+            $data['file_path'] = $path;
+            $data['original_filename'] = $file->getClientOriginalName();
+        }
+
+        $resource->update($data);
+
+        return redirect()->route('admin.resources.index')
+            ->with('success', 'Resource updated successfully');
     }
 
     /**
@@ -112,7 +131,11 @@ class ResourceController extends Controller
      */
     public function destroy(Resource $resource)
     {
-        // Delete the resource from storage
+        if (auth()->user()->hasRole('member')) abort(403);
+        if ($resource->file_path && Storage::disk('public')->exists($resource->file_path)) {
+            Storage::disk('public')->delete($resource->file_path);
+        }
+
         $resource->delete();
 
         return redirect()->route('admin.resources.index')
@@ -124,10 +147,10 @@ class ResourceController extends Controller
      */
     public function download(Resource $resource): StreamedResponse
     {
-        // Verify the resource exists
-        if (!Storage::exists($resource->file_path)) {
+        if (!$resource->file_path || !Storage::disk('public')->exists($resource->file_path)) {
             abort(404);
         }
-        return Storage::download($resource->file_path, $resource->original_filename);
+
+        return Storage::disk('public')->download($resource->file_path, $resource->original_filename);
     }
 }

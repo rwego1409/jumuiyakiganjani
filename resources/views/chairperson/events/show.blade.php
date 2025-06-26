@@ -61,20 +61,26 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <a href="{{ route('chairperson.events.edit', $event->id) }}" 
-                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md">
-                        <i class="fas fa-edit mr-2"></i>{{ __('Edit Event') }}
+                <div class="flex flex-wrap justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700 gap-3">
+                    <a href="{{ route('chairperson.events.index') }}" 
+                       class="bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i>{{ __('Back to Events') }}
                     </a>
-                    <form action="{{ route('chairperson.events.destroy', $event->id) }}" method="POST" class="inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" 
-                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
-                                onclick="return confirm('{{ __('Are you sure you want to delete this event?') }}')">
-                            <i class="fas fa-trash mr-2"></i>{{ __('Delete Event') }}
-                        </button>
-                    </form>
+                    <div class="flex space-x-3">
+                        <a href="{{ route('chairperson.events.edit', $event->id) }}" 
+                           class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-edit mr-2"></i>{{ __('Edit Event') }}
+                        </a>
+                        <form action="{{ route('chairperson.events.destroy', $event->id) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" 
+                                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
+                                    onclick="return confirm('{{ __('Are you sure you want to delete this event?') }}')">
+                                <i class="fas fa-trash mr-2"></i>{{ __('Delete Event') }}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
