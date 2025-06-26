@@ -230,18 +230,6 @@
                             </div>
                         </div>
                         <p class="ml-3 text-base text-gray-600 dark:text-gray-400">
-                            14-day premium trial for larger communities
-                        </p>
-                    </div>
-                    <div class="flex items-start">
-                        <div class="flex-shrink-0">
-                            <div class="flex items-center justify-center h-6 w-6 rounded-md bg-indigo-500 text-white">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        <p class="ml-3 text-base text-gray-600 dark:text-gray-400">
                             Dedicated support for all community leaders
                         </p>
                     </div>
@@ -354,8 +342,8 @@
     </section>
 
     <!-- Team Section -->
-    <section id="team-section" class="py-16 bg-white dark:bg-gray-900">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="team" class="py-20 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                     Meet the Developers
@@ -395,6 +383,9 @@
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Magdalena Munisi</h3>
                     <p class="text-indigo-700 dark:text-indigo-300 font-medium mb-1">Web Designer & Database Development</p>
                 </div>
+            </div>
+            <div class="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
+                University of Dar es Salaam, Final Year Project 2025
             </div>
         </div>
     </section>
