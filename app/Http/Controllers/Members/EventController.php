@@ -17,37 +17,21 @@ class EventController extends Controller
         $user = auth()->user();
         $query = Event::query();
 
-        if ($user->hasRole('member')) {
+        if ($user->role === 'member') {
             $member = $user->member;
-
             if ($member && $member->jumuiya_id) {
                 $jumuiyaId = $member->jumuiya_id;
-
-                // Get IDs of chairpersons linked to the member's jumuiya
-                $chairpersonIds = \App\Models\User::whereHas('jumuiyas', function($q) use ($jumuiyaId) {
-                    $q->where('jumuiya_id', $jumuiyaId);
-                })
-                ->whereHas('roles', function($q) {
-                    $q->where('name', 'chairperson');
-                })
-                ->pluck('id')
-                ->toArray();
-
-                $query->where(function ($q) use ($jumuiyaId, $chairpersonIds) {
+                $query->where(function ($q) use ($jumuiyaId) {
+                    // Events linked to the member's jumuiya
                     $q->whereHas('jumuiyas', function ($q2) use ($jumuiyaId) {
                         $q2->where('jumuiya_id', $jumuiyaId);
-                    });
-
-                    if (!empty($chairpersonIds)) {
-                        $q->orWhereIn('created_by', $chairpersonIds);
-                    }
-
-                    // Global events created by admins (no jumuiya)
-                    $q->orWhere(function ($q3) {
+                    })
+                    // Or global events created by admin (not linked to any jumuiya)
+                    ->orWhere(function ($q3) {
                         $q3->whereDoesntHave('jumuiyas')
-                           ->whereHas('creator', function ($q4) {
-                               $q4->where('role', 'admin');
-                           });
+                            ->whereHas('creator', function ($q4) {
+                                $q4->where('role', 'admin');
+                            });
                     });
                 });
             } else {
@@ -69,9 +53,7 @@ class EventController extends Controller
      */
     public function create()
     {
-        return view('member.events.create', [
-            'jumuiyas' => Jumuiya::all()
-        ]);
+        abort(403);
     }
 
     /**
@@ -79,27 +61,7 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'jumuiya_id' => 'required|exists:jumuiyas,id',
-            'name' => 'required|string|max:255',
-            'date' => 'required|date',
-            'location' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'required|in:upcoming,ongoing,completed',
-        ]);
-
-        Event::create([
-            'jumuiya_id' => $request->jumuiya_id,
-            'name' => $request->name,
-            'date' => $request->date,
-            'location' => $request->location,
-            'description' => $request->description,
-            'status' => $request->status,
-            'created_by' => auth()->id(),
-        ]);
-
-        return redirect()->route('member.events.index')
-            ->with('success', 'Event created successfully');
+        abort(403);
     }
 
     /**
@@ -117,10 +79,7 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        return view('member.events.edit', [
-            'event' => $event,
-            'jumuiyas' => Jumuiya::all()
-        ]);
+        abort(403);
     }
 
     /**
@@ -128,26 +87,7 @@ class EventController extends Controller
      */
     public function update(Request $request, Event $event)
     {
-        $request->validate([
-            'jumuiya_id' => 'required|exists:jumuiyas,id',
-            'name' => 'required|string|max:255',
-            'date' => 'required|date',
-            'location' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'required|in:upcoming,ongoing,completed',
-        ]);
-
-        $event->update([
-            'jumuiya_id' => $request->jumuiya_id,
-            'name' => $request->name,
-            'date' => $request->date,
-            'location' => $request->location,
-            'description' => $request->description,
-            'status' => $request->status,
-        ]);
-
-        return redirect()->route('member.events.index')
-            ->with('success', 'Event updated successfully');
+        abort(403);
     }
 
     /**
@@ -155,9 +95,6 @@ class EventController extends Controller
      */
     public function destroy(Event $event)
     {
-        $event->delete();
-
-        return redirect()->route('member.events.index')
-            ->with('success', 'Event deleted successfully');
+        abort(403);
     }
 }

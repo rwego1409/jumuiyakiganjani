@@ -23,16 +23,27 @@ class ResourceController extends Controller
         $user = auth()->user();
         $query = Resource::query();
 
-        // Members can see resources from their jumuiya and those created by admin
-        if ($user->hasRole('member')) {
+        // Members can see resources from their jumuiya and global admin resources
+        if ($user->role === 'member') {
             $member = $user->member;
             if ($member && $member->jumuiya_id) {
-                $query->where(function ($q) use ($member) {
-                    $q->where('jumuiya_id', $member->jumuiya_id)
-                      ->orWhereHas('creator', function ($q2) {
-                          $q2->where('role', 'admin');
+                $jumuiyaId = $member->jumuiya_id;
+                $query->where(function ($q) use ($jumuiyaId) {
+                    $q->where('jumuiya_id', $jumuiyaId)
+                      // Or global resources created by admin (not linked to any jumuiya)
+                      ->orWhere(function ($q2) {
+                          $q2->whereNull('jumuiya_id')
+                             ->whereHas('creator', function ($q3) {
+                                 $q3->where('role', 'admin');
+                             });
                       });
                 });
+            } else {
+                // If no jumuiya, only show global admin resources
+                $query->whereNull('jumuiya_id')
+                      ->whereHas('creator', function ($q) {
+                          $q->where('role', 'admin');
+                      });
             }
         }
 
@@ -51,7 +62,7 @@ class ResourceController extends Controller
      */
     public function create()
     {
-        if (auth()->user()->hasRole('member')) abort(403);
+        if (auth()->user()->role === 'member') abort(403);
         return view('admin.resources.create', [
             'jumuiyas' => Jumuiya::all()
         ]);
@@ -62,7 +73,7 @@ class ResourceController extends Controller
      */
     public function store(StoreResourceRequest $request)
     {
-        if (auth()->user()->hasRole('member')) abort(403);
+        if (auth()->user()->role === 'member') abort(403);
         $data = $request->only(['jumuiya_id', 'name', 'type', 'description', 'status']);
         $data['created_by'] = auth()->id();
 
@@ -94,7 +105,7 @@ class ResourceController extends Controller
      */
     public function edit(Resource $resource)
     {
-        if (auth()->user()->hasRole('member')) abort(403);
+        if (auth()->user()->role === 'member') abort(403);
         return view('admin.resources.edit', [
             'resource' => $resource->load(['jumuiya']),
             'jumuiyas' => Jumuiya::all()
@@ -106,7 +117,7 @@ class ResourceController extends Controller
      */
     public function update(UpdateResourceRequest $request, Resource $resource)
     {
-        if (auth()->user()->hasRole('member')) abort(403);
+        if (auth()->user()->role === 'member') abort(403);
         $data = $request->only(['jumuiya_id', 'name', 'type', 'description', 'status']);
 
         if ($request->hasFile('file')) {
@@ -131,7 +142,7 @@ class ResourceController extends Controller
      */
     public function destroy(Resource $resource)
     {
-        if (auth()->user()->hasRole('member')) abort(403);
+        if (auth()->user()->role === 'member') abort(403);
         if ($resource->file_path && Storage::disk('public')->exists($resource->file_path)) {
             Storage::disk('public')->delete($resource->file_path);
         }
@@ -151,6 +162,6 @@ class ResourceController extends Controller
             abort(404);
         }
 
-        return Storage::disk('public')->download($resource->file_path, $resource->original_filename);
+        return response()->download(storage_path('app/public/' . $resource->file_path), $resource->original_filename);
     }
 }
