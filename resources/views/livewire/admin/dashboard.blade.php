@@ -25,7 +25,7 @@
                         @foreach($recentActivities as $activity)
                             <div class="flex items-start">
                                 <div class="flex-shrink-0 bg-{{ $activity['color'] }}-100 p-2 rounded-md">
-                                    <x-icon name="{{ $activity['icon'] }}" class="h-5 w-5 text-{{ $activity['color'] }}-600" />
+                                    {{-- <x-icon name="{{ $activity['icon'] }}" class="h-5 w-5 text-{{ $activity['color'] }}-600" /> --}}
                                 </div>
                                 <div class="ml-3">
                                     <p class="text-sm font-medium text-gray-900">{{ $activity['title'] }}</p>

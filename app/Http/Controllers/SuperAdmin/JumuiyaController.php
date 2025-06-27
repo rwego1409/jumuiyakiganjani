@@ -36,53 +36,50 @@ class JumuiyaController extends Controller
             'name' => ['required', 'string', 'max:255', 'unique:jumuiyas'],
             'description' => ['nullable', 'string'],
             'location' => ['required', 'string', 'max:255'],
-            'chairperson_email' => ['required', 'email'],
             'meeting_day' => ['required', 'string', Rule::in(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])],
             'meeting_time' => ['required', 'date_format:H:i'],
             'status' => ['required', 'string', Rule::in(['active', 'inactive'])]
         ]);
 
-        DB::transaction(function () use ($validated) {
-            // Find or create the chairperson user
-            $user = User::where('email', $validated['chairperson_email'])->first();
-            if (!$user) {
-                $user = User::create([
-                    'name' => $validated['chairperson_email'], // You may want to split or ask for name
-                    'email' => $validated['chairperson_email'],
-                    'password' => bcrypt('password'), // Set a default password or send invite
-                    'role' => 'chairperson',
-                ]);
-            } else {
-                $user->update(['role' => 'chairperson']);
-            }
+        $jumuiya = Jumuiya::create([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'location' => $validated['location'],
+            'status' => 'pending',
+            'chairperson_id' => null,
+            // ...other fields...
+        ]);
 
-            $jumuiyaData = $validated;
-            $jumuiyaData['chairperson_id'] = $user->id;
-            unset($jumuiyaData['chairperson_email']);
+        // Optionally notify super admin here
 
-            Jumuiya::create($jumuiyaData);
-        });
-
-        return redirect()->route('super_admin.jumuiyas.index')
-            ->with('success', 'Jumuiya created successfully.');
+        return redirect()->route('super_admin.jumuiyas.index')->with('success', 'Jumuiya request submitted and pending verification.');
     }
 
     public function show(Jumuiya $jumuiya)
     {
-        $jumuiya->load(['chairperson', 'events' => function ($query) {
-            $query->latest()->take(5);
-        }]);
-
-        $members = $jumuiya->members()
-            ->with('user')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
+        $chairpersons = \App\Models\User::where('role', 'chairperson')->get();
+        $members = $jumuiya->members()->paginate(10);
         $memberCount = $jumuiya->members()->count();
         $activeMembers = $jumuiya->members()->where('status', 'active')->count();
         $pendingMembers = $jumuiya->members()->where('status', 'pending')->count();
+        return view('super_admin.jumuiyas.show', compact(
+            'jumuiya', 'chairpersons', 'members',
+            'memberCount', 'activeMembers', 'pendingMembers'
+        ));
+    }
 
-        return view('super_admin.jumuiyas.show', compact('jumuiya', 'members', 'memberCount', 'activeMembers', 'pendingMembers'));
+    public function verify(Request $request, Jumuiya $jumuiya)
+    {
+        $request->validate([
+            'chairperson_id' => 'required|exists:users,id',
+        ]);
+        $jumuiya->chairperson_id = $request->chairperson_id;
+        $jumuiya->status = 'verified';
+        $jumuiya->verified_at = now();
+        $jumuiya->verified_by = auth()->id();
+        $jumuiya->save();
+        // Optionally, trigger events/notifications here
+        return redirect()->route('super_admin.jumuiyas.show', $jumuiya)->with('success', 'Jumuiya verified successfully.');
     }
 
     public function edit(Jumuiya $jumuiya)

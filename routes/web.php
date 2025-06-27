@@ -456,3 +456,9 @@ Route::post('/test-post', function (\Illuminate\Http\Request $request) {
     \Log::info('Test POST route hit', ['data' => $request->all()]);
     return response()->json(['success' => true, 'data' => $request->all()]);
 });
+
+// Route to verify a pending jumuiya by assigning a chairperson
+Route::post('super-admin/jumuiyas/{jumuiya}/verify', [\App\Http\Controllers\SuperAdmin\JumuiyaController::class, 'verify'])->name('super_admin.jumuiyas.verify');
+
+// Super Admin Members - Update Role
+Route::patch('super_admin/members/{member}/update-role', [App\Http\Controllers\SuperAdmin\MembersController::class, 'updateRole'])->name('super_admin.members.updateRole');

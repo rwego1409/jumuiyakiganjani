@@ -26,19 +26,19 @@ class SubscriptionController extends Controller
             'submitter_contact' => 'required|string|max:255',
         ]);
 
+        // Combine address fields into a single location string
+        $location = $validated['region'] . ', ' . $validated['district'] . ', ' . $validated['ward'] . ', ' . $validated['street'] . ', ' . $validated['address'];
+
         // Save the Jumuiya (add fields as needed)
         $jumuiya = Jumuiya::create([
             'name' => $validated['jumuiya_name'],
-            'region' => $validated['region'],
-            'district' => $validated['district'],
-            'ward' => $validated['ward'],
-            'street' => $validated['street'],
-            'address' => $validated['address'],
+            'location' => $location,
             'description' => $validated['description'],
             'created_by_name' => $validated['submitter_name'],
             'created_by_contact' => $validated['submitter_contact'],
         ]);
 
-        return redirect()->route('subscription.create')->with('success', 'Jumuiya registered successfully!');
+        // Redirect to confirmation page
+        return view('subscription.confirmation');
     }
 }

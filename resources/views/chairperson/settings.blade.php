@@ -66,9 +66,7 @@
                         <!-- Save Button -->
                         <div class="flex items-center gap-4">
                             <x-primary-button>{{ __('Save Templates') }}</x-primary-button>
-                            <x-action-message class="mr-3" on="templates-saved">
-                                {{ __('Saved.') }}
-                            </x-action-message>
+                            {{-- <x-action-message class="mr-3" on="templates-saved">{{ __('Saved.') }}</x-action-message> --}}
                         </div>
                     </div>
                 </div>

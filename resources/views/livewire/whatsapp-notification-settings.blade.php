@@ -33,10 +33,9 @@
 
             <div class="flex items-center gap-4">
                 <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-                <x-action-message class="mr-3" on="settings-updated">
+                {{-- <x-action-message class="mr-3" on="settings-updated">
                     {{ __('Saved.') }}
-                </x-action-message>
+                </x-action-message> --}}
             </div>
         </form>
     </div>
