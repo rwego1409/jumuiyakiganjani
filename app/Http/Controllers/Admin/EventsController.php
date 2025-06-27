@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Event;
 use App\Models\Jumuiya;
+use App\Models\Activity;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -51,6 +52,15 @@ class EventsController extends Controller
 
         $event = Event::create($validated);
         $event->jumuiyas()->sync($jumuiyaIds);
+        // Log activity
+        Activity::create([
+            'user_id' => auth()->id(),
+            'action' => 'created',
+            'description' => 'Created event: ' . $event->title,
+            'model_type' => Event::class,
+            'model_id' => $event->id,
+            'properties' => $event->toArray(),
+        ]);
 
         return redirect()->route('admin.events.index')
             ->with('success', 'Event created successfully!');
@@ -71,6 +81,7 @@ class EventsController extends Controller
     public function edit(string $id)
     {
         $event = Event::findOrFail($id);
+        $this->authorize('update', $event);
         $jumuiyas = Jumuiya::all();
         return view('admin.events.edit', compact('event', 'jumuiyas'));
     }
@@ -81,7 +92,7 @@ class EventsController extends Controller
     public function update(Request $request, string $id)
     {
         $event = Event::findOrFail($id);
-
+        $this->authorize('update', $event);
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'status' => 'required|in:upcoming,ongoing,completed',
@@ -92,16 +103,22 @@ class EventsController extends Controller
             'jumuiya_ids' => 'required|array|min:1',
             'jumuiya_ids.*' => 'exists:jumuiyas,id|distinct',
         ]);
-
         $jumuiyaIds = $validated['jumuiya_ids'];
         if (in_array('all', $jumuiyaIds)) {
             $jumuiyaIds = Jumuiya::pluck('id')->toArray();
         }
         unset($validated['jumuiya_ids']);
-
         $event->update($validated);
         $event->jumuiyas()->sync($jumuiyaIds);
-
+        // Log activity
+        Activity::create([
+            'user_id' => auth()->id(),
+            'action' => 'updated',
+            'description' => 'Updated event: ' . $event->title,
+            'model_type' => Event::class,
+            'model_id' => $event->id,
+            'properties' => $event->toArray(),
+        ]);
         return redirect()->route('admin.events.show', $event->id)
             ->with('success', 'Event updated successfully!');
     }
@@ -112,8 +129,17 @@ class EventsController extends Controller
     public function destroy(string $id)
     {
         $event = Event::findOrFail($id);
+        $this->authorize('delete', $event);
+        // Log activity before delete
+        Activity::create([
+            'user_id' => auth()->id(),
+            'action' => 'deleted',
+            'description' => 'Deleted event: ' . $event->title,
+            'model_type' => Event::class,
+            'model_id' => $event->id,
+            'properties' => $event->toArray(),
+        ]);
         $event->delete();
-
         return redirect()->route('admin.events.index')
             ->with('success', 'Event deleted successfully!');
     }

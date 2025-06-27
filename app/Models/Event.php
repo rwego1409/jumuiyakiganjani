@@ -13,7 +13,7 @@ class Event extends Model
         'end_time' => 'datetime',
     ];
 
-    protected $fillable = ['title', 'description', 'start_time', 'end_time', 'location', 'status'];
+    protected $fillable = ['title', 'description', 'start_time', 'end_time', 'location', 'status', 'created_by'];
 
     public function jumuiyas()
     {

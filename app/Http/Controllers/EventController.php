@@ -62,9 +62,14 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
+        $user = auth()->user();
+        // Allow admin or chairperson to edit only their own events
+        if ($event->created_by !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
         return view('admin.events.edit', [
             'event' => $event,
-            'jumuiyas' => Jumuiya::all()
+            'jumuiyas' => \App\Models\Jumuiya::all()
         ]);
     }
 
@@ -73,6 +78,10 @@ class EventController extends Controller
      */
     public function update(UpdateEventRequest $request, Event $event)
     {
+        $user = auth()->user();
+        if ($event->created_by !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
         $event->update([
             'jumuiya_id' => $request->jumuiya_id,
             'name' => $request->name,
@@ -81,7 +90,6 @@ class EventController extends Controller
             'description' => $request->description,
             'status' => $request->status
         ]);
-
         return redirect()->route('admin.events.index')
             ->with('success', 'Event updated successfully');
     }

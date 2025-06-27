@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Chairperson;
 use App\Http\Controllers\Controller;
 use App\Models\Contribution;
 use App\Models\Member;
+use App\Models\Activity;
 use App\Traits\JumuiyaAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,23 +27,17 @@ class ContributionsController extends Controller
         $jumuiyaId = $jumuiya->id;
         $cacheKey = "jumuiya_{$jumuiyaId}_contributions";
         
-        $contributions = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($jumuiyaId) {
-            return Contribution::with(['member.user'])
-                ->where('jumuiya_id', $jumuiyaId)
-                ->latest()
-                ->paginate(10);
-        });
+        $contributions = Contribution::with(['member.user'])
+            ->where('jumuiya_id', $jumuiyaId)
+            ->latest()
+            ->paginate(10);
 
         $statsKey = "jumuiya_{$jumuiyaId}_contribution_stats";
-        $stats = Cache::remember($statsKey, now()->addMinutes(5), function () use ($jumuiyaId) {
-            return [
-                'total_amount' => Contribution::where('jumuiya_id', $jumuiyaId)->sum('amount'),
-                'total_contributions' => Contribution::where('jumuiya_id', $jumuiyaId)->count(),
-                'pending_contributions' => Contribution::where('jumuiya_id', $jumuiyaId)
-                   
-                    ->count()
-            ];
-        });
+        $stats = [
+            'total_amount' => Contribution::where('jumuiya_id', $jumuiyaId)->sum('amount'),
+            'total_contributions' => Contribution::where('jumuiya_id', $jumuiyaId)->count(),
+            'pending_contributions' => Contribution::where('jumuiya_id', $jumuiyaId)->count()
+        ];
 
         return view('chairperson.contributions.index', compact('contributions', 'stats'));
     }
@@ -93,7 +88,16 @@ class ContributionsController extends Controller
         $validated['user_id'] = $member->user_id;
         $validated['payment_reference'] = \Illuminate\Support\Str::uuid();
 
-        Contribution::create($validated);
+        $contribution = Contribution::create($validated);
+        // Log activity
+        Activity::create([
+            'user_id' => Auth::id(),
+            'action' => 'created',
+            'description' => 'Created contribution: ' . ($contribution->id ?? ''),
+            'model_type' => Contribution::class,
+            'model_id' => $contribution->id,
+            'properties' => $contribution->toArray(),
+        ]);
 
         return redirect()->route('chairperson.contributions.index')
             ->with('success', 'Contribution recorded successfully.');
@@ -159,6 +163,15 @@ class ContributionsController extends Controller
         }
 
         $contribution->update($validated);
+        // Log activity
+        Activity::create([
+            'user_id' => Auth::id(),
+            'action' => 'updated',
+            'description' => 'Updated contribution: ' . $contribution->id,
+            'model_type' => Contribution::class,
+            'model_id' => $contribution->id,
+            'properties' => $contribution->toArray(),
+        ]);
 
         return redirect()->route('chairperson.contributions.index')
             ->with('success', 'Contribution updated successfully.');
@@ -173,6 +186,14 @@ class ContributionsController extends Controller
                 ->with('error', 'Unauthorized action.');
         }
 
+        Activity::create([
+            'user_id' => Auth::id(),
+            'action' => 'deleted',
+            'description' => 'Deleted contribution: ' . $contribution->id,
+            'model_type' => Contribution::class,
+            'model_id' => $contribution->id,
+            'properties' => $contribution->toArray(),
+        ]);
         $contribution->delete();
 
         return redirect()->route('chairperson.contributions.index')

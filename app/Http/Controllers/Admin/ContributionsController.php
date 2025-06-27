@@ -19,6 +19,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ContributionsImport;
 use App\Models\User;
 use Illuminate\Support\Str;
+use App\Models\Activity;
 
 class ContributionsController extends Controller
 {
@@ -98,7 +99,16 @@ class ContributionsController extends Controller
     }
 
     // Create contribution record
-    Contribution::create($validated);
+    $contribution = Contribution::create($validated);
+    // Log activity
+    Activity::create([
+        'user_id' => auth()->id(),
+        'action' => 'created',
+        'description' => 'Created contribution: ' . $contribution->receipt_number,
+        'model_type' => Contribution::class,
+        'model_id' => $contribution->id,
+        'properties' => $contribution->toArray(),
+    ]);
 
     return redirect()->route('admin.contributions.index')
         ->with('success', 'Contribution recorded successfully');
@@ -158,6 +168,15 @@ class ContributionsController extends Controller
         // Find the contribution by ID and update it
         $contribution = Contribution::findOrFail($id);
         $contribution->update($request->all());
+        // Log activity
+        Activity::create([
+            'user_id' => auth()->id(),
+            'action' => 'updated',
+            'description' => 'Updated contribution: ' . $contribution->receipt_number,
+            'model_type' => Contribution::class,
+            'model_id' => $contribution->id,
+            'properties' => $contribution->toArray(),
+        ]);
 
         // Redirect to the contributions index with success message
         return redirect()->route('admin.contributions.index')
@@ -171,6 +190,15 @@ class ContributionsController extends Controller
     {
         // Find the contribution by ID and delete it
         $contribution = Contribution::findOrFail($id);
+        // Log activity before delete
+        Activity::create([
+            'user_id' => auth()->id(),
+            'action' => 'deleted',
+            'description' => 'Deleted contribution: ' . $contribution->receipt_number,
+            'model_type' => Contribution::class,
+            'model_id' => $contribution->id,
+            'properties' => $contribution->toArray(),
+        ]);
         $contribution->delete();
 
         // Redirect to the contributions index with success message

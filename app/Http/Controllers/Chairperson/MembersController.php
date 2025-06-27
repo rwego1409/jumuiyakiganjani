@@ -59,4 +59,16 @@ class MembersController extends Controller
         // If you need to pass data (e.g., dropdowns), fetch here
         return view('chairperson.members.create');
     }
+
+    public function destroy(Member $member)
+    {
+        $jumuiya = Auth::user()->jumuiyas()->first();
+        if (!$jumuiya || $member->jumuiya_id !== $jumuiya->id) {
+            return redirect()->route('chairperson.members.index')
+                ->with('error', 'Unauthorized action.');
+        }
+        $member->delete();
+        return redirect()->route('chairperson.members.index')
+            ->with('success', 'Member deleted successfully.');
+    }
 }

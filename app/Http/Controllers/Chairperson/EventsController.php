@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Chairperson;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Jumuiya;
+use App\Models\User;
+use App\Models\Activity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class EventsController extends Controller
 {
@@ -14,19 +17,22 @@ class EventsController extends Controller
      */
     public function index(Request $request)
     {
+        // Check if user can view events
+        $this->authorize('viewAny', Event::class);
+
         $user = auth()->user();
-        \Log::info('EventsController@index user', [
+        Log::info('EventsController@index user', [
             'id' => $user->id,
             'role' => $user->role,
             'jumuiya_ids' => $user->jumuiyas->pluck('id'),
             'member_jumuiya_id' => optional($user->member)->jumuiya_id
         ]);
 
-        $query = Event::query();
+        $query = Event::with(['creator', 'jumuiyas']);
 
         if ($user->hasRole('chairperson')) {
             $jumuiya = $user->jumuiyas()->first();
-            \Log::info('Chairperson jumuiya', ['jumuiya' => $jumuiya]);
+            Log::info('Chairperson jumuiya', ['jumuiya' => $jumuiya]);
 
             if ($jumuiya) {
                 $query->where(function ($q) use ($jumuiya, $user) {
@@ -41,7 +47,7 @@ class EventsController extends Controller
             }
         } elseif ($user->hasRole('member')) {
             $member = $user->member;
-            \Log::info('Member info', ['member' => $member]);
+            Log::info('Member info', ['member' => $member]);
 
             if ($member && $member->jumuiya_id) {
                 $query->where(function ($q) use ($member) {
@@ -80,7 +86,10 @@ class EventsController extends Controller
 
         $events = $query->latest()->paginate(10);
 
-        \Log::info('EventsController@index events count', ['count' => $events->count(), 'event_ids' => $events->pluck('id')]);
+        Log::info('EventsController@index events count', [
+            'count' => $events->count(), 
+            'event_ids' => $events->pluck('id')
+        ]);
 
         return view('chairperson.events.index', compact('events'));
     }
@@ -90,6 +99,9 @@ class EventsController extends Controller
      */
     public function create()
     {
+        // Check if user can create events
+        $this->authorize('create', Event::class);
+        
         return view('chairperson.events.create');
     }
 
@@ -98,6 +110,9 @@ class EventsController extends Controller
      */
     public function store(Request $request)
     {
+        // Check if user can create events
+        $this->authorize('create', Event::class);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'start_time' => 'required|date',
@@ -119,6 +134,22 @@ class EventsController extends Controller
 
         $event = Event::create($validated);
         $event->jumuiyas()->attach($jumuiya->id);
+        // Log activity
+        Activity::create([
+            'user_id' => auth()->id(),
+            'action' => 'created',
+            'description' => 'Created event: ' . $event->title,
+            'model_type' => Event::class,
+            'model_id' => $event->id,
+            'properties' => $event->toArray(),
+        ]);
+
+        Log::info('Event created by chairperson', [
+            'event_id' => $event->id,
+            'created_by' => $event->created_by,
+            'creator_id' => auth()->id(),
+            'jumuiya_id' => $jumuiya->id
+        ]);
 
         return redirect()->route('chairperson.events.show', $event)
             ->with('success', __('Event created successfully.'));
@@ -129,6 +160,9 @@ class EventsController extends Controller
      */
     public function show(Event $event)
     {
+        // Check if user can view this specific event
+        $this->authorize('view', $event);
+        
         return view('chairperson.events.show', compact('event'));
     }
 
@@ -137,12 +171,26 @@ class EventsController extends Controller
      */
     public function edit(Event $event)
     {
-        $user = auth()->user();
-
-        if ($event->created_by !== $user->id) {
+        // Laravel will automatically check EventPolicy::update()
+        // This will throw an authorization exception if not allowed
+        try {
+            $this->authorize('update', $event);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            // Check if it's an admin event for better error message
+            if (optional($event->creator)->role === 'admin') {
+                return redirect()->route('chairperson.events.index')
+                    ->with('error', 'This event was created by admin. Please contact admin to edit it.');
+            }
+            
             return redirect()->route('chairperson.events.index')
                 ->with('error', 'You are not authorized to edit this event.');
         }
+        
+        Log::info('Edit authorized', [
+            'event_id' => $event->id,
+            'user_id' => auth()->id(),
+            'event_created_by' => $event->created_by
+        ]);
 
         return view('chairperson.events.edit', compact('event'));
     }
@@ -152,9 +200,16 @@ class EventsController extends Controller
      */
     public function update(Request $request, Event $event)
     {
-        $user = auth()->user();
-
-        if ($event->created_by !== $user->id) {
+        // Laravel will automatically check EventPolicy::update()
+        try {
+            $this->authorize('update', $event);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            // Check if it's an admin event for better error message
+            if (optional($event->creator)->role === 'admin') {
+                return redirect()->route('chairperson.events.index')
+                    ->with('error', 'This event was created by admin. Please contact admin to edit it.');
+            }
+            
             return redirect()->route('chairperson.events.index')
                 ->with('error', 'You are not authorized to update this event.');
         }
@@ -170,8 +225,22 @@ class EventsController extends Controller
 
         $validated['title'] = $validated['name'];
         unset($validated['name']);
-
+        
         $event->update($validated);
+        // Log activity
+        Activity::create([
+            'user_id' => auth()->id(),
+            'action' => 'updated',
+            'description' => 'Updated event: ' . $event->title,
+            'model_type' => Event::class,
+            'model_id' => $event->id,
+            'properties' => $event->toArray(),
+        ]);
+
+        Log::info('Event updated successfully', [
+            'event_id' => $event->id,
+            'updated_by' => auth()->id()
+        ]);
 
         return redirect()->route('chairperson.events.show', $event)
             ->with('success', __('Event updated successfully.'));
@@ -182,14 +251,35 @@ class EventsController extends Controller
      */
     public function destroy(Event $event)
     {
-        $user = auth()->user();
-
-        if ($event->created_by !== $user->id) {
+        // Laravel will automatically check EventPolicy::delete()
+        try {
+            $this->authorize('delete', $event);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            // Check if it's an admin event for better error message
+            if (optional($event->creator)->role === 'admin') {
+                return redirect()->route('chairperson.events.index')
+                    ->with('error', 'This event was created by admin. Please contact admin to delete it.');
+            }
+            
             return redirect()->route('chairperson.events.index')
                 ->with('error', 'You are not authorized to delete this event.');
         }
-
+        // Log activity
+        Activity::create([
+            'user_id' => auth()->id(),
+            'action' => 'deleted',
+            'description' => 'Deleted event: ' . $event->title,
+            'model_type' => Event::class,
+            'model_id' => $event->id,
+            'properties' => $event->toArray(),
+        ]);
+        $eventId = $event->id;
         $event->delete();
+
+        Log::info('Event deleted successfully', [
+            'event_id' => $eventId,
+            'deleted_by' => auth()->id()
+        ]);
 
         return redirect()->route('chairperson.events.index')
             ->with('success', __('Event deleted successfully.'));

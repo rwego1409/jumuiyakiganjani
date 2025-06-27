@@ -114,7 +114,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Members management
             Route::resource('members', App\Http\Controllers\Chairperson\MembersController::class);
 
-            // Events management
+            // Events management - FIXED: Removed conflicting routes
             Route::resource('events', App\Http\Controllers\Chairperson\EventsController::class);
 
             // Resources management
@@ -187,7 +187,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Export (generic, for filtered export)
             Route::get('/contributions/export', [ContributionsController::class, 'export'])->name('contributions.export');
 
-            // Events
+            // Events - FIXED: Removed conflicting routes
             Route::resource('events', EventsController::class);
 
             // Activities
