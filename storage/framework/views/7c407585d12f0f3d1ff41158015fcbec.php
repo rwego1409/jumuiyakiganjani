@@ -206,7 +206,7 @@
                 <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
                     Become part of the movement transforming faith communities across Tanzania. Sign up today and experience the difference.
                 </p>
-                <div class="space-y-4">
+                <!-- <div class="space-y-4">
                     <div class="flex items-start">
                         <div class="flex-shrink-0">
                             <div class="flex items-center justify-center h-6 w-6 rounded-md bg-indigo-500 text-white">
@@ -231,7 +231,7 @@
                             Dedicated support for all community leaders
                         </p>
                     </div>
-                </div>
+                </div> -->
             </div>
             
             <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
@@ -255,15 +255,15 @@
                             <div class="w-full border-t border-gray-300 dark:border-gray-700"></div>
                         </div>
                         <div class="relative flex justify-center text-sm">
-                            <span class="px-2 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                            <!-- <span class="px-2 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
                                 University Project
-                            </span>
+                            </span> -->
                         </div>
                     </div>
                     
-                    <div class="text-center text-sm text-gray-600 dark:text-gray-400">
+                    <!-- <div class="text-center text-sm text-gray-600 dark:text-gray-400">
                         <p>Final Year Project by University of Dar es Salaam Students</p>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -382,9 +382,9 @@
                     <p class="text-indigo-700 dark:text-indigo-300 font-medium mb-1">Web Designer & Database Development</p>
                 </div>
             </div>
-            <div class="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <!-- <div class="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
                 University of Dar es Salaam, Final Year Project 2025
-            </div>
+            </div> -->
         </div>
     </section>
     <!-- End Team Section -->

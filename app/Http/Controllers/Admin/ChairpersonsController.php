@@ -55,7 +55,7 @@ class ChairpersonsController extends Controller
             'phone' => ['required','string','max:255',Rule::unique('users')->ignore($chairperson->id)],
             'password' => 'nullable|string|min:6|confirmed',
         ]);
-        if ($validated['password']) {
+        if (array_key_exists('password', $validated) && $validated['password']) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
             unset($validated['password']);

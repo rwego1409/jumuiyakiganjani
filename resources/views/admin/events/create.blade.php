@@ -7,7 +7,9 @@
             <div class="p-6 bg-white border-b border-gray-200">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-2xl font-semibold">Create New Event</h2>
-                    <a href="{{ route('admin.events.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 focus:outline-none focus:border-gray-300 focus:ring focus:ring-gray-200 active:bg-gray-400 transition">Back</a>
+                    <a href="{{ route('admin.events.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 focus:outline-none focus:border-gray-300 focus:ring focus:ring-gray-200 active:bg-gray-400 transition">
+                        Back
+                    </a>
                 </div>
 
                 @if ($errors->any())
@@ -20,11 +22,6 @@
                     </div>
                 @endif
 
-                @php
-                    $startValue = old('start_time') ? \Carbon\Carbon::parse(old('start_time'))->format('Y-m-d') : '';
-                    $endValue = old('end_time') ? \Carbon\Carbon::parse(old('end_time'))->format('Y-m-d') : '';
-                @endphp
-
                 <form method="POST" action="{{ route('admin.events.store') }}">
                     @csrf
 
@@ -32,11 +29,7 @@
                         <!-- Event Title -->
                         <div>
                             <x-input-label for="title" :value="__('Event Title')" />
-                            <x-text-input id="title" class="block mt-1 w-full"
-                                type="text"
-                                name="title"
-                                value="{{ old('title') }}"
-                                required autofocus />
+                            <x-text-input id="title" name="title" type="text" class="block mt-1 w-full" value="{{ old('title') }}" required autofocus />
                             <x-input-error :messages="$errors->get('title')" class="mt-2" />
                         </div>
 
@@ -55,40 +48,29 @@
                         <!-- Start Date -->
                         <div>
                             <x-input-label for="start_time" :value="__('Start Date')" />
-                            <x-text-input id="start_time" class="block mt-1 w-full"
-                                type="date"
-                                name="start_time"
-                                value="{{ $startValue }}"
-                                required />
+                            <x-text-input id="start_time" name="start_time" type="date" class="block mt-1 w-full" value="{{ old('start_time') }}" required />
                             <x-input-error :messages="$errors->get('start_time')" class="mt-2" />
                         </div>
 
                         <!-- End Date -->
                         <div>
                             <x-input-label for="end_time" :value="__('End Date')" />
-                            <x-text-input id="end_time" class="block mt-1 w-full"
-                                type="date"
-                                name="end_time"
-                                value="{{ $endValue }}"
-                                required />
+                            <x-text-input id="end_time" name="end_time" type="date" class="block mt-1 w-full" value="{{ old('end_time') }}" required />
                             <x-input-error :messages="$errors->get('end_time')" class="mt-2" />
                         </div>
 
                         <!-- Location -->
                         <div class="md:col-span-2">
                             <x-input-label for="location" :value="__('Location')" />
-                            <x-text-input id="location" class="block mt-1 w-full"
-                                type="text"
-                                name="location"
-                                value="{{ old('location') }}"
-                                required />
+                            <x-text-input id="location" name="location" type="text" class="block mt-1 w-full" value="{{ old('location') }}" required />
                             <x-input-error :messages="$errors->get('location')" class="mt-2" />
                         </div>
 
                         <!-- Jumuiya Selection -->
                         <div class="md:col-span-2">
-                            <x-input-label for="jumuiya_ids" :value="__('Jumuiya(s)')" />
-                            <select id="jumuiya_ids" name="jumuiya_ids[]" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" multiple required>
+                            <x-input-label for="jumuiya_ids" :value="__('Jumuiya')" />
+                            <select id="jumuiya_ids" name="jumuiya_ids[]" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                <option value="">Select Jumuiya</option>
                                 <option value="all" {{ (collect(old('jumuiya_ids'))->contains('all')) ? 'selected' : '' }}>All Jumuiyas</option>
                                 @foreach($jumuiyas as $jumuiya)
                                     <option value="{{ $jumuiya->id }}" {{ (collect(old('jumuiya_ids'))->contains($jumuiya->id)) ? 'selected' : '' }}>
@@ -97,23 +79,19 @@
                                 @endforeach
                             </select>
                             <x-input-error :messages="$errors->get('jumuiya_ids')" class="mt-2" />
-                            <p class="text-xs text-gray-500 mt-1">Hold Ctrl (Windows) or Cmd (Mac) to select multiple. Select "All Jumuiyas" to target everyone.</p>
+                            <p class="text-xs text-gray-500 mt-1">Select one Jumuiya or choose "All Jumuiyas".</p>
                         </div>
 
                         <!-- Description -->
                         <div class="md:col-span-2">
                             <x-input-label for="description" :value="__('Description')" />
-                            <textarea id="description" name="description" rows="4"
-                                class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                            >{{ old('description') }}</textarea>
+                            <textarea id="description" name="description" rows="4" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description') }}</textarea>
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
                     </div>
 
                     <div class="flex items-center justify-end mt-6">
-                        <x-primary-button>
-                            Create Event
-                        </x-primary-button>
+                        <x-primary-button>Create Event</x-primary-button>
                     </div>
                 </form>
             </div>

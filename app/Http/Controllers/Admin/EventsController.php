@@ -33,6 +33,11 @@ class EventsController extends Controller
      */
     public function store(Request $request)
     {
+        $data = $request->all();
+        if (isset($data['jumuiya_ids']) && in_array('all', $data['jumuiya_ids'])) {
+            $data['jumuiya_ids'] = Jumuiya::pluck('id')->toArray();
+            $request->merge(['jumuiya_ids' => $data['jumuiya_ids']]);
+        }
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'status' => 'required|in:upcoming,ongoing,completed',
@@ -45,9 +50,6 @@ class EventsController extends Controller
         ]);
 
         $jumuiyaIds = $validated['jumuiya_ids'];
-        if (in_array('all', $jumuiyaIds)) {
-            $jumuiyaIds = Jumuiya::pluck('id')->toArray();
-        }
         unset($validated['jumuiya_ids']);
 
         $event = Event::create($validated);
@@ -60,6 +62,9 @@ class EventsController extends Controller
             'model_type' => Event::class,
             'model_id' => $event->id,
             'properties' => $event->toArray(),
+            'activity_type' => 'event',
+            'loggable_type' => Event::class,
+            'loggable_id' => $event->id,
         ]);
 
         return redirect()->route('admin.events.index')

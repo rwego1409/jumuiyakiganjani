@@ -18,7 +18,10 @@ class Activity extends Model
         'model_id',
         'properties',
         'target_type',
-        'target_id'
+        'target_id',
+        'activity_type',
+        'loggable_type',
+        'loggable_id',
     ];
 
     protected $casts = [

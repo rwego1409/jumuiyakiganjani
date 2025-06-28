@@ -291,7 +291,7 @@
 
             <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
                 <p class="text-base text-gray-500 dark:text-gray-400 text-center">
-                    &copy; 2023 Jumuiya Kiganjani. University of Dar es Salaam Final Year Project. All rights reserved.
+                    &copy; 2025 Jumuiya Kiganjani All rights reserved.
                 </p>
             </div>
         </div>
