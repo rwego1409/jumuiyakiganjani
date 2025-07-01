@@ -15,7 +15,13 @@ class EventsController extends Controller
      */
     public function index()
     {
-        $events = Event::with('jumuiya')->latest()->paginate(10);
+        // Only show events created by admin (not by chairperson)
+        $events = Event::with('jumuiya')
+            ->whereHas('creator', function($q) {
+                $q->where('role', 'admin');
+            })
+            ->latest()
+            ->paginate(10);
         return view('admin.events.index', compact('events'));
     }
 
@@ -51,7 +57,7 @@ class EventsController extends Controller
 
         $jumuiyaIds = $validated['jumuiya_ids'];
         unset($validated['jumuiya_ids']);
-
+        $validated['created_by'] = auth()->id();
         $event = Event::create($validated);
         $event->jumuiyas()->sync($jumuiyaIds);
         // Log activity
@@ -86,6 +92,10 @@ class EventsController extends Controller
     public function edit(string $id)
     {
         $event = Event::findOrFail($id);
+        // Only allow editing if event was created by admin
+        if ($event->creator && $event->creator->role !== 'admin') {
+            abort(403, 'You are not authorized to edit this event.');
+        }
         $this->authorize('update', $event);
         $jumuiyas = Jumuiya::all();
         return view('admin.events.edit', compact('event', 'jumuiyas'));
@@ -134,6 +144,10 @@ class EventsController extends Controller
     public function destroy(string $id)
     {
         $event = Event::findOrFail($id);
+        // Only allow deleting if event was created by admin
+        if ($event->creator && $event->creator->role !== 'admin') {
+            abort(403, 'You are not authorized to delete this event.');
+        }
         $this->authorize('delete', $event);
         // Log activity before delete
         Activity::create([
@@ -143,6 +157,9 @@ class EventsController extends Controller
             'model_type' => Event::class,
             'model_id' => $event->id,
             'properties' => $event->toArray(),
+            'activity_type' => 'event',
+            'loggable_type' => Event::class,
+            'loggable_id' => $event->id,
         ]);
         $event->delete();
         return redirect()->route('admin.events.index')

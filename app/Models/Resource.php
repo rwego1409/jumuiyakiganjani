@@ -9,7 +9,7 @@ class Resource extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['jumuiya_id', 'title', 'description', 'file_path', 'type'];
+    protected $fillable = ['jumuiya_id', 'title', 'description', 'file_path', 'type', 'created_by', 'original_filename', 'file_size', 'file_extension'];
 
     public function jumuiya()
     {

@@ -68,7 +68,7 @@
         </div>
 
         <!-- Resources Report Card -->
-        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <!-- <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -94,7 +94,7 @@
                     </a>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 
     <!-- Custom Report Generator -->

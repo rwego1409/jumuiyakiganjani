@@ -79,8 +79,8 @@ class ResourceController extends Controller
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $path = $file->store('resources', 'public');
-            $data['file_path'] = $path;
+            $filePath = $file->store('resources', 'public');
+            $data['file_path'] = $filePath;
             $data['original_filename'] = $file->getClientOriginalName();
         }
 
@@ -126,8 +126,8 @@ class ResourceController extends Controller
             }
 
             $file = $request->file('file');
-            $path = $file->store('resources', 'public');
-            $data['file_path'] = $path;
+            $filePath = $file->store('resources', 'public');
+            $data['file_path'] = $filePath;
             $data['original_filename'] = $file->getClientOriginalName();
         }
 
@@ -158,10 +158,9 @@ class ResourceController extends Controller
      */
     public function download(Resource $resource): StreamedResponse
     {
-        if (!$resource->file_path || !Storage::disk('public')->exists($resource->file_path)) {
+        if (!$resource->file_path || !\Storage::disk('public')->exists($resource->file_path)) {
             abort(404);
         }
-
-        return response()->download(storage_path('app/public/' . $resource->file_path), $resource->original_filename);
+        return \Storage::disk('public')->download($resource->file_path, $resource->original_filename);
     }
 }

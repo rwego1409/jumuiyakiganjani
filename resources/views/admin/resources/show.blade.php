@@ -7,9 +7,17 @@
             <div class="flex items-center justify-between mb-8">
                 <h2 class="text-3xl font-bold text-blue-700 dark:text-blue-300">Resource Details</h2>
                 <div class="space-x-4">
-                    <a href="{{ route('admin.resources.edit', $resource->id) }}" class="inline-flex items-center px-4 py-2 rounded-xl shadow font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
-                        Edit Resource
-                    </a>
+                    @if(auth()->user()->id === $resource->created_by && $resource->jumuiya_id === null)
+                        <a href="{{ route('admin.resources.edit', $resource->id) }}" class="inline-flex items-center px-4 py-2 rounded-xl shadow font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                            Edit Resource
+                        </a>
+                        <form action="{{ route('admin.resources.destroy', $resource->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Delete this resource?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="inline-flex items-center px-4 py-2 rounded-xl shadow font-semibold text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all">
+                                Delete Resource
+                            </button>
+                        </form>
+                    @endif
                     <a href="{{ route('admin.resources.index') }}" class="inline-flex items-center px-4 py-2 rounded-xl shadow font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-all">
                         Back to List
                     </a>
@@ -31,8 +39,8 @@
                         <div>
                             <dt class="text-sm font-medium text-gray-500">File</dt>
                             <dd class="mt-1 text-blue-700 dark:text-blue-300 font-semibold">
-                                @if($resource->file)
-                                    <a href="{{ asset('storage/' . $resource->file) }}" target="_blank" class="underline">View File</a>
+                                @if($resource->file_path)
+                                    <a href="{{ route('admin.resources.download', $resource->id) }}" class="underline" target="_blank">Download File</a>
                                 @else
                                     -
                                 @endif

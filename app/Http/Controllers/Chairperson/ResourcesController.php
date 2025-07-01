@@ -24,8 +24,11 @@ class ResourcesController extends Controller
             if ($jumuiya) {
                 $query->where(function($q) use ($jumuiya) {
                     $q->where('jumuiya_id', $jumuiya->id)
-                      ->orWhereHas('creator', function($q2) {
-                          $q2->where('role', 'admin');
+                      ->orWhere(function($q2) {
+                          $q2->whereNull('jumuiya_id')
+                             ->whereHas('creator', function($q3) {
+                                 $q3->where('role', 'admin');
+                             });
                       });
                 });
             }
@@ -98,8 +101,9 @@ class ResourcesController extends Controller
         // Handle file upload
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $filePath = $file->store('resources');
+            $filePath = $file->store('resources', 'public');
             $validated['file_path'] = $filePath;
+            $validated['original_filename'] = $file->getClientOriginalName();
         }
 
         $resource = Resource::create($validated);
@@ -145,8 +149,9 @@ class ResourcesController extends Controller
             }
 
             $file = $request->file('file');
-            $filePath = $file->store('resources');
+            $filePath = $file->store('resources', 'public');
             $validated['file_path'] = $filePath;
+            $validated['original_filename'] = $file->getClientOriginalName();
         }
 
         $resource->update($validated);
@@ -176,10 +181,9 @@ class ResourcesController extends Controller
      */
     public function download(Resource $resource): StreamedResponse
     {
-        if (!$resource->file_path || !Storage::exists($resource->file_path)) {
+        if (!$resource->file_path || !\Storage::disk('public')->exists($resource->file_path)) {
             abort(404, __('Resource file not found.'));
         }
-
-        return Storage::download($resource->file_path, basename($resource->file_path));
+        return \Storage::disk('public')->download($resource->file_path, $resource->original_filename);
     }
 }
