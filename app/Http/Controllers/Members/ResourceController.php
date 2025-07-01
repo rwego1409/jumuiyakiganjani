@@ -95,9 +95,7 @@ class ResourceController extends Controller
      */
     public function show(Resource $resource)
     {
-        return view('admin.resources.show', [
-            'resource' => $resource->load(['jumuiya'])
-        ]);
+        return view('member.resources.show', compact('resource'));
     }
 
     /**
@@ -154,14 +152,13 @@ class ResourceController extends Controller
     }
 
     /**
-     * Download the specified resource.
+     * Download the resource file.
      */
     public function download(Resource $resource): StreamedResponse
     {
-        if (!$resource->file_path || !Storage::disk('public')->exists($resource->file_path)) {
-            abort(404);
+        if (!$resource->file_path || !Storage::exists($resource->file_path)) {
+            abort(404, __('Resource file not found.'));
         }
-
-        return response()->download(storage_path('app/public/' . $resource->file_path), $resource->original_filename);
+        return Storage::download($resource->file_path, basename($resource->file_path));
     }
 }

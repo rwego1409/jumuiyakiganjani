@@ -40,8 +40,9 @@
         <span class="text-blue-700 font-semibold text-sm sm:text-base">Secured by ClickPesa</span>
       </div>
       
-      <form id="contributionForm" method="POST" action="{{ route('clickpesa.ussd-push') }}">
+      <form id="contributionForm" method="POST" action="{{ route('member.contributions.initiateClickPesa') }}">
         @csrf
+        <input type="hidden" name="contribution_id" value="{{ $contribution->id ?? '' }}">
         <div class="mb-4 sm:mb-6">
           <label for="amount" class="block text-gray-700 text-sm font-medium mb-2">Amount (TZS)</label>
           <div class="relative">
@@ -57,29 +58,20 @@
           </div>
           <p class="text-gray-500 text-xs sm:text-sm mt-1">Minimum: 1,000 TZS | Maximum: 3,000,000 TZS</p>
         </div>
-
         <div class="mb-6">
           <label for="phone" class="block text-gray-700 text-sm font-medium mb-2">Mobile Number</label>
           <div class="relative">
             <input type="tel" 
                    id="phone" 
-                   name="phoneNumber" 
+                   name="phone" 
                    class="w-full pl-4 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base" 
-                   pattern="0\d{9}|255\d{9}" 
-                   placeholder="0693662424 or 255693662424" 
-                   title="Enter 10 digits starting with 0 or 12 digits starting with 255" 
+                   pattern="255\d{9}" 
+                   placeholder="255693662424" 
+                   title="Enter 12 digits starting with 255" 
                    required>
           </div>
-          <p class="text-gray-500 text-xs sm:text-sm mt-1">Formats: 0693662424 (10 digits) or 255693662424 (12 digits)</p>
+          <p class="text-gray-500 text-xs sm:text-sm mt-1">Format: 255XXXXXXXXX (12 digits)</p>
         </div>
-
-        <input type="hidden" name="orderReference" value="{{ 'ORD-' . uniqid() }}">
-
-        @auth
-          <input type="hidden" name="buyer_email" value="{{ auth()->user()->email }}">
-          <input type="hidden" name="buyer_name" value="{{ auth()->user()->name }}">
-        @endauth
-
         <button type="submit" 
                 id="proceedToPaymentBtn" 
                 class="w-full bg-indigo-600 text-white py-3 sm:py-4 rounded-lg font-medium hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition-colors text-base">

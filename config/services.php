@@ -60,6 +60,8 @@ return [
         'api_key' => env('CLICKPESA_API_KEY'),
         'vendor_id' => env('CLICKPESA_VENDOR_ID'),
         'base_url' => env('CLICKPESA_BASE_URL', 'https://api.clickpesa.com'),
+        'callback_url' => env('NGROK_URL', env('APP_URL')).'/clickpesa/callback',
+        'secret' => env('CLICKPESA_SECRET'),
     ],
 
     'vodacom' => [

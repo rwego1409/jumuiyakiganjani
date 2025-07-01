@@ -13,6 +13,10 @@ class Payment extends Model
         'transaction_id',
         'member_id',
         'course_id',
+        'reference',
+        'status',
+        'user_id',
+        'payment_data',
         // other fields
     ];
 

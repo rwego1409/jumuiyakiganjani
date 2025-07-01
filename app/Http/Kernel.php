@@ -19,6 +19,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \App\Http\Middleware\TrustNgrok::class,
     ];
 
     /**
@@ -75,5 +76,6 @@ class Kernel extends HttpKernel
         'member' => \App\Http\Middleware\MemberMiddleware::class,
         'chairperson' => \App\Http\Middleware\ChairpersonMiddleware::class,
         'super_admin' => \App\Http\Middleware\SuperAdmin::class,
+        'verify.clickpesa.signature' => \App\Http\Middleware\VerifyClickPesaSignature::class,
     ];
 }

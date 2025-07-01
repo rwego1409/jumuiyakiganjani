@@ -242,6 +242,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('/{contribution}', [MemberContributionController::class, 'show'])->name('show');
                 Route::get('/{contribution}/receipt', [MemberContributionController::class, 'downloadReceipt'])->name('receipt');
                 Route::get('/{contribution}/history', [MemberContributionController::class, 'history'])->name('history');
+                Route::post('/initiate-clickpesa', [\App\Http\Controllers\Members\ContributionController::class, 'initiateClickPesa'])
+                    ->name('initiateClickPesa');
             });
 
             // Payments
@@ -291,35 +293,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
     });
 
-    // Test Routes (for development)
-    Route::get('/test-mpesa-token', function () {
-        $mpesaService = app(App\Services\MpesaService::class);
-        return response()->json($mpesaService->testWithDirectToken());
-    });
 
-    Route::get('/send-test-email', function () {
-        Mail::raw('This is a test email sent via Mailtrap.', function ($message) {
-            $message->to('ludovickpancras@gmail.com')->subject('Test Email');
-        });
-        return 'Test email sent!';
-    });
+    
 
-    Route::get('/test-notification', function () {
-        $user = User::first();
-        $user->notify(new TestNotification());
-        return 'Notification sent!';
-    });
-
-    Route::get('/test-assets', function () {
-        return view('asset-test', [
-            'paths' => [
-                asset('admindashboard.png'),
-                asset('admincontributions.png'),
-                asset('adminresources.png')
-            ]
-        ]);
-    });
-
+ 
     Route::get('/payment', function () {
         return view('payment.form');
     })->name('payment.form');
@@ -462,3 +439,41 @@ Route::post('super-admin/jumuiyas/{jumuiya}/verify', [\App\Http\Controllers\Supe
 
 // Super Admin Members - Update Role
 Route::patch('super_admin/members/{member}/update-role', [App\Http\Controllers\SuperAdmin\MembersController::class, 'updateRole'])->name('super_admin.members.updateRole');
+
+// ClickPesa callback route with signature verification middleware
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use App\Models\Contribution;
+
+Route::post('/clickpesa/callback', function (\Illuminate\Http\Request $request) {
+    $signature = hash_hmac('sha256', $request->reference, env('CLICKPESA_API_KEY'));
+    if (!hash_equals($signature, $request->header('X-ClickPesa-Signature'))) {
+        Log::error('Invalid ClickPesa signature', ['ip' => $request->ip(), 'data' => $request->all()]);
+        abort(403);
+    }
+
+    DB::transaction(function () use ($request) {
+        $payment = App\Models\Payment::where('reference', $request->reference)->firstOrFail();
+        $payment->update([
+            'status' => $request->status === 'success' ? 'paid' : 'failed',
+            'payment_data' => $request->all()
+        ]);
+        if ($payment->status === 'paid') {
+            $contribution = Contribution::find($payment->contribution_id);
+            if ($contribution) {
+                $contribution->update(['status' => 'paid']);
+            }
+        }
+    });
+
+    return response()->json(['status' => 'received']);
+});
+
+// Diagnostic route for debugging asset and app URLs
+Route::get('/diag', function() {
+    return response()->json([
+        'asset_url' => asset('css/app.css'),
+        'config_app_url' => config('app.url'),
+        'request_host' => request()->getHost()
+    ]);
+});

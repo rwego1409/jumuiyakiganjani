@@ -200,4 +200,47 @@ class ContributionController extends Controller
         $contribution = Contribution::with(['jumuiya', 'user', 'payments'])->findOrFail($id);
         return view('member.contributions.history', compact('contribution'));
     }
+
+    /**
+     * Initiate ClickPesa payment.
+     */
+    public function initiateClickPesa(Request $request)
+    {
+        $validated = $request->validate([
+            'amount' => 'required|numeric|min:1000',
+            'phone' => 'required|regex:/^255\d{9}$/',
+            'contribution_id' => 'required|exists:contributions,id'
+        ]);
+
+        $reference = 'CP-' . \Illuminate\Support\Str::random(12);
+
+        // Create a pending payment record
+        $payment = \App\Models\Payment::create([
+            'reference' => $reference,
+            'amount' => $validated['amount'],
+            'status' => 'pending',
+            'user_id' => auth()->id(),
+            'contribution_id' => $validated['contribution_id'],
+        ]);
+
+        $response = \Illuminate\Support\Facades\Http::withHeaders([
+            'Authorization' => 'Bearer ' . env('CLICKPESA_API_KEY')
+        ])->post(env('CLICKPESA_BASE_URL').'/v1/payments/hosted', [
+            'amount' => $validated['amount'] * 100,
+            'currency' => 'TZS',
+            'reference' => $reference,
+            'callback_url' => url('/clickpesa/callback'),
+            'success_url' => route('member.contributions.index'),
+            'customer' => [
+                'phone' => $validated['phone'],
+                'email' => auth()->user()->email
+            ]
+        ]);
+
+        if ($response->successful() && isset($response->json()['checkout_url'])) {
+            return redirect($response->json()['checkout_url']);
+        }
+
+        return back()->with('error', 'Payment initiation failed');
+    }
 }
