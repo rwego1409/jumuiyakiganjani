@@ -60,6 +60,48 @@ class MembersController extends Controller
         return view('chairperson.members.create');
     }
 
+    public function edit($id)
+    {
+        $jumuiya = Auth::user()->jumuiyas()->first();
+        $member = Member::findOrFail($id);
+        if (!$jumuiya || $member->jumuiya_id !== $jumuiya->id) {
+            return redirect()->route('chairperson.members.index')
+                ->with('error', 'Unauthorized action.');
+        }
+        return view('chairperson.members.edit', compact('member'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $jumuiya = Auth::user()->jumuiyas()->first();
+        $member = Member::findOrFail($id);
+        if (!$jumuiya || $member->jumuiya_id !== $jumuiya->id) {
+            return redirect()->route('chairperson.members.index')
+                ->with('error', 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $member->user_id,
+            'phone' => 'required|string|max:20',
+            'status' => 'required|in:active,inactive',
+            'joined_date' => 'nullable|date',
+        ]);
+
+        $member->user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ]);
+        $member->update([
+            'phone' => $validated['phone'],
+            'status' => $validated['status'],
+            'joined_date' => $validated['joined_date'],
+        ]);
+
+        return redirect()->route('chairperson.members.index')
+            ->with('success', 'Member updated successfully.');
+    }
+
     public function destroy(Member $member)
     {
         $jumuiya = Auth::user()->jumuiyas()->first();

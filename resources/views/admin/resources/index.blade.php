@@ -123,11 +123,15 @@
                                         Download
                                     </a>
                                     <div class="space-x-2">
-                                        <a href="{{ route('admin.resources.edit', $resource->id) }}" class="text-yellow-700 hover:text-yellow-900 dark:text-yellow-300 dark:hover:text-yellow-100 font-semibold">Edit</a>
-                                        <form action="{{ route('admin.resources.destroy', $resource->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Delete this resource?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 font-semibold">Delete</button>
-                                        </form>
+                                        @can('update', $resource)
+                                            <a href="{{ route('admin.resources.edit', $resource->id) }}" class="text-yellow-700 hover:text-yellow-900 dark:text-yellow-300 dark:hover:text-yellow-100 font-semibold">Edit</a>
+                                        @endcan
+                                        @can('delete', $resource)
+                                            <form action="{{ route('admin.resources.destroy', $resource->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Delete this resource?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 font-semibold">Delete</button>
+                                            </form>
+                                        @endcan
                                     </div>
                                 </div>
                             </div>
@@ -168,19 +172,23 @@
                                                download>
                                                 Download
                                             </a>
-                                            <a href="{{ route('admin.resources.edit', $resource->id) }}" 
-                                               class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300">
-                                                Edit
-                                            </a>
-                                            <form action="{{ route('admin.resources.destroy', $resource->id) }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" 
-                                                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                                                        onclick="return confirm('Are you sure?')">
-                                                    Delete
-                                                </button>
-                                            </form>
+                                            @can('update', $resource)
+                                                <a href="{{ route('admin.resources.edit', $resource->id) }}" 
+                                                   class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300">
+                                                    Edit
+                                                </a>
+                                            @endcan
+                                            @can('delete', $resource)
+                                                <form action="{{ route('admin.resources.destroy', $resource->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                                                            onclick="return confirm('Are you sure?')">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            @endcan
                                         </div>
                                     </td>
                                 </tr>

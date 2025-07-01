@@ -45,17 +45,17 @@
                             <x-input-error :messages="$errors->get('status')" class="mt-2" />
                         </div>
 
-                        <!-- Start Date -->
+                        <!-- Start Date & Time -->
                         <div>
-                            <x-input-label for="start_time" :value="__('Start Date')" />
-                            <x-text-input id="start_time" name="start_time" type="date" class="block mt-1 w-full" value="{{ old('start_time') }}" required />
+                            <x-input-label for="start_time" :value="__('Start Date & Time')" />
+                            <x-text-input id="start_time" name="start_time" type="datetime-local" class="block mt-1 w-full" value="{{ old('start_time') }}" required />
                             <x-input-error :messages="$errors->get('start_time')" class="mt-2" />
                         </div>
 
-                        <!-- End Date -->
+                        <!-- End Date & Time -->
                         <div>
-                            <x-input-label for="end_time" :value="__('End Date')" />
-                            <x-text-input id="end_time" name="end_time" type="date" class="block mt-1 w-full" value="{{ old('end_time') }}" required />
+                            <x-input-label for="end_time" :value="__('End Date & Time')" />
+                            <x-text-input id="end_time" name="end_time" type="datetime-local" class="block mt-1 w-full" value="{{ old('end_time') }}" required />
                             <x-input-error :messages="$errors->get('end_time')" class="mt-2" />
                         </div>
 

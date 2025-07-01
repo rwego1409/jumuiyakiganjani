@@ -54,6 +54,15 @@ class ResourcePolicy
      */
     public function update(User $user, Resource $resource): bool
     {
+        // Admin can update only their own uploads (jumuiya_id null and created_by matches)
+        if ($user->role === 'admin') {
+            return $resource->jumuiya_id === null && $resource->created_by === $user->id;
+        }
+        // Chairperson can update only their own uploads
+        if ($user->role === 'chairperson') {
+            $jumuiya = $user->jumuiyas()->first();
+            return $resource->jumuiya_id === optional($jumuiya)->id && $resource->created_by === $user->id;
+        }
         return false;
     }
 
@@ -62,6 +71,15 @@ class ResourcePolicy
      */
     public function delete(User $user, Resource $resource): bool
     {
+        // Admin can delete only their own uploads (jumuiya_id null and created_by matches)
+        if ($user->role === 'admin') {
+            return $resource->jumuiya_id === null && $resource->created_by === $user->id;
+        }
+        // Chairperson can delete only their own uploads
+        if ($user->role === 'chairperson') {
+            $jumuiya = $user->jumuiyas()->first();
+            return $resource->jumuiya_id === optional($jumuiya)->id && $resource->created_by === $user->id;
+        }
         return false;
     }
 

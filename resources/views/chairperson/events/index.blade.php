@@ -106,32 +106,26 @@
         <div id="cardView">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($events as $event)
-                <div class="event-card bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                    <div class="p-6">
-                        <div class="flex items-center mb-4">
-                            <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-white mr-3">
+                <div class="event-card bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-2xl shadow-xl border border-purple-100 dark:border-purple-900 hover:shadow-2xl hover:scale-105 transition-all duration-200 ease-out relative overflow-hidden">
+                    <div class="absolute inset-0 pointer-events-none bg-gradient-to-br from-purple-100/40 to-indigo-200/20 dark:from-purple-900/30 dark:to-indigo-900/10"></div>
+                    <div class="relative p-6">
+                        <div class="flex items-center mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center shadow text-white mr-3">
                                 <i class="fas fa-calendar"></i>
                             </div>
-                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ $event->name }}</h3>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ $event->title ?? $event->name }}</h3>
                         </div>
-                        
-                        <div class="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                            <i class="fas fa-clock mr-2"></i>
-                            {{ $event->start_time->format('M d, Y h:i A') }}
+                        <div class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                            <span class="font-medium">Date:</span>
+                            {{ $event->start_time ? \Carbon\Carbon::parse($event->start_time)->format('M d, Y h:i A') : '' }}
                         </div>
-                        
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
-                            {{ $event->description }}
-                        </p>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full
-                                {{ $event->status === 'upcoming' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                                : ($event->status === 'ongoing' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300') }}">
-                                {{ ucfirst($event->status) }}
-                            </span>
-                            
+                        <div class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                            <span class="font-medium">Location:</span> {{ $event->location }}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                            <span class="font-medium">Status:</span> {{ ucfirst($event->status) }}
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
                             <div class="space-x-2">
                                 <a href="{{ route('chairperson.events.edit', $event->id) }}"
                                    class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:text-indigo-900 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-800 dark:hover:text-indigo-100 px-3 py-1 rounded font-semibold shadow focus:outline-none focus:ring-2 focus:ring-indigo-400 transition">

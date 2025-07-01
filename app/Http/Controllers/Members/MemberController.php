@@ -87,9 +87,27 @@ class MemberController extends Controller
     // Events
     public function indexEvents()
     {
-        // Fetch all events, ordered by start_time descending, paginated
-        $events = Event::orderBy('start_time', 'desc')->paginate(10);
-
+        $user = auth()->user();
+        $member = $user->member;
+        $events = collect();
+        if ($member && $member->jumuiya_id) {
+            // Events for this member's jumuiya or created by admin
+            $events = Event::whereHas('jumuiyas', function($q) use ($member) {
+                    $q->where('jumuiya_id', $member->jumuiya_id);
+                })
+                ->orWhereHas('creator', function($q) {
+                    $q->where('role', 'admin');
+                })
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        } else {
+            // If not in a jumuiya, only show admin events
+            $events = Event::whereHas('creator', function($q) {
+                    $q->where('role', 'admin');
+                })
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        }
         return view('member.events.index', compact('events'));
     }
 

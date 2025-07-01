@@ -53,7 +53,14 @@ class EventPolicy
      */
     public function update(User $user, Event $event): bool
     {
-        return true;
+        // Only allow admin to update admin events, and chairperson to update their own events
+        if ($user->role === 'admin') {
+            return optional($event->creator)->role === 'admin';
+        }
+        if ($user->role === 'chairperson') {
+            return optional($event->creator)->id === $user->id;
+        }
+        return false;
     }
 
     /**
@@ -61,7 +68,14 @@ class EventPolicy
      */
     public function delete(User $user, Event $event): bool
     {
-        return true;
+        // Only allow admin to delete admin events, and chairperson to delete their own events
+        if ($user->role === 'admin') {
+            return optional($event->creator)->role === 'admin';
+        }
+        if ($user->role === 'chairperson') {
+            return optional($event->creator)->id === $user->id;
+        }
+        return false;
     }
 
     /**

@@ -79,8 +79,8 @@ class ResourceController extends Controller
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $path = $file->store('resources', 'public');
-            $data['file_path'] = $path;
+            $filePath = $file->store('resources', 'public');
+            $data['file_path'] = $filePath;
             $data['original_filename'] = $file->getClientOriginalName();
         }
 
@@ -95,7 +95,9 @@ class ResourceController extends Controller
      */
     public function show(Resource $resource)
     {
-        return view('member.resources.show', compact('resource'));
+        return view('admin.resources.show', [
+            'resource' => $resource->load(['jumuiya'])
+        ]);
     }
 
     /**
@@ -124,8 +126,8 @@ class ResourceController extends Controller
             }
 
             $file = $request->file('file');
-            $path = $file->store('resources', 'public');
-            $data['file_path'] = $path;
+            $filePath = $file->store('resources', 'public');
+            $data['file_path'] = $filePath;
             $data['original_filename'] = $file->getClientOriginalName();
         }
 
@@ -152,13 +154,13 @@ class ResourceController extends Controller
     }
 
     /**
-     * Download the resource file.
+     * Download the specified resource.
      */
     public function download(Resource $resource): StreamedResponse
     {
-        if (!$resource->file_path || !Storage::exists($resource->file_path)) {
-            abort(404, __('Resource file not found.'));
+        if (!$resource->file_path || !\Storage::disk('public')->exists($resource->file_path)) {
+            abort(404);
         }
-        return Storage::download($resource->file_path, basename($resource->file_path));
+        return \Storage::disk('public')->download($resource->file_path, $resource->original_filename);
     }
 }

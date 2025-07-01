@@ -24,74 +24,44 @@
                         {{ __('No resources found') }}
                     </div>
                 @else
-                    <div class="overflow-x-auto rounded-lg">
-                        <table class="min-w-full divide-y divide-pink-200 dark:divide-purple-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Name') }}
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Type') }}
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Description') }}
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Status') }}
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Actions') }}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @foreach($resources as $resource)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                                {{ $resource->name }}
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                {{ ucfirst($resource->type) }}
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
-                                                {{ Str::limit($resource->description, 100) }}
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="inline-flex px-2 text-xs font-semibold rounded-full
-                                                @if($resource->status === 'active') bg-green-100 text-green-800
-                                                @elseif($resource->status === 'inactive') bg-red-100 text-red-800
-                                                @else bg-gray-100 text-gray-800 @endif">
-                                                {{ ucfirst($resource->status) }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                            <a href="{{ route('chairperson.resources.show', $resource->id) }}" 
-                                               class="text-primary-600 hover:text-primary-900 dark:text-primary-500 dark:hover:text-primary-400">
-                                                <i class="fas fa-eye text-yellow-500"></i>
-                                            </a>
-                                            <a href="{{ route('chairperson.resources.edit', $resource->id) }}"
-                                               class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 hover:text-yellow-900 px-3 py-1 rounded font-semibold shadow focus:outline-none focus:ring-2 focus:ring-yellow-400 transition mr-2">
-                                                <i class="fas fa-edit text-yellow-500"></i>
-                                            </a>
-                                            <form action="{{ route('chairperson.resources.destroy', $resource->id) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 hover:text-yellow-900 px-3 py-1 rounded font-semibold shadow focus:outline-none focus:ring-2 focus:ring-yellow-400 transition">
-                                                    <i class="fas fa-trash text-yellow-500"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @foreach($resources as $resource)
+                            <div class="bg-white dark:bg-gray-800 shadow rounded-xl border border-pink-100 dark:border-purple-700 p-6 flex flex-col justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-pink-700 dark:text-pink-200 mb-2">{{ $resource->title ?? $resource->name }}</h3>
+                                    <div class="mb-2">
+                                        <span class="inline-block px-2 py-1 text-xs font-semibold rounded bg-pink-100 text-pink-700 dark:bg-purple-800 dark:text-pink-200">
+                                            {{ ucfirst($resource->type) }}
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">{{ Str::limit($resource->description, 100) }}</p>
+                                </div>
+                                <div class="flex items-center justify-between mt-4">
+                                    <span class="inline-flex px-2 text-xs font-semibold rounded-full
+                                        @if($resource->status === 'active') bg-green-100 text-green-800
+                                        @elseif($resource->status === 'inactive') bg-red-100 text-red-800
+                                        @else bg-gray-100 text-gray-800 @endif">
+                                    {{ ucfirst($resource->status) }}
+                                    </span>
+                                    <div class="space-x-2">
+                                        <a href="{{ route('chairperson.resources.show', $resource->id) }}" class="text-primary-600 hover:text-primary-900 dark:text-primary-500 dark:hover:text-primary-400">
+                                            <i class="fas fa-eye text-yellow-500"></i>
+                                        </a>
+                                        <a href="{{ route('chairperson.resources.edit', $resource->id) }}"
+                                           class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 hover:text-yellow-900 px-3 py-1 rounded font-semibold shadow focus:outline-none focus:ring-2 focus:ring-yellow-400 transition mr-2">
+                                            <i class="fas fa-edit text-yellow-500"></i>
+                                        </a>
+                                        <form action="{{ route('chairperson.resources.destroy', $resource->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 hover:text-yellow-900 px-3 py-1 rounded font-semibold shadow focus:outline-none focus:ring-2 focus:ring-yellow-400 transition">
+                                                <i class="fas fa-trash text-yellow-500"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                     <div class="px-6 py-4">
                         {{ $resources->links() }}

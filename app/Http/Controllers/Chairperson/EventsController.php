@@ -142,6 +142,9 @@ class EventsController extends Controller
             'model_type' => Event::class,
             'model_id' => $event->id,
             'properties' => $event->toArray(),
+            'activity_type' => 'event',
+            'loggable_type' => Event::class,
+            'loggable_id' => $event->id,
         ]);
 
         Log::info('Event created by chairperson', [
@@ -235,6 +238,9 @@ class EventsController extends Controller
             'model_type' => Event::class,
             'model_id' => $event->id,
             'properties' => $event->toArray(),
+            'activity_type' => 'event',
+            'loggable_type' => Event::class,
+            'loggable_id' => $event->id,
         ]);
 
         Log::info('Event updated successfully', [
@@ -272,6 +278,9 @@ class EventsController extends Controller
             'model_type' => Event::class,
             'model_id' => $event->id,
             'properties' => $event->toArray(),
+            'activity_type' => 'event',
+            'loggable_type' => Event::class,
+            'loggable_id' => $event->id,
         ]);
         $eventId = $event->id;
         $event->delete();

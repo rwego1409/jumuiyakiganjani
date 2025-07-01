@@ -15,8 +15,13 @@ class ResourcesController extends Controller
      */
     public function index()
     {
-        $resources = Resource::orderBy('created_at', 'desc')
-                      ->paginate(10); // 10 items per page
+        $user = auth()->user();
+        // Only show resources created by admins (global or jumuiya-specific)
+        $resources = Resource::whereHas('creator', function ($q) {
+                $q->whereIn('role', ['admin', 'super_admin']);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         return view('admin.resources.index', compact('resources'));
     }
@@ -49,22 +54,22 @@ class ResourcesController extends Controller
             'type' => 'required|string|in:document,video,audio,image,other',
             'description' => 'nullable|string',
             'file' => 'required|file|mimes:pdf,jpeg,png,jpg,docx,mp4,mov,mp3,wav|max:20480',
-            'jumuiya_id' => 'required|exists:jumuiyas,id' // Add validation
+            'jumuiya_id' => 'required',
         ]);
-    
+
         $file = $request->file('file');
-        
+        $jumuiya_id = $validated['jumuiya_id'] === 'all' ? null : $validated['jumuiya_id'];
         $resource = Resource::create([
             'title' => $validated['title'],
             'type' => $validated['type'],
             'description' => $validated['description'],
-            'jumuiya_id' => $validated['jumuiya_id'], // Add this line
+            'jumuiya_id' => $jumuiya_id,
             'file_path' => $file->store('resources', 'public'),
             'original_filename' => $file->getClientOriginalName(),
             'file_size' => round($file->getSize() / 1024),
             'file_extension' => $file->getClientOriginalExtension(),
+            'created_by' => auth()->id(),
         ]);
-    
         return redirect()->route('admin.resources.show', $resource->id)
                        ->with('success', 'Resource created successfully');
     }
@@ -137,19 +142,9 @@ class ResourcesController extends Controller
         ];
 
         if ($request->hasFile('file')) {
-            // Delete old file
-            Storage::delete('public/' . $resource->file_path);
-
-            // Store new file
             $file = $request->file('file');
-            $filePath = $file->store('resources', 'public');
-            
-            $updateData = array_merge($updateData, [
-                'file_path' => $filePath,
-                'original_filename' => $file->getClientOriginalName(),
-                'file_size' => round($file->getSize() / 1024),
-                'file_extension' => $file->getClientOriginalExtension(),
-            ]);
+            $updateData['file_path'] = $file->store('resources', 'public');
+            $updateData['original_filename'] = $file->getClientOriginalName();
         }
 
         $resource->update($updateData);
@@ -177,18 +172,11 @@ class ResourcesController extends Controller
     }
 
     public function download(Resource $resource)
-{
-    // Verify the resource exists and user has permission
-    if (!$resource->exists) {
-        abort(404);
+    {
+        if (!$resource->file_path || !\Storage::disk('public')->exists($resource->file_path)) {
+            abort(404);
+        }
+        $filename = $resource->original_filename ?? basename($resource->file_path);
+        return \Storage::disk('public')->download($resource->file_path, $filename);
     }
-
-    $filePath = storage_path('app/' . $resource->file_path);
-    
-    if (!file_exists($filePath)) {
-        abort(404, 'The requested file does not exist.');
-    }
-
-    return response()->download($filePath, $resource->original_name);
-}
 }
