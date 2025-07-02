@@ -2,6 +2,12 @@
 @section('content')
 <div class="max-w-4xl mx-auto py-8">
     <h2 class="text-2xl font-bold mb-4">All Member Contributions (Cash & Digital)</h2>
+    
+    <div class="mt-6 flex justify-end mb-4">
+        <a href="{{ route('chairperson.contributions.create') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg font-semibold shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
+            <i class="fas fa-plus mr-2"></i> Record Cash Contribution
+        </a>
+    </div>
     <div class="bg-white rounded-lg shadow overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -36,11 +42,6 @@
         <div class="px-4 py-3">
             {{ $contributions->links() }}
         </div>
-    </div>
-    <div class="mt-6 flex justify-end">
-        <a href="{{ route('chairperson.contributions.create') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg font-semibold shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
-            <i class="fas fa-plus mr-2"></i> Record Cash Contribution
-        </a>
     </div>
 </div>
 @endsection

@@ -49,10 +49,10 @@
                         <span class="hidden md:inline xl:inline">{{ __('Chairpersons') }}</span>
                         <span class="hidden md:inline xl:hidden">Chairs</span>
                     </x-nav-link>
-                    <x-nav-link :href="route('super_admin.admins.index')" :active="request()->routeIs('super_admin.admins.*')">
+                    <x-nav-link :href="route('super_admin.users.index')" :active="request()->routeIs('super_admin.users.*')">
                         <i class="fas fa-user-shield mr-1 text-indigo-500"></i>
-                        <span class="hidden md:inline xl:inline">{{ __('Admins') }}</span>
-                        <span class="hidden md:inline xl:hidden">Adm</span>
+                        <span class="hidden md:inline xl:inline">{{ __('Users') }}</span>
+                        <span class="hidden md:inline xl:hidden">Users</span>
                     </x-nav-link>
                     <x-nav-link :href="route('super_admin.notifications.index')" :active="request()->routeIs('super_admin.notifications.*')">
                         <i class="fas fa-bell mr-1 text-yellow-500"></i>
@@ -204,9 +204,9 @@
                 <i class="fas fa-user-tie mr-3 text-pink-500 w-5 text-center"></i>
                 {{ __('Chairpersons') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('super_admin.admins.index')" :active="request()->routeIs('super_admin.admins.*')" class="flex items-center min-h-[44px]">
+            <x-responsive-nav-link :href="route('super_admin.users.index')" :active="request()->routeIs('super_admin.users.*')" class="flex items-center min-h-[44px]">
                 <i class="fas fa-user-shield mr-3 text-indigo-500 w-5 text-center"></i>
-                {{ __('Admins') }}
+                {{ __('Users') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('super_admin.notifications.index')" :active="request()->routeIs('super_admin.notifications.*')" class="flex items-center min-h-[44px]">
                 <i class="fas fa-bell mr-3 text-yellow-500 w-5 text-center"></i>

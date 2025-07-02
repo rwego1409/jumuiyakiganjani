@@ -5,14 +5,14 @@
         notificationsOpen: false,
         darkMode: (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches))
     }" 
-    class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 shadow-lg" 
-    aria-label="Member navigation">
+    class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 shadow-lg fixed w-full z-30 top-0 left-0" 
+    aria-label="Super Admin navigation">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
             <!-- Left Side -->
             <div class="flex items-center space-x-2">
-                <!-- Mobile Menu Button (move before logo) -->
+                <!-- Mobile Menu Button -->
                 <button @click="mobileMenuOpen = !mobileMenuOpen"
                         class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 sm:hidden mr-2"
                         aria-controls="mobile-menu"
@@ -24,7 +24,7 @@
                 </button>
                 <!-- Branding -->
                 <div class="flex-shrink-0 min-w-0">
-                    <a href="<?php echo e(route('member.dashboard')); ?>" class="flex items-center group focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-md min-w-0" aria-label="Dashboard">
+                    <a href="<?php echo e(route('super_admin.dashboard')); ?>" class="flex items-center group focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-md min-w-0" aria-label="Dashboard">
                         <svg class="h-8 w-8 text-primary-600 group-hover:text-primary-700 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
@@ -37,14 +37,14 @@
                 <div class="hidden sm:flex sm:items-center sm:ml-4 space-x-2">
                     <?php if (isset($component)) { $__componentOriginalc295f12dca9d42f28a259237a5724830 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalc295f12dca9d42f28a259237a5724830 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.nav-link','data' => ['href' => route('member.dashboard'),'active' => request()->routeIs('member.dashboard')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.nav-link','data' => ['href' => route('super_admin.dashboard'),'active' => request()->routeIs('super_admin.dashboard')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('nav-link'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('member.dashboard')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('member.dashboard'))]); ?>
+<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('super_admin.dashboard')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('super_admin.dashboard'))]); ?>
                         <i class="fas fa-tachometer-alt mr-1 text-primary-500"></i>
                         <span class="hidden md:inline"><?php echo e(__('Dashboard')); ?></span>
                         <span class="md:hidden">Dash</span>
@@ -60,17 +60,16 @@
 <?php endif; ?>
                     <?php if (isset($component)) { $__componentOriginalc295f12dca9d42f28a259237a5724830 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalc295f12dca9d42f28a259237a5724830 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.nav-link','data' => ['href' => route('member.contributions.index'),'active' => request()->routeIs('member.contributions.*')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.nav-link','data' => ['href' => route('super_admin.jumuiyas.index'),'active' => request()->routeIs('super_admin.jumuiyas.*')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('nav-link'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('member.contributions.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('member.contributions.*'))]); ?>
-                        <i class="fas fa-hand-holding-usd mr-1 text-green-500"></i>
-                        <span class="hidden md:inline"><?php echo e(__('Contributions')); ?></span>
-                        <span class="md:hidden">Contr.</span>
+<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('super_admin.jumuiyas.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('super_admin.jumuiyas.*'))]); ?>
+                        <i class="fas fa-users-cog mr-1 text-orange-500"></i>
+                        <span><?php echo e(__('Jumuiyas')); ?></span>
                      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalc295f12dca9d42f28a259237a5724830)): ?>
@@ -81,19 +80,19 @@
 <?php $component = $__componentOriginalc295f12dca9d42f28a259237a5724830; ?>
 <?php unset($__componentOriginalc295f12dca9d42f28a259237a5724830); ?>
 <?php endif; ?>
-                    <?php if(Route::has('member.events.index')): ?>
                     <?php if (isset($component)) { $__componentOriginalc295f12dca9d42f28a259237a5724830 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalc295f12dca9d42f28a259237a5724830 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.nav-link','data' => ['href' => route('member.events.index'),'active' => request()->routeIs('member.events.*')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.nav-link','data' => ['href' => route('super_admin.chairpersons.index'),'active' => request()->routeIs('super_admin.chairpersons.*')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('nav-link'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('member.events.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('member.events.*'))]); ?>
-                        <i class="fas fa-calendar-alt mr-1 text-purple-500"></i>
-                        <span><?php echo e(__('Events')); ?></span>
+<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('super_admin.chairpersons.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('super_admin.chairpersons.*'))]); ?>
+                        <i class="fas fa-user-tie mr-1 text-pink-500"></i>
+                        <span class="hidden md:inline xl:inline"><?php echo e(__('Chairpersons')); ?></span>
+                        <span class="hidden md:inline xl:hidden">Chairs</span>
                      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalc295f12dca9d42f28a259237a5724830)): ?>
@@ -104,21 +103,19 @@
 <?php $component = $__componentOriginalc295f12dca9d42f28a259237a5724830; ?>
 <?php unset($__componentOriginalc295f12dca9d42f28a259237a5724830); ?>
 <?php endif; ?>
-                    <?php endif; ?>
-                    <?php if(Route::has('member.resources.index')): ?>
                     <?php if (isset($component)) { $__componentOriginalc295f12dca9d42f28a259237a5724830 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalc295f12dca9d42f28a259237a5724830 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.nav-link','data' => ['href' => route('member.resources.index'),'active' => request()->routeIs('member.resources.*')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.nav-link','data' => ['href' => route('super_admin.users.index'),'active' => request()->routeIs('super_admin.users.*')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('nav-link'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('member.resources.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('member.resources.*'))]); ?>
-                        <i class="fas fa-file-alt mr-1 text-yellow-500"></i>
-                        <span class="hidden md:inline"><?php echo e(__('Resources')); ?></span>
-                        <span class="md:hidden">Res.</span>
+<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('super_admin.users.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('super_admin.users.*'))]); ?>
+                        <i class="fas fa-user-shield mr-1 text-indigo-500"></i>
+                        <span class="hidden md:inline xl:inline"><?php echo e(__('Users')); ?></span>
+                        <span class="hidden md:inline xl:hidden">Users</span>
                      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalc295f12dca9d42f28a259237a5724830)): ?>
@@ -129,20 +126,19 @@
 <?php $component = $__componentOriginalc295f12dca9d42f28a259237a5724830; ?>
 <?php unset($__componentOriginalc295f12dca9d42f28a259237a5724830); ?>
 <?php endif; ?>
-                    <?php endif; ?>
                     <?php if (isset($component)) { $__componentOriginalc295f12dca9d42f28a259237a5724830 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalc295f12dca9d42f28a259237a5724830 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.nav-link','data' => ['href' => route('member.notifications.index'),'active' => request()->routeIs('member.notifications.*')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.nav-link','data' => ['href' => route('super_admin.notifications.index'),'active' => request()->routeIs('super_admin.notifications.*')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('nav-link'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('member.notifications.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('member.notifications.*'))]); ?>
-                        <i class="fas fa-bell mr-1 text-red-500"></i>
-                        <span class="hidden md:inline"><?php echo e(__('Notifications')); ?></span>
-                        <span class="md:hidden">Notif</span>
+<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('super_admin.notifications.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('super_admin.notifications.*'))]); ?>
+                        <i class="fas fa-bell mr-1 text-yellow-500"></i>
+                        <span class="hidden md:inline lg:inline"><?php echo e(__('Notifications')); ?></span>
+                        <span class="hidden md:inline lg:hidden">Notif</span>
                      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalc295f12dca9d42f28a259237a5724830)): ?>
@@ -400,14 +396,14 @@
         <div class="px-2 py-3 space-y-1">
             <?php if (isset($component)) { $__componentOriginald69b52d99510f1e7cd3d80070b28ca18 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald69b52d99510f1e7cd3d80070b28ca18 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.responsive-nav-link','data' => ['href' => route('member.dashboard'),'active' => request()->routeIs('member.dashboard'),'class' => 'flex items-center min-h-[44px]']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.responsive-nav-link','data' => ['href' => route('super_admin.dashboard'),'active' => request()->routeIs('super_admin.dashboard'),'class' => 'flex items-center min-h-[44px]']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('responsive-nav-link'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('member.dashboard')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('member.dashboard')),'class' => 'flex items-center min-h-[44px]']); ?>
+<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('super_admin.dashboard')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('super_admin.dashboard')),'class' => 'flex items-center min-h-[44px]']); ?>
                 <i class="fas fa-tachometer-alt mr-3 text-primary-500 w-5 text-center"></i>
                 <?php echo e(__('Dashboard')); ?>
 
@@ -423,16 +419,16 @@
 <?php endif; ?>
             <?php if (isset($component)) { $__componentOriginald69b52d99510f1e7cd3d80070b28ca18 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald69b52d99510f1e7cd3d80070b28ca18 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.responsive-nav-link','data' => ['href' => route('member.contributions.index'),'active' => request()->routeIs('member.contributions.*'),'class' => 'flex items-center min-h-[44px]']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.responsive-nav-link','data' => ['href' => route('super_admin.jumuiyas.index'),'active' => request()->routeIs('super_admin.jumuiyas.*'),'class' => 'flex items-center min-h-[44px]']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('responsive-nav-link'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('member.contributions.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('member.contributions.*')),'class' => 'flex items-center min-h-[44px]']); ?>
-                <i class="fas fa-hand-holding-usd mr-3 text-green-500 w-5 text-center"></i>
-                <?php echo e(__('Contributions')); ?>
+<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('super_admin.jumuiyas.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('super_admin.jumuiyas.*')),'class' => 'flex items-center min-h-[44px]']); ?>
+                <i class="fas fa-users-cog mr-3 text-orange-500 w-5 text-center"></i>
+                <?php echo e(__('Jumuiyas')); ?>
 
              <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -446,16 +442,16 @@
 <?php endif; ?>
             <?php if (isset($component)) { $__componentOriginald69b52d99510f1e7cd3d80070b28ca18 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald69b52d99510f1e7cd3d80070b28ca18 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.responsive-nav-link','data' => ['href' => route('member.events.index'),'active' => request()->routeIs('member.events.*'),'class' => 'flex items-center min-h-[44px]']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.responsive-nav-link','data' => ['href' => route('super_admin.chairpersons.index'),'active' => request()->routeIs('super_admin.chairpersons.*'),'class' => 'flex items-center min-h-[44px]']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('responsive-nav-link'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('member.events.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('member.events.*')),'class' => 'flex items-center min-h-[44px]']); ?>
-                <i class="fas fa-calendar-alt mr-3 text-purple-500 w-5 text-center"></i>
-                <?php echo e(__('Events')); ?>
+<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('super_admin.chairpersons.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('super_admin.chairpersons.*')),'class' => 'flex items-center min-h-[44px]']); ?>
+                <i class="fas fa-user-tie mr-3 text-pink-500 w-5 text-center"></i>
+                <?php echo e(__('Chairpersons')); ?>
 
              <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -469,16 +465,16 @@
 <?php endif; ?>
             <?php if (isset($component)) { $__componentOriginald69b52d99510f1e7cd3d80070b28ca18 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald69b52d99510f1e7cd3d80070b28ca18 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.responsive-nav-link','data' => ['href' => route('member.resources.index'),'active' => request()->routeIs('member.resources.*'),'class' => 'flex items-center min-h-[44px]']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.responsive-nav-link','data' => ['href' => route('super_admin.users.index'),'active' => request()->routeIs('super_admin.users.*'),'class' => 'flex items-center min-h-[44px]']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('responsive-nav-link'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('member.resources.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('member.resources.*')),'class' => 'flex items-center min-h-[44px]']); ?>
-                <i class="fas fa-file-alt mr-3 text-yellow-500 w-5 text-center"></i>
-                <?php echo e(__('Resources')); ?>
+<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('super_admin.users.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('super_admin.users.*')),'class' => 'flex items-center min-h-[44px]']); ?>
+                <i class="fas fa-user-shield mr-3 text-indigo-500 w-5 text-center"></i>
+                <?php echo e(__('Users')); ?>
 
              <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -492,15 +488,15 @@
 <?php endif; ?>
             <?php if (isset($component)) { $__componentOriginald69b52d99510f1e7cd3d80070b28ca18 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald69b52d99510f1e7cd3d80070b28ca18 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.responsive-nav-link','data' => ['href' => route('member.notifications.index'),'active' => request()->routeIs('member.notifications.*'),'class' => 'flex items-center min-h-[44px]']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.responsive-nav-link','data' => ['href' => route('super_admin.notifications.index'),'active' => request()->routeIs('super_admin.notifications.*'),'class' => 'flex items-center min-h-[44px]']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('responsive-nav-link'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('member.notifications.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('member.notifications.*')),'class' => 'flex items-center min-h-[44px]']); ?>
-                <i class="fas fa-bell mr-3 text-red-500 w-5 text-center"></i>
+<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('super_admin.notifications.index')),'active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('super_admin.notifications.*')),'class' => 'flex items-center min-h-[44px]']); ?>
+                <i class="fas fa-bell mr-3 text-yellow-500 w-5 text-center"></i>
                 <?php echo e(__('Notifications')); ?>
 
              <?php echo $__env->renderComponent(); ?>
@@ -514,7 +510,7 @@
 <?php unset($__componentOriginald69b52d99510f1e7cd3d80070b28ca18); ?>
 <?php endif; ?>
         </div>
-        <!-- Mobile Profile Section (Simplified - removed duplicate dark mode toggle) -->
+        <!-- Mobile Profile Section -->
         <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-750">
             <div class="flex items-center">
                 <div class="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-semibold mr-3">
@@ -523,7 +519,7 @@
                 </div>
                 <div>
                     <div class="text-base font-medium text-gray-800 dark:text-gray-200"><?php echo e(Auth::user()->name); ?></div>
-                    <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Member</div>
+                    <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Super Admin</div>
                 </div>
             </div>
             <div class="mt-3 space-y-1">
@@ -585,4 +581,11 @@
          @click="mobileMenuOpen = false"
          class="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden"
          style="display: none;"></div>
-</nav><?php /**PATH C:\xampp\htdocs\jumuiyakiganjani\resources\views/member/partials/navigation.blade.php ENDPATH**/ ?>
+</nav>
+
+<!-- Main Content -->
+<div class="pt-16 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto py-6">
+        <!-- Your content goes here -->
+    </div>
+</div><?php /**PATH C:\xampp\htdocs\jumuiyakiganjani\resources\views/super_admin/partials/navigation.blade.php ENDPATH**/ ?>

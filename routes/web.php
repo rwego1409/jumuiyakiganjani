@@ -67,10 +67,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Jumuiya Management
             Route::resource('jumuiyas', App\Http\Controllers\SuperAdmin\JumuiyaController::class);
 
-            // Admin Management
-            Route::resource('admins', App\Http\Controllers\Admin\AdminManagementController::class);
-            Route::get('admins/{admin}/activities', [App\Http\Controllers\Admin\AdminManagementController::class, 'activities'])
-                ->name('admins.activities');
+            // User Management
+            Route::resource('users', App\Http\Controllers\SuperAdmin\UserManagementController::class);
 
             // Chairpersons Management
             Route::resource('chairpersons', App\Http\Controllers\SuperAdmin\ChairpersonsController::class);
