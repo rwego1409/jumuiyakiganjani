@@ -252,10 +252,3 @@
          class="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden"
          style="display: none;"></div>
 </nav>
-
-<!-- Main Content -->
-<div class="pt-16 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-7xl mx-auto py-6">
-        <!-- Your content goes here -->
-    </div>
-</div>

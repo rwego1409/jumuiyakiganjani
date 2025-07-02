@@ -1,15 +1,15 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-blue-900 dark:via-gray-800 dark:to-blue-900">
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-blue-900 dark:via-gray-800 dark:to-blue-900 pt-16">
     <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <!-- Header Section -->
         <div class="mb-8">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                 <div>
-                    <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent drop-shadow-lg md:text-5xl lg:text-6xl">
+<h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">
                         <span class="inline-block align-middle">
-                            <svg class="w-10 h-10 mr-2 inline-block text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 mr-2 inline-block text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m13-6.13V7a4 4 0 00-3-3.87M6 4.13A4 4 0 019 4h6a4 4 0 013 3.87v2.13M12 14v6m0 0a2 2 0 01-2-2h4a2 2 0 01-2 2z"/>
                             </svg>
                         </span>

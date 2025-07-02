@@ -29,6 +29,11 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    // ZenoPay configuration
+    'zenopay' => [
+        'base_url' => env('ZENOPAY_BASE_URL', 'https://zenoapi.com/api'),
+        'api_key' => env('ZENOPAY_API_KEY'),
+    ],
 
     'whatsapp' => [
         'api_url' => env('WHATSAPP_API_URL', 'https://graph.facebook.com/v17.0'),
@@ -55,14 +60,7 @@ return [
         'callback_url' => env('MPESA_CALLBACK_URL'),
     ],
 
-    'clickpesa' => [
-        'client_id' => env('CLICKPESA_CLIENT_ID'),
-        'api_key' => env('CLICKPESA_API_KEY'),
-        'vendor_id' => env('CLICKPESA_VENDOR_ID'),
-        'base_url' => env('CLICKPESA_BASE_URL', 'https://api.clickpesa.com'),
-        'callback_url' => env('NGROK_URL', env('APP_URL')).'/clickpesa/callback',
-        'secret' => env('CLICKPESA_SECRET'),
-    ],
+    // ...existing code...
 
     'vodacom' => [
         'api_key' => env('VODACOM_API_KEY'),
@@ -75,8 +73,5 @@ return [
     'token' => env('PALMPESA_TOKEN'),
 ],
 
-    'zenopay' => [
-        'api_key' => env('ZENOPAY_API_KEY', 'YOUR_API_KEY_HERE'),
-        'base_url' => env('ZENOPAY_BASE_URL', 'https://zenoapi.com/api/payments'),
-    ],
+    // ...existing code...
 ];

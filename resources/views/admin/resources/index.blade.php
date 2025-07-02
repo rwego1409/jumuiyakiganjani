@@ -10,7 +10,7 @@
 </div>
 @endif
 
-<div class="py-4 sm:py-8 bg-gradient-to-br from-yellow-50 via-white to-yellow-100 dark:from-yellow-900 dark:via-gray-800 dark:to-yellow-900 min-h-screen">
+<div class="py-12 bg-gradient-to-br from-yellow-50 via-white to-yellow-100 dark:from-yellow-900 dark:via-gray-800 dark:to-yellow-900 min-h-screen">
     <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="p-4 sm:p-6">
@@ -20,7 +20,7 @@
                         <svg class="h-8 w-8 text-yellow-500 dark:text-yellow-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <h2 class="text-xl sm:text-2xl font-semibold text-yellow-900 dark:text-yellow-100">Resources Management</h2>
+<h2 class="text-3xl font-bold text-yellow-900 dark:text-yellow-100">Resources Management</h2>
                     </div>
                     <!-- Controls Section -->
                     <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto">

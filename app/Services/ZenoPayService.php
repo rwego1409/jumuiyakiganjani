@@ -1,88 +1,55 @@
 <?php
-
 namespace App\Services;
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class ZenoPayService
 {
-    protected $apiKey;
     protected $baseUrl;
+    protected $apiKey;
 
     public function __construct()
     {
+        $this->baseUrl = rtrim(config('services.zenopay.base_url'), '/');
         $this->apiKey = config('services.zenopay.api_key');
-        $this->baseUrl = config('services.zenopay.base_url', 'https://zenoapi.com/api/payments');
     }
 
-    public function initiatePayment($phone, $amount, $reference, $webhookUrl = null, $buyerEmail = null, $buyerName = null)
+    public function initiatePayment(array $payload)
     {
-        $orderData = [
-            'order_id'    => $reference,
-            'buyer_email' => $buyerEmail ?? (auth()->user()->email ?? 'customer@example.com'),
-            'buyer_name'  => $buyerName ?? (auth()->user()->name ?? 'Member'),
-            'buyer_phone' => $phone,
-            'amount'      => $amount,
-            'webhook_url' => $webhookUrl ?? route('zenopay.webhook'),
-        ];
 
-        $ch = curl_init(rtrim($this->baseUrl, '/') . '/mobile_money_tanzania');
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST           => true,
-            CURLOPT_HTTPHEADER     => [
-                'Content-Type: application/json',
-                'x-api-key: ' . $this->apiKey,
-            ],
-            CURLOPT_POSTFIELDS     => json_encode($orderData),
-        ]);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-        curl_close($ch);
-
-        if ($response === false || $httpCode !== 200) {
-            Log::error('ZenoPay Error', ['error' => $error, 'response' => $response, 'http' => $httpCode]);
-            return [
-                'status' => 'error',
-                'message' => $error ?: $response,
-            ];
+        // Always append webhook_url if not set, using ngrok or fallback
+        if (!isset($payload['webhook_url'])) {
+            $payload['webhook_url'] = $this->getAutoWebhookUrl();
         }
 
-        $data = json_decode($response, true);
-        return $data;
+        $response = Http::withHeaders([
+            'X-API-Key' => $this->apiKey,
+            'Accept' => 'application/json'
+        ])->post("{$this->baseUrl}/payments/mobile_money_tanzania", $payload);
+
+        return $response->throw()->json();
     }
 
-    public function checkStatus($orderId)
+    public function checkOrderStatus(string $orderId)
     {
-        $url = rtrim($this->baseUrl, '/') . '/order-status?order_id=' . urlencode($orderId);
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER     => [
-                'x-api-key: ' . $this->apiKey,
-            ],
-        ]);
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-        curl_close($ch);
-        if ($response === false || $httpCode !== 200) {
-            return [
-                'status' => 'error',
-                'message' => $error ?: $response,
-            ];
+        return Http::withHeaders([
+            'X-API-Key' => $this->apiKey
+        ])->get("{$this->baseUrl}/payments/order-status", [
+            'order_id' => $orderId
+        ])->throw()->json();
+    }
+
+    protected function getAutoWebhookUrl(): string
+    {
+        // Always use the current host, works for any ngrok or prod
+        $scheme = request()->getScheme();
+        $host = request()->getHost();
+        $port = request()->getPort();
+        $base = $scheme . '://' . $host;
+        if ($port && !in_array($port, [80, 443])) {
+            $base .= ":$port";
         }
-        $responseData = json_decode($response, true);
-        if (!empty($responseData['data']) && ($responseData['result'] ?? '') === 'SUCCESS') {
-            return $responseData;
-        } else {
-            return [
-                'status' => 'error',
-                'message' => $responseData['message'] ?? 'Unknown error',
-            ];
-        }
+        return rtrim($base, '/') . '/api/webhook/zenopay';
     }
 }

@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="py-6 bg-gradient-to-br from-purple-50 via-white to-purple-100 dark:from-purple-900 dark:via-gray-800 dark:to-purple-900 min-h-screen">
+<div class="py-12 bg-gradient-to-br from-purple-50 via-white to-purple-100 dark:from-purple-900 dark:via-gray-800 dark:to-purple-900 min-h-screen">
   <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
     <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg">
       <div class="p-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-semibold text-purple-900 dark:text-purple-100">Events Management</h2>
+<h2 class="text-3xl font-bold text-purple-900 dark:text-purple-100">Events Management</h2>
           <a href="{{ route('admin.events.create') }}"
              class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
             Create New Event
