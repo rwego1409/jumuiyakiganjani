@@ -73,6 +73,21 @@ class ReportsController extends Controller
                 return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\ResourcesExport($resourcesQuery), 'resources_report.csv', \Maatwebsite\Excel\Excel::CSV);
             }
         }
+
+        if ($type === 'contributions') {
+            $contributionsQuery = \App\Models\Contribution::with(['member.user'])
+                ->whereIn('jumuiya_id', $jumuiyaIds)
+                ->whereBetween('created_at', [$start_date, $end_date]);
+            $contributions = $contributionsQuery->get();
+            if ($format === 'pdf') {
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('chairperson.reports.contributions_pdf', ['contributions' => $contributions]);
+                return $pdf->download('contributions_report.pdf');
+            } elseif ($format === 'excel' || $format === 'xlsx') {
+                return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\ContributionsExport($contributionsQuery), 'contributions_report.xlsx');
+            } elseif ($format === 'csv') {
+                return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\ContributionsExport($contributionsQuery), 'contributions_report.csv', \Maatwebsite\Excel\Excel::CSV);
+            }
+        }
         abort(404, 'Report type or format not supported.');
     }
 }

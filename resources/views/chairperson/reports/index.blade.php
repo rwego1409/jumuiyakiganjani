@@ -38,6 +38,35 @@
             </div>
         </div>
 
+        <!-- Contributions Report Card -->
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        {{ __('Contributions Report') }}
+                    </h3>
+                    <i class="fas fa-donate text-2xl text-green-500"></i>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    {{ __('Generate detailed reports of all contributions with filtering options.') }}
+                </p>
+                <div class="space-y-3">
+                    <a href="{{ route('chairperson.reports.generate', ['type' => 'contributions', 'format' => 'pdf']) }}"
+                       class="block w-full py-2 px-4 text-sm text-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50 transition-colors duration-200">
+                        <i class="fas fa-file-pdf mr-2"></i>{{ __('Download PDF') }}
+                    </a>
+                    <a href="{{ route('chairperson.reports.generate', ['type' => 'contributions', 'format' => 'xlsx']) }}"
+                       class="block w-full py-2 px-4 text-sm text-center rounded-md bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50 transition-colors duration-200">
+                        <i class="fas fa-file-excel mr-2"></i>{{ __('Download Excel') }}
+                    </a>
+                    <a href="{{ route('chairperson.reports.generate', ['type' => 'contributions', 'format' => 'csv']) }}"
+                       class="block w-full py-2 px-4 text-sm text-center rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors duration-200">
+                        <i class="fas fa-file-csv mr-2"></i>{{ __('Download CSV') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <!-- Events Report Card -->
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="p-6">

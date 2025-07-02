@@ -58,10 +58,18 @@
                         <span class="md:hidden">Res.</span>
                     </x-nav-link>
                     @endif
-                    <x-nav-link :href="route('member.notifications.index')" :active="request()->routeIs('member.notifications.*')">
+                    <x-nav-link :href="route('member.notifications.index')" :active="request()->routeIs('member.notifications.*')" class="relative">
                         <i class="fas fa-bell mr-1 text-red-500"></i>
                         <span class="hidden md:inline">{{ __('Notifications') }}</span>
                         <span class="md:hidden">Notif</span>
+                        @php
+                            $unreadCount = Auth::user()->unreadNotifications()->count();
+                        @endphp
+                        @if($unreadCount > 0)
+                            <span class="absolute top-0 right-0 mt-0.5 ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full z-10">
+                                {{ $unreadCount }}
+                            </span>
+                        @endif
                     </x-nav-link>
                 </div>
             </div>
@@ -212,9 +220,17 @@
                 <i class="fas fa-file-alt mr-3 text-yellow-500 w-5 text-center"></i>
                 {{ __('Resources') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('member.notifications.index')" :active="request()->routeIs('member.notifications.*')" class="flex items-center min-h-[44px]">
+            <x-responsive-nav-link :href="route('member.notifications.index')" :active="request()->routeIs('member.notifications.*')" class="flex items-center min-h-[44px] relative">
                 <i class="fas fa-bell mr-3 text-red-500 w-5 text-center"></i>
                 {{ __('Notifications') }}
+                @php
+                    $unreadCount = Auth::user()->unreadNotifications()->count();
+                @endphp
+                @if($unreadCount > 0)
+                    <span class="absolute top-1 right-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full z-10">
+                        {{ $unreadCount }}
+                    </span>
+                @endif
             </x-responsive-nav-link>
         </div>
         <!-- Mobile Profile Section (Simplified - removed duplicate dark mode toggle) -->

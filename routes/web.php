@@ -126,6 +126,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('/', [App\Http\Controllers\Chairperson\NotificationController::class, 'index'])->name('index');
                 Route::get('/create', [App\Http\Controllers\Chairperson\NotificationController::class, 'create'])->name('create');
                 Route::post('/', [App\Http\Controllers\Chairperson\NotificationController::class, 'store'])->name('store');
+                Route::get('/{notification}/edit', [App\Http\Controllers\Chairperson\NotificationController::class, 'edit'])->name('edit');
+                Route::put('/{notification}', [App\Http\Controllers\Chairperson\NotificationController::class, 'update'])->name('update');
+                Route::delete('/{notification}', [App\Http\Controllers\Chairperson\NotificationController::class, 'destroy'])->name('destroy');
                 Route::get('/{notification}', [App\Http\Controllers\Chairperson\NotificationController::class, 'show'])->name('show');
                 Route::post('/mark-all-read', [App\Http\Controllers\Chairperson\NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
             });

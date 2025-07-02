@@ -1,0 +1,39 @@
+public function edit($id)
+{
+    $jumuiya = $this->getJumuiya();
+    $notification = \App\Models\JumuiyaNotification::where('id', $id)
+        ->where('jumuiya_id', $jumuiya ? $jumuiya->id : 0)
+        ->firstOrFail();
+    $members = $jumuiya ? $jumuiya->members()->with('user')->get() : collect();
+    return view('chairperson.notifications.edit', compact('notification', 'members'));
+}
+
+public function update(Request $request, $id)
+{
+    $jumuiya = $this->getJumuiya();
+    $notification = \App\Models\JumuiyaNotification::where('id', $id)
+        ->where('jumuiya_id', $jumuiya ? $jumuiya->id : 0)
+        ->firstOrFail();
+
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'message' => 'required|string',
+        'type' => 'required|in:general,alert,reminder,update',
+        'recipient_type' => 'required|in:all,specific',
+        'member_ids' => 'required_if:recipient_type,specific|array',
+        'member_ids.*' => 'exists:members,id',
+        'action_url' => 'nullable|url'
+    ]);
+
+    $notification->update([
+        'title' => $validated['title'],
+        'message' => $validated['message'],
+        'type' => $validated['type'],
+        'recipient_type' => $validated['recipient_type'],
+        'action_url' => $validated['action_url'] ?? null,
+        'member_ids' => $validated['recipient_type'] === 'specific' ? $validated['member_ids'] : null,
+    ]);
+
+    return redirect()->route('chairperson.notifications.index')
+        ->with('success', 'Notification updated successfully.');
+}

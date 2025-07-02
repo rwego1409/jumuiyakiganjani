@@ -12,43 +12,11 @@ class NotificationController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $role = $user->role;
-        $member = $user->member;
-        $jumuiyaId = $member ? $member->jumuiya_id : null;
-
-        // Admin notifications sent to all
-        $adminNotifications = \App\Models\AdminNotification::whereJsonContains('recipients', 'all')
-            ->orderByDesc('created_at')
-            ->get();
-
-        // Jumuiya notifications for this member's jumuiya
-        $jumuiyaNotifications = $jumuiyaId
-            ? \App\Models\JumuiyaNotification::where('jumuiya_id', $jumuiyaId)
-                ->orderByDesc('created_at')
-                ->get()
-            : collect();
-
-        // Merge all and sort by date
-        $allNotifications = $adminNotifications
-            ->concat($jumuiyaNotifications)
-            ->sortByDesc(function($n) {
-                return $n->created_at;
-            })->values();
-
-        // Paginate manually (since it's a collection)
-        $perPage = 10;
-        $page = request()->get('page', 1);
-        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
-            $allNotifications->forPage($page, $perPage),
-            $allNotifications->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
+        $notifications = $user->notifications()->latest()->paginate(10);
 
         return view('notifications.index', [
-            'notifications' => $paginated,
-            'role' => $role
+            'notifications' => $notifications,
+            'role' => $user->role
         ]);
     }
 

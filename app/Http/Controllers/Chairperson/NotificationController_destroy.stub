@@ -1,0 +1,10 @@
+public function destroy($id)
+{
+    $jumuiya = $this->getJumuiya();
+    $notification = \App\Models\JumuiyaNotification::where('id', $id)
+        ->where('jumuiya_id', $jumuiya ? $jumuiya->id : 0)
+        ->firstOrFail();
+    $notification->delete();
+    return redirect()->route('chairperson.notifications.index')
+        ->with('success', 'Notification deleted successfully.');
+}
