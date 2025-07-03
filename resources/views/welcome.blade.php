@@ -46,35 +46,6 @@
         </div>
     </div>
 
-    <!-- Dashboard Preview -->
-    <div class="mt-16 relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div class="dashboard-preview p-2 shadow-2xl border border-indigo-200 dark:border-indigo-800 transition-all duration-300">
-            <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden transition-colors duration-300">
-                <!-- Window Controls -->
-                <div class="h-8 bg-gray-100 dark:bg-gray-900 flex items-center px-4 transition-colors duration-300">
-                    <div class="flex space-x-2">
-                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                    </div>
-                    <div class="mx-auto text-xs text-gray-600 dark:text-gray-400 transition-colors duration-300">
-                        Jumuiya Kiganjani Dashboard
-                    </div>
-                </div>
-                
-                <!-- Dashboard Content -->
-                <div class="h-[600px] sm:h-[90vh] flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-                    <div class="text-center p-8">
-                        <div class="mx-auto bg-indigo-100 dark:bg-indigo-900 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                            <i class="fas fa-users text-indigo-600 dark:text-indigo-300 text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Admin Dashboard</h3>
-                        <p class="text-gray-600 dark:text-gray-300">Complete overview of your community with key metrics and management tools</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Stats Section -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">

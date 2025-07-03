@@ -1,6 +1,4 @@
-@extends('layouts.chairperson')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-100 dark:from-pink-900 dark:via-gray-800 dark:to-purple-900 py-12">
     <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 py-6">
         <div class="bg-white/80 dark:bg-purple-900/80 backdrop-blur-md shadow-2xl rounded-2xl border border-pink-200/60 dark:border-purple-700/60 p-8">
@@ -10,30 +8,38 @@
                 Create Notification
             </h2>
 
-            @if(session('success'))
+            <?php if(session('success')): ?>
             <div class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700">
-                {{ session('success') }}
-            </div>
-            @endif
+                <?php echo e(session('success')); ?>
 
-            @if(isset($noJumuiya) && $noJumuiya)
+            </div>
+            <?php endif; ?>
+
+            <?php if(isset($noJumuiya) && $noJumuiya): ?>
                 <div class="max-w-2xl mx-auto mt-8 p-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded">
                     <strong>Notice:</strong> You are not currently assigned to a Jumuiya. Please contact your system administrator to be assigned before sending notifications.
                 </div>
-            @else
-            <form action="{{ route('chairperson.notifications.store') }}" method="POST" class="space-y-6">
-                @csrf
+            <?php else: ?>
+            <form action="<?php echo e(route('chairperson.notifications.store')); ?>" method="POST" class="space-y-6">
+                <?php echo csrf_field(); ?>
 
                 <div>
                     <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Title
                     </label>
-                    <input type="text" name="title" id="title" value="{{ old('title') }}"
+                    <input type="text" name="title" id="title" value="<?php echo e(old('title')); ?>"
                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
                            required autofocus placeholder="Enter notification title">
-                    @error('title')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    <?php $__errorArgs = ['title'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <p class="mt-1 text-sm text-red-600"><?php echo e($message); ?></p>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <div>
@@ -42,10 +48,17 @@
                     </label>
                     <textarea name="message" id="message" rows="5"
                               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                              required placeholder="Enter detailed notification message">{{ old('message') }}</textarea>
-                    @error('message')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                              required placeholder="Enter detailed notification message"><?php echo e(old('message')); ?></textarea>
+                    <?php $__errorArgs = ['message'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <p class="mt-1 text-sm text-red-600"><?php echo e($message); ?></p>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <div>
@@ -54,14 +67,21 @@
                     </label>
                     <select name="type" id="type"
                             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
-                        <option value="general" {{ old('type') == 'general' ? 'selected' : '' }}>General Notification</option>
-                        <option value="alert" {{ old('type') == 'alert' ? 'selected' : '' }}>Alert</option>
-                        <option value="reminder" {{ old('type') == 'reminder' ? 'selected' : '' }}>Reminder</option>
-                        <option value="update" {{ old('type') == 'update' ? 'selected' : '' }}>System Update</option>
+                        <option value="general" <?php echo e(old('type') == 'general' ? 'selected' : ''); ?>>General Notification</option>
+                        <option value="alert" <?php echo e(old('type') == 'alert' ? 'selected' : ''); ?>>Alert</option>
+                        <option value="reminder" <?php echo e(old('type') == 'reminder' ? 'selected' : ''); ?>>Reminder</option>
+                        <option value="update" <?php echo e(old('type') == 'update' ? 'selected' : ''); ?>>System Update</option>
                     </select>
-                    @error('type')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    <?php $__errorArgs = ['type'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <p class="mt-1 text-sm text-red-600"><?php echo e($message); ?></p>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <div>
@@ -71,7 +91,8 @@
                     <div class="mt-2 space-y-4">
                         <div class="flex items-center">
                             <input type="radio" name="recipient_type" id="all" value="all"
-                                   {{ old('recipient_type', 'all') == 'all' ? 'checked' : '' }}
+                                   <?php echo e(old('recipient_type', 'all') == 'all' ? 'checked' : ''); ?>
+
                                    class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 dark:border-gray-600">
                             <label for="all" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 All members of my Jumuiya
@@ -79,55 +100,80 @@
                         </div>
                         <div class="flex items-center">
                             <input type="radio" name="recipient_type" id="specific" value="specific"
-                                   {{ old('recipient_type') == 'specific' ? 'checked' : '' }}
+                                   <?php echo e(old('recipient_type') == 'specific' ? 'checked' : ''); ?>
+
                                    class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 dark:border-gray-600">
                             <label for="specific" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Select specific members
                             </label>
                         </div>
                     </div>
-                    @error('recipient_type')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    <?php $__errorArgs = ['recipient_type'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <p class="mt-1 text-sm text-red-600"><?php echo e($message); ?></p>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
 
-                <div id="member-selection" class="{{ old('recipient_type') == 'specific' ? '' : 'hidden' }}">
+                <div id="member-selection" class="<?php echo e(old('recipient_type') == 'specific' ? '' : 'hidden'); ?>">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Select Members
                     </label>
                     <div class="mt-2 max-h-60 overflow-y-auto space-y-2">
-                        @foreach($members as $member)
+                        <?php $__currentLoopData = $members; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $member): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="flex items-center">
-                                <input type="checkbox" name="member_ids[]" value="{{ $member->id }}"
-                                       {{ in_array($member->id, old('member_ids', [])) ? 'checked' : '' }}
+                                <input type="checkbox" name="member_ids[]" value="<?php echo e($member->id); ?>"
+                                       <?php echo e(in_array($member->id, old('member_ids', [])) ? 'checked' : ''); ?>
+
                                        class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 dark:border-gray-600">
                                 <label class="ml-3 text-sm text-gray-700 dark:text-gray-300">
-                                    {{ $member->user->name }}
+                                    <?php echo e($member->user->name); ?>
+
                                 </label>
                             </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
-                    @error('member_ids')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    <?php $__errorArgs = ['member_ids'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <p class="mt-1 text-sm text-red-600"><?php echo e($message); ?></p>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <div>
                     <label for="action_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Action Link (optional)
                     </label>
-                    <input type="url" name="action_url" id="action_url" value="{{ old('action_url') }}"
+                    <input type="url" name="action_url" id="action_url" value="<?php echo e(old('action_url')); ?>"
                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
                            placeholder="https://example.com/action">
                     <p class="mt-1 text-sm text-gray-500">URL to direct users when they click the notification</p>
-                    @error('action_url')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    <?php $__errorArgs = ['action_url'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <p class="mt-1 text-sm text-red-600"><?php echo e($message); ?></p>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <!-- <div class="flex items-center">
                     <input type="checkbox" name="whatsapp_reminder" id="whatsapp_reminder" value="1"
-                           {{ old('whatsapp_reminder') ? 'checked' : '' }}
+                           <?php echo e(old('whatsapp_reminder') ? 'checked' : ''); ?>
+
                            class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 dark:border-gray-600">
                     <label for="whatsapp_reminder" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Also send as WhatsApp message
@@ -135,7 +181,7 @@
                 </div> -->
 
                 <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <a href="{{ route('chairperson.notifications.index') }}"
+                    <a href="<?php echo e(route('chairperson.notifications.index')); ?>"
                         class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Cancel
                     </a>
@@ -145,12 +191,12 @@
                     </button>
                 </div>
             </form>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 </div>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const recipientTypeInputs = document.querySelectorAll('input[name="recipient_type"]');
@@ -168,5 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleMemberSelection();
 });
 </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.chairperson', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\jumuiyakiganjani\resources\views/chairperson/notifications/create.blade.php ENDPATH**/ ?>
